@@ -1348,12 +1348,13 @@ document.addEventListener('click', (e) => {
     if (e.target.closest('.sheet-backdrop')) return;
     if (e.target.closest('.text-segment')) return;
     if (e.target.closest('.audio-segment')) return;
+    if (e.target.closest('.bg-segment')) return;
+    if (e.target.closest('.seg-handle')) return;
     if (e.target.closest('.playhead')) return;
     if (e.target.closest('.playhead-cap')) return;
     clearSelection();
   }
 }, true);
-
 /* ============================================
    Misc
    ============================================ */
