@@ -35,9 +35,6 @@ let _resize = null;
 let _move = null;
 let _longPressTimer = null;
 
-/* ============================================
-   Init
-   ============================================ */
 document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
   initAudioSegmentListeners();
@@ -65,9 +62,6 @@ function renderAll() {
   renderLyricsList();
 }
 
-/* ============================================
-   Card Entry Animation
-   ============================================ */
 function playCardAnimation() {
   const banner = document.getElementById('cardBanner');
   const info = document.getElementById('cardInfo');
@@ -81,9 +75,6 @@ function playCardAnimation() {
   setTimeout(() => { if (footer) footer.classList.add('show'); }, 1500);
 }
 
-/* ============================================
-   Helpers
-   ============================================ */
 function hasAudio() {
   return state.audioUrl && state.audioDuration > 0;
 }
@@ -96,9 +87,6 @@ function fileToTimeline(fileSec) {
   return state.audioStart + (fileSec - state.audioTrimIn);
 }
 
-/* ============================================
-   Tabs
-   ============================================ */
 function openTab(tabName, btnEl) {
   if (currentTab === tabName) { closeSheet(); return; }
   currentTab = tabName;
@@ -121,9 +109,6 @@ function closeSheet() {
   if (sb) sb.classList.remove('open');
 }
 
-/* ============================================
-   Audio Upload
-   ============================================ */
 function initAudioUpload() {
   const input = document.getElementById('audioInput');
   if (!input) return;
@@ -213,9 +198,6 @@ function initAudioSegmentListeners() {
   audioSeg.addEventListener('touchstart', lp, { passive: true });
 }
 
-/* ============================================
-   Lyrics List
-   ============================================ */
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
   state.lyrics.push({ text: '', start: startAt, duration: 3, glass: false });
@@ -257,9 +239,6 @@ function renderLyricsList() {
   });
 }
 
-/* ============================================
-   Timeline Duration
-   ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
   if (hasAudio()) {
@@ -268,9 +247,6 @@ function getTimelineDuration() {
   return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
-/* ============================================
-   Ruler
-   ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
   if (!ruler) return;
@@ -286,9 +262,6 @@ function renderRuler() {
   }
 }
 
-/* ============================================
-   Timeline
-   ============================================ */
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
   if (!trackText) return;
@@ -338,9 +311,6 @@ function renderTimeline() {
   setTimeout(checkAllTextOverlaps, 10);
 }
 
-/* ============================================
-   Selection
-   ============================================ */
 function selectText(index) {
   state.selectedType = 'text';
   state.selectedIndex = index;
@@ -460,9 +430,6 @@ function cmAction(action) {
   }
 }
 
-/* ============================================
-   Resize
-   ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
@@ -570,9 +537,6 @@ function onResizeEnd() {
   }
 }
 
-/* ============================================
-   Text Overlap
-   ============================================ */
 function checkTextOverlap() {
   const segs = document.querySelectorAll('.text-segment');
   segs.forEach(s => s.classList.remove('overlap'));
@@ -597,9 +561,6 @@ function checkAllTextOverlaps() {
   checkTextOverlap();
 }
 
-/* ============================================
-   Long Press → Text
-   ============================================ */
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -664,17 +625,14 @@ function startLongPressText(e, index, segEl) {
       document.addEventListener('touchend', onEndFn);
     } else {
       document.addEventListener('mousemove', onMoveFn);
-      document.addEventListener('mouseup',[ onEndFn);
+      document.addEventListener('mouseup', onEndFn);
     }
   }, LONG_PRESS_MS);
 }
 
-/* ============================================
-0   Long Press → Audio
-   ============================================ */
-function start].LongPressAudio(e, segEl) {
-  const cxclient = e.touches ? e.touches[Y0].clientX : e.clientX;
-  : const cy = e.touches ? e.touches e.clientY;
+function startLongPressAudio(e, segEl) {
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
   let cancelled = false;
 
   const cancelIfMove = (ev) => {
@@ -743,9 +701,6 @@ function start].LongPressAudio(e, segEl) {
   }, LONG_PRESS_MS);
 }
 
-/* ============================================
-   Playhead Position
-   ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
@@ -757,9 +712,6 @@ function setPlayheadPosition(sec) {
   updateTimeDisplay();
 }
 
-/* ============================================
-   Playhead Drag
-   ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
   const vp = document.getElementById('timelineViewport');
@@ -842,9 +794,6 @@ function setupPlayheadDrag() {
   });
 }
 
-/* ============================================
-   Playhead Loop
-   ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
   _lastRAFTime = performance.now();
@@ -926,9 +875,6 @@ function autoScrollPlayhead() {
   }
 }
 
-/* ============================================
-   Sync Playhead → Lyric
-   ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
   let idx = -1;
@@ -969,9 +915,6 @@ function renderLyricFromPlayhead(idx) {
   currEl.classList.add('animate-in');
 }
 
-/* ============================================
-   Play / Pause
-   ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const isAudioActive = hasAudio();
@@ -1024,9 +967,6 @@ function fmt(s) {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 
-/* ============================================
-   Font Controls
-   ============================================ */
 function setupFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1068,9 +1008,6 @@ function applyFont() {
   });
 }
 
-/* ============================================
-   Font Filter
-   ============================================ */
 function setFontFilter(filter, btnEl) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
@@ -1081,9 +1018,6 @@ function setFontFilter(filter, btnEl) {
   });
 }
 
-/* ============================================
-   Aspect Ratio
-   ============================================ */
 function setAspectRatio(ratio, btnEl) {
   const frame = document.getElementById('previewFrame');
   if (!frame) return;
@@ -1093,9 +1027,6 @@ function setAspectRatio(ratio, btnEl) {
   if (navigator.vibrate) try { navigator.vibrate(8); } catch (err) {}
 }
 
-/* ============================================
-   Background Upload
-   ============================================ */
 function initBgUpload() {
   const bgInput = document.getElementById('bgInput');
   if (!bgInput) return;
@@ -1123,9 +1054,6 @@ function removeBackground() {
   document.getElementById('bgInput').value = '';
 }
 
-/* ============================================
-   Instagram
-   ============================================ */
 function initIgInput() {
   const igInput = document.getElementById('igNameInput');
   if (!igInput) return;
@@ -1142,9 +1070,6 @@ function openInstagram() {
   window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
 }
 
-/* ============================================
-   Tap → Hide Menu
-   ============================================ */
 document.addEventListener('click', (e) => {
   if (state.selectedType) {
     if (e.target.closest('.capcut-menu')) return;
@@ -1159,9 +1084,6 @@ document.addEventListener('click', (e) => {
   }
 }, true);
 
-/* ============================================
-   Misc
-   ============================================ */
 function closeEditor() {
   if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
 }
