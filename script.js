@@ -1210,9 +1210,41 @@ function initBgUpload() {
     document.getElementById('bgPreview').classList.remove('hidden');
     document.getElementById('bgPreviewImg').src = state.bgUrl;
     document.getElementById('bgPreviewName').textContent = file.name;
+
+    // ✅ Update segment + show filters + apply
+    const filtersBox = document.getElementById('bgFiltersBox');
+    if (filtersBox) filtersBox.style.display = 'block';
+    updateBgSegment();
+    applyBgFilters();
+    renderRuler();
   });
 }
+/* ============================================
+   🎨 BG Segment Listeners
+   ============================================ */
+function initBgSegmentListeners() {
+  const seg = document.getElementById('bgSegment');
+  if (!seg) return;
 
+  // Click → Select
+  seg.addEventListener('click', function(e) {
+    if (e.target.classList.contains('seg-handle')) return;
+    selectBg();
+  });
+
+  // Handles (Resize) — يمين ويسار
+  const hL = document.createElement('div');
+  hL.className = 'seg-handle handle-left';
+  hL.addEventListener('mousedown', function(e) { startResize(e, 0, 'left'); });
+  hL.addEventListener('touchstart', function(e) { startResize(e, 0, 'left'); }, { passive: false });
+  seg.appendChild(hL);
+
+  const hR = document.createElement('div');
+  hR.className = 'seg-handle handle-right';
+  hR.addEventListener('mousedown', function(e) { startResize(e, 0, 'right'); });
+  hR.addEventListener('touchstart', function(e) { startResize(e, 0, 'right'); }, { passive: false });
+  seg.appendChild(hR);
+}
 function removeBackground() {
   if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
   state.bgUrl = null;
@@ -1224,6 +1256,16 @@ function removeBackground() {
   document.getElementById('bgUploadBtn').classList.remove('hidden');
   document.getElementById('bgPreview').classList.add('hidden');
   document.getElementById('bgInput').value = '';
+
+  // ✅ Hide filters + Hide segment
+  const filtersBox = document.getElementById('bgFiltersBox');
+  if (filtersBox) filtersBox.style.display = 'none';
+  updateBgSegment();
+
+  // If bg was selected, clear
+  if (state.selectedType === 'bg') {
+    clearSelection();
+  }
 }
 
 /* ============================================
