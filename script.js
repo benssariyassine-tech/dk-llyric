@@ -1,14 +1,16 @@
 /* ============================================
-   🎯 dk.llyric — CapCut-Style Editor Logic
+   🎯 dk.llyric — Editor Logic v3 (Smooth + Fade)
    ============================================ */
 
-const PX_PER_SEC = 22;
+const PX_PER_SEC = 30; // سرعة أكبر = سحب أسرع
+const LONG_PRESS_MS = 400;
+
 const state = {
-  coverUrl: null,
   audioUrl: null,
   audioDuration: 0,
   currentTime: 0,
   isPlaying: false,
+  isLooping: false,
   songName: 'راجع',
   artistName: 'عمرو دياب',
   lyrics: [
@@ -16,11 +18,19 @@ const state = {
     { text: 'راجع', start: 4, duration: 3 }
   ],
   activeSegment: -1,
-  font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff', anim: 'fadeUp' }
+  font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff', anim: 'fadeUp' },
+  audioEffects: {
+    fadeIn: { enabled: false, duration: 1 },
+    fadeOut: { enabled: false, duration: 1 },
+    speed: 1,
+    reverb: 0
+  }
 };
 
 let currentTab = null;
-let dragState = { active: false, offsetX: 0, offsetY: 0 };
+let _resize = null;
+let _move = null;
+let _longPressTimer = null;
 
 // ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLyricDrag();
   setupPlayheadDrag();
   initFontControls();
+  initAudioEffects();
 });
 
 /* ============================================
@@ -79,10 +90,8 @@ function initAudioUpload() {
     document.getElementById('audioPreview').classList.remove('hidden');
     document.getElementById('audioPreviewName').textContent = file.name;
     document.getElementById('audioPreviewMeta').textContent = (file.size/(1024*1024)).toFixed(1) + ' MB';
-    // أظهر في timeline
     document.getElementById('audioSegment').classList.remove('hidden');
     document.getElementById('audioAddBtn').classList.add('hidden');
-    document.getElementById('audioLabel').textContent = 'Imported audio';
   });
 }
 function removeAudio() {
@@ -97,8 +106,71 @@ function removeAudio() {
   document.getElementById('audioAddBtn').classList.remove('hidden');
   updateTimeDisplay();
 }
-function openAudioPicker() {
-  document.getElementById('audioInput').click();
+function openAudioPicker() { document.getElementById('audioInput').click(); }
+
+/* ============================================
+   🎚️ Audio Effects
+   ============================================ */
+function initAudioEffects() {
+  // Fade In
+  const fadeInItem = document.getElementById('fadeInItem');
+  if (fadeInItem) {
+    fadeInItem.addEventListener('click', () => {
+      state.audioEffects.fadeIn.enabled = !state.audioEffects.fadeIn.enabled;
+      fadeInItem.classList.toggle('active', state.audioEffects.fadeIn.enabled);
+      applyAudioFade();
+    });
+  }
+  const fadeInSlider = document.getElementById('fadeInSlider');
+  if (fadeInSlider) {
+    fadeInSlider.addEventListener('input', (e) => {
+      state.audioEffects.fadeIn.duration = parseFloat(e.target.value);
+      document.getElementById('fadeInVal').textContent = e.target.value + 's';
+      applyAudioFade();
+    });
+  }
+  // Fade Out
+  const fadeOutItem = document.getElementById('fadeOutItem');
+  if (fadeOutItem) {
+    fadeOutItem.addEventListener('click', () => {
+      state.audioEffects.fadeOut.enabled = !state.audioEffects.fadeOut.enabled;
+      fadeOutItem.classList.toggle('active', state.audioEffects.fadeOut.enabled);
+      applyAudioFade();
+    });
+  }
+  const fadeOutSlider = document.getElementById('fadeOutSlider');
+  if (fadeOutSlider) {
+    fadeOutSlider.addEventListener('input', (e) => {
+      state.audioEffects.fadeOut.duration = parseFloat(e.target.value);
+      document.getElementById('fadeOutVal').textContent = e.target.value + 's';
+      applyAudioFade();
+    });
+  }
+  // Audio cards
+  document.querySelectorAll('.audio-effect-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const effect = card.dataset.effect;
+      if (effect === 'speed') {
+        const speeds = [1, 0.75, 1.25, 1.5];
+        const cur = speeds.indexOf(state.audioEffects.speed);
+        state.audioEffects.speed = speeds[(cur + 1) % speeds.length];
+        card.querySelector('.audio-effect-desc').textContent = state.audioEffects.speed + 'x';
+      } else if (effect === 'reverb') {
+        state.audioEffects.reverb = state.audioEffects.reverb > 0 ? 0 : 0.3;
+        card.classList.toggle('active', state.audioEffects.reverb > 0);
+        card.querySelector('.audio-effect-desc').textContent = state.audioEffects.reverb > 0 ? 'ON' : 'OFF';
+      }
+      applyAudioEffects();
+    });
+  });
+}
+
+function applyAudioFade() {
+  // في المرحلة الجاية راح نطبقوها على الملف الصوتي
+  console.log('Fade In:', state.audioEffects.fadeIn, 'Fade Out:', state.audioEffects.fadeOut);
+}
+function applyAudioEffects() {
+  console.log('Audio Effects:', state.audioEffects);
 }
 
 /* ============================================
@@ -147,7 +219,7 @@ function renderLyricsList() {
 }
 
 /* ============================================
-   🎞️ Timeline
+   🎞️ Timeline (LTR)
    ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
@@ -169,27 +241,43 @@ function renderTimeline() {
   state.lyrics.forEach((lyric, index) => {
     const seg = document.createElement('div');
     seg.className = 'text-segment' + (index === state.activeSegment ? ' active' : '');
+    // نستعملو margin-left باش نحترمو الـ start (LTR)
     seg.style.width = (lyric.duration * PX_PER_SEC) + 'px';
+    seg.style.marginLeft = (lyric.start * PX_PER_SEC) + 'px';
     seg.textContent = lyric.text || `السطر ${index + 1}`;
     seg.dataset.index = index;
-    seg.addEventListener('click', () => {
-      state.activeSegment = index;
-      renderTimeline();
-      renderPreview();
+
+    // مقبض يسار
+    const hL = document.createElement('div');
+    hL.className = 'seg-handle left';
+    hL.addEventListener('mousedown', e => startResize(e, index, 'left'));
+    hL.addEventListener('touchstart', e => startResize(e, index, 'left'), { passive: false });
+    seg.appendChild(hL);
+
+    // مقبض يمين
+    const hR = document.createElement('div');
+    hR.className = 'seg-handle right';
+    hR.addEventListener('mousedown', e => startResize(e, index, 'right'));
+    hR.addEventListener('touchstart', e => startResize(e, index, 'right'), { passive: false });
+    seg.appendChild(hR);
+
+    // سحب الكامل (Move)
+    seg.addEventListener('mousedown', e => {
+      if (e.target.classList.contains('seg-handle')) return;
+      startLongPress(e, index, seg);
     });
-    // Handle يمين + يسار
-    ['left', 'right'].forEach(side => {
-      const handle = document.createElement('div');
-      handle.className = `seg-handle ${side}`;
-      handle.addEventListener('mousedown', e => startResize(e, index, side));
-      handle.addEventListener('touchstart', e => startResize(e, index, side), { passive: false });
-      seg.appendChild(handle);
-    });
+    seg.addEventListener('touchstart', e => {
+      if (e.target.classList.contains('seg-handle')) return;
+      startLongPress(e, index, seg);
+    }, { passive: true });
+
     trackText.appendChild(seg);
   });
 }
 
-let _resize = { active: false, index: 0, side: 'right', startX: 0, startDur: 0, startStart: 0 };
+/* ============================================
+   🎯 Resize (يمين / يسار)
+   ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
@@ -209,24 +297,28 @@ function startResize(e, index, side) {
   }
 }
 function onResizeMove(e) {
-  if (!_resize.active) return;
+  if (!_resize || !_resize.active) return;
   e.preventDefault();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  // ✅ LTR: drag right = +
   const dx = clientX - _resize.startX;
-  const deltaSec = -dx / PX_PER_SEC;
+  const deltaSec = dx / PX_PER_SEC;
+
   if (_resize.side === 'right') {
-    let d = Math.max(0.5, Math.min(30, _resize.startDur + deltaSec));
+    // المقبض اليمين: كي نسحبو لليمين، المدة تزيد
+    const d = Math.max(0.5, Math.min(30, _resize.startDur + deltaSec));
     state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
   } else {
-    let s = Math.max(0, _resize.startStart + deltaSec);
-    let d = Math.max(0.5, _resize.startDur - deltaSec);
+    // المقبض اليسار: كي نسحبو لليمين، البداية تزيد والمدة تنقص
+    const s = Math.max(0, _resize.startStart + deltaSec);
+    const d = Math.max(0.5, _resize.startDur - deltaSec);
     state.lyrics[_resize.index].start = Math.round(s * 10) / 10;
     state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
   }
   renderTimeline();
 }
 function onResizeEnd() {
-  _resize.active = false;
+  if (_resize) _resize.active = false;
   document.body.style.userSelect = '';
   document.removeEventListener('mousemove', onResizeMove);
   document.removeEventListener('mouseup', onResizeEnd);
@@ -235,7 +327,73 @@ function onResizeEnd() {
 }
 
 /* ============================================
-   ▶️ Playhead Scrub
+   👆 Long Press + Move (نقل السطر كامل)
+   ============================================ */
+function startLongPress(e, index, segEl) {
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  _longPressTimer = setTimeout(() => {
+    // Long press نجح
+    segEl.classList.add('long-pressing');
+    if (navigator.vibrate) try { navigator.vibrate(15); } catch(e) {}
+
+    // ابدأ Move
+    _move = {
+      active: true, index, startX: clientX, startY: clientY,
+      startStart: state.lyrics[index].start, segEl,
+      longPressDetected: true
+    };
+    document.body.style.userSelect = 'none';
+    if (e.touches) {
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onMoveEnd);
+    } else {
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onMoveEnd);
+    }
+  }, LONG_PRESS_MS);
+
+  // إذا المستخدم حرك قبل ما يكمل Long Press → نلغيه
+  const cancelLongPress = () => {
+    clearTimeout(_longPressTimer);
+    _longPressTimer = null;
+  };
+  if (e.touches) {
+    document.addEventListener('touchmove', cancelLongPress, { once: true });
+  }
+  document.addEventListener('mouseup', cancelLongPress, { once: true });
+}
+
+function onMove(e) {
+  if (!_move || !_move.active) return;
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const dx = clientX - _move.startX;
+  const deltaSec = dx / PX_PER_SEC;
+  const newStart = Math.max(0, _move.startStart + deltaSec);
+  state.lyrics[_move.index].start = Math.round(newStart * 10) / 10;
+  renderTimeline();
+  // حافظ على التحديد
+  const segs = document.querySelectorAll('.text-segment');
+  if (segs[_move.index]) segs[_move.index].classList.add('long-pressing');
+}
+
+function onMoveEnd() {
+  if (_move) {
+    if (_move.segEl) _move.segEl.classList.remove('long-pressing');
+    _move.active = false;
+  }
+  _move = null;
+  document.body.style.userSelect = '';
+  document.removeEventListener('mousemove', onMove);
+  document.removeEventListener('mouseup', onMoveEnd);
+  document.removeEventListener('touchmove', onMove);
+  document.removeEventListener('touchend', onMoveEnd);
+}
+
+/* ============================================
+   ▶️ Playhead
    ============================================ */
 function setupPlayheadDrag() {
   const playhead = document.getElementById('playhead');
@@ -275,7 +433,7 @@ function syncPlayheadToLyric() {
 }
 
 /* ============================================
-   ▶️ Play/Pause
+   ▶️ Play / Pause / Loop
    ============================================ */
 function togglePlay() {
   if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
@@ -285,6 +443,7 @@ function togglePlay() {
     state.isPlaying = false;
   } else {
     player.currentTime = state.currentTime;
+    player.playbackRate = state.audioEffects.speed || 1;
     player.play();
     state.isPlaying = true;
   }
@@ -309,7 +468,6 @@ function fmt(s) {
   return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
 }
 
-// audio timeupdate
 setInterval(() => {
   const player = document.getElementById('audioPlayer');
   if (player && !player.paused && !player.ended) {
@@ -340,7 +498,6 @@ function renderPreview() {
   if (lyricEl) {
     const a = state.lyrics[state.activeSegment];
     lyricEl.textContent = (a && a.text) ? a.text : (state.lyrics[0].text || 'اكتب الكلمات');
-    // أنيميشن fade up
     const el = document.getElementById('lyricElement');
     if (el) {
       el.style.animation = 'none';
@@ -352,18 +509,30 @@ function renderPreview() {
 }
 
 /* ============================================
-   🎯 Lyric Drag
+   🎯 Lyric Drag (في المعاينة)
    ============================================ */
 function initLyricDrag() {
   const el = document.getElementById('lyricElement');
   if (!el) return;
-  let start = { x: 0, y: 0, tx: 0, ty: 0 };
+  let start = { x: 0, y: 0 };
   const onDown = (e) => {
     const touch = e.touches ? e.touches[0] : e;
     start.x = touch.clientX; start.y = touch.clientY;
-    start.tx = el.offsetLeft; start.ty = el.offsetTop;
     el.classList.add('dragging');
     selectLyric();
+    const onMove = (ev) => {
+      const t = ev.touches ? ev.touches[0] : ev;
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+    const onUp = () => {
+      el.classList.remove('dragging');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchend', onUp);
+    };
     if (e.touches) {
       document.addEventListener('touchmove', onMove, { passive: false });
       document.addEventListener('touchend', onUp);
@@ -372,19 +541,6 @@ function initLyricDrag() {
       document.addEventListener('mouseup', onUp);
     }
     e.preventDefault();
-  };
-  const onMove = (e) => {
-    const touch = e.touches ? e.touches[0] : e;
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
-    el.style.transform = `translate(${dx}px, ${dy}px)`;
-  };
-  const onUp = () => {
-    el.classList.remove('dragging');
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    document.removeEventListener('touchend', onUp);
   };
   el.addEventListener('mousedown', onDown);
   el.addEventListener('touchstart', onDown, { passive: false });
@@ -398,7 +554,7 @@ document.addEventListener('click', (e) => {
 });
 
 /* ============================================
-   🔤 Font Controls
+   🔤 Font
    ============================================ */
 function initFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
@@ -442,11 +598,6 @@ function applyFont() {
 }
 
 /* ============================================
-   🌫️ Ambient
-   ============================================ */
-// ملفوف في زر رفع الصورة إذا حبيت
-
-/* ============================================
    🚪 Close / Export
    ============================================ */
 function closeEditor() {
@@ -454,15 +605,11 @@ function closeEditor() {
     window.location.href = 'index.html';
   }
 }
-function exportVideo() {
-  alert('التصدير راح يتوفر قريباً! 🎬');
-}
+function exportVideo() { alert('التصدير راح يتوفر قريباً! 🎬'); }
 function undoAction() { console.log('Undo'); }
 function redoAction() { console.log('Redo'); }
 
-/* ============================================
-   🎬 Animations
-   ============================================ */
+/* Animations */
 const style = document.createElement('style');
 style.textContent = `
 @keyframes lyricFadeUp {
