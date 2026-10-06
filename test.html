@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify-Style Lyrics Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   🎵 SPOTIFY-STYLE LYRICS CARD
+   Pixel-Perfect Component
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cairo', 'Inter', sans-serif;
+  padding: 20px;
+}
+
+/* ============================================
+   📦 CARD CONTAINER
+   ============================================ */
+.card-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spotify-card {
+  /* 📐 Dimensions */
+  width: 84%;
+  max-width: 380px;
+  border-radius: 26px;
+  padding: 20px;
+
+  /* 🎨 Glass Effect */
+  background: rgba(15, 15, 15, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  /* ✨ Shadow */
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* 📐 Flex Layout */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================
+   🔝 HEADER — Track Info
+   ============================================ */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.album-art {
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #1a1a24, #0b0b0f);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.track-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #b3b3b3;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================
+   🎯 MIDDLE — Lyrics Zone
+===   ============================================ */
+.card-lyrics {
+  flex: */
+ 1;
+  min-height: 140px.card;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+/* السطر السابق واللاحق */
+.lyric-prev,
+.lyric-next {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  opacity: 0.4;
+  line-height: 1.4;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* السطر النشط */
+.lyric-current {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  opacity: 1;
+  line-height: 1.4;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* أنيميشن دخول السطر النشط */
+.lyric-current.animate-in {
+  animation: lyricEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lyricEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ============================================
+   🔻 FOOTER — Branding
+   =========================================-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* 🎯 Bottom-Left Positioning */
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+
+.ig-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #ffffff;
+  stroke: #ffffff;
+  fill: none;
+}
+
+.ig-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  line-height: 1;
+}
+</style>
+</head>
+<body>
+
+  <!-- ============================================
+       📦 CARD
+       ============================================ -->
+  <div class="card-wrapper">
+    <div class="spotify-card">
+
+      <!-- 🔝 HEADER -->
+      <div class="card-header">
+        <img
+          class="album-art"
+          src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80"
+          alt="Album Cover"
+        >
+        <div class="track-info">
+          <div class="track-name">راجع</div>
+          <div class="artist-name">عمرو دياب</div>
+        </div>
+      </div>
+
+      <!-- 🎯 LYRICS -->
+      <div class="card-lyrics">
+        <div class="lyric-prev">راجع بتقولي اللي ما بينا</div>
+        <div class="lyric-current animate-in">راجع بتقولي اللي ما بينا</div>
+        <div class="lyric-next">راجع</div>
+      </div>
+
+      <!-- 🔻 FOOTER -->
+      <div class="card-footer">
+        <svg class="ig-icon" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+        <span class="ig-name">dk.llyric</span>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
