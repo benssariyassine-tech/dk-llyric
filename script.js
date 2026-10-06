@@ -413,6 +413,7 @@ function onResizeMove(e) {
   const deltaSec = dx / PX_PER_SEC;
 
   if (_resize.isAudio) {
+    // ===== قص الصوت =====
     if (_resize.side === 'right') {
       const ne = Math.max(state.audioStart + 0.5, Math.min(state.audioDuration, _resize.startDur + deltaSec));
       state.audioEnd = Math.round(ne * 10) / 10;
@@ -420,30 +421,84 @@ function onResizeMove(e) {
       const ns = Math.max(0, Math.min(state.audioEnd - 0.5, _resize.startStart + deltaSec));
       state.audioStart = Math.round(ns * 10) / 10;
     }
-    updateAudioSegment();
-  } else {
-    if (_resize.side === 'right') {
-      const d = Math.max(0.5, Math.min(300, _resize.startDur + deltaSec));
-      state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
-    } else {
-      const s = Math.max(0, _resize.startStart + deltaSec);
-      const d = Math.max(0.5, _resize.startDur - deltaSec);
-      state.lyrics[_resize.index].start = Math.round(s * 10) / 10;
-      state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
+    // تحديث DOM مباشرة (سلس)
+    const seg = document.getElementById('audioSegment');
+    if (seg) {
+      seg.style.left = (state.audioStart * PX_PER_SEC) + 'px';
+      seg.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     }
-    renderTimeline();
-    renderRuler();
+  } else {
+    // ===== قص الكلمة (سلس) =====
+    const idx = _resize.index;
+    let newStart = _resize.startStart;
+    let newDuration = _resize.startDur;
+
+    if (_resize.side === 'right') {
+      newDuration = Math.max(0.5, Math.min(300, _resize.startDur + deltaSec));
+    } else {
+      newStart = Math.max(0, _resize.startStart + deltaSec);
+      newDuration = Math.max(0.5, _resize.startDur - deltaSec);
+    }
+
+    state.lyrics[idx].start = Math.round(newStart * 10) / 10;
+    state.lyrics[idx].duration = Math.round(newDuration * 10) / 10;
+
+    // تحديث DOM مباشرة (سلس) — بلا re-render
+    const segs = document.querySelectorAll('.text-segment');
+    const seg = segs[idx];
+    if (seg) {
+      seg.style.left = (state.lyrics[idx].start * PX_PER_SEC) + 'px';
+      seg.style.width = (state.lyrics[idx].duration * PX_PER_SEC) + 'px';
+    }
+
+    // ✅ تحقق التداخل + حدّد أحمر
+    checkTextOverlap(idx);
   }
 }
 function onResizeEnd() {
-  if (_resize) _resize.active = false;
+  if (!_resize) return;
+  const wasText = !_resize.isAudio;
+  _resize.active = false;
   _resize = null;
   document.removeEventListener('mousemove', onResizeMove);
   document.removeEventListener('mouseup', onResizeEnd);
   document.removeEventListener('touchmove', onResizeMove);
   document.removeEventListener('touchend', onResizeEnd);
+
+  // بعد القص، نحدّثو الـ ruler + نتحققو من التداخلات الكل
+  if (wasText) {
+    renderRuler();
+    setTimeout(checkAllTextOverlaps, 20);
+  }
+}
+/* ============================================
+   🎯 Text Overlap Check
+   ============================================ */
+function checkTextOverlap(currentIdx) {
+  const segs = document.querySelectorAll('.text-segment');
+
+  // امسح الـ overlap من الكل
+  segs.forEach(s => s.classList.remove('overlap'));
+
+  // تحقق من التداخل لكل زوج
+  for (let i = 0; i < state.lyrics.length; i++) {
+    const a = state.lyrics[i];
+    const aS = a.start, aE = a.start + a.duration;
+    for (let j = i + 1; j < state.lyrics.length; j++) {
+      const b = state.lyrics[j];
+      const bS = b.start, bE = b.start + b.duration;
+      // إذا فيهم تداخل
+      if (aS < bE && aE > bS) {
+        if (segs[i]) segs[i].classList.add('overlap');
+        if (segs[j]) segs[j].classList.add('overlap');
+      }
+    }
+  }
 }
 
+function checkAllTextOverlaps() {
+  checkTextOverlap(-1);
+}
 /* ============================================
    Long Press = Move Block
    ============================================ */
