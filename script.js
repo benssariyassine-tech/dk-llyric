@@ -585,12 +585,13 @@ function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  _resize = {
+_resize = {
     active: true,
     index: index,
     side: side,
     startX: cx,
     isAudio: state.selectedType === 'audio',
+    isBg: state.selectedType === 'bg',
     startDur: state.lyrics[index] ? state.lyrics[index].duration : 0,
     startStart: state.lyrics[index] ? state.lyrics[index].start : 0,
     startBlockStart: state.audioStart,
