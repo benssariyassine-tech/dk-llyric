@@ -1391,12 +1391,8 @@ function updateBgSegment() {
 
   seg.classList.remove('hidden');
 
-  // نفس طول الأغنية (إذا كاينة)، وإلا كيتبع آخر كلمة
-  const start = hasAudio() ? state.audioStart : 0;
-  const end = hasAudio() ? state.audioEnd : getTimelineDuration();
-
-  seg.style.left = (start * PX_PER_SEC) + 'px';
-  seg.style.width = ((end - start) * PX_PER_SEC) + 'px';
+  seg.style.left = (state.bgStart * PX_PER_SEC) + 'px';
+  seg.style.width = ((state.bgEnd - state.bgStart) * PX_PER_SEC) + 'px';
 }
 
 /* ============================================
