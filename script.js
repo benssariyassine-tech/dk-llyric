@@ -1245,6 +1245,10 @@ function initBgUpload() {
     document.getElementById('bgPreviewImg').src = state.bgUrl;
     document.getElementById('bgPreviewName').textContent = file.name;
 
+// ✅ تعيين طول الخلفية = طول الأغنية
+    state.bgStart = hasAudio() ? state.audioStart : 0;
+    state.bgEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
+
     // ✅ Update segment + show filters + apply
     const filtersBox = document.getElementById('bgFiltersBox');
     if (filtersBox) filtersBox.style.display = 'block';
