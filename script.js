@@ -617,20 +617,19 @@ function onResizeMove(e) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const dx = cx - _resize.startX;
   const deltaSec = dx / PX_PER_SEC;
-
-  if (_resize.isBg) {
-    // Background segment: نفس منطق الصوت
+if (_resize.isBg) {
+    // Background segment: مستقل تماماً
     if (_resize.side === 'left') {
       const newStart = Math.max(0, _resize.startStart + deltaSec);
-      state.audioStart = Math.round(newStart * 10) / 10;
+      state.bgStart = Math.round(newStart * 10) / 10;
     } else {
-      const newEnd = Math.max(state.audioStart + 0.5, _resize.startDur + deltaSec);
-      state.audioEnd = Math.round(newEnd * 10) / 10;
+      const newEnd = Math.max(state.bgStart + 0.5, _resize.startDur + deltaSec);
+      state.bgEnd = Math.round(newEnd * 10) / 10;
     }
     updateBgSegment();
-    updateAudioSegment();
     return;
   }
+
 
   if (_resize.isAudio) {
     if (_resize.side === 'left') {
