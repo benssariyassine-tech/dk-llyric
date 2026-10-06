@@ -147,41 +147,79 @@
       <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر جديد</button>
     </div>
 
-    <div class="sheet-content" data-sheet="effects">
-      <h3 class="sheet-title">التأثيرات</h3>
-      <div class="font-group">
-        <label class="font-label">الخط</label>
-        <div class="font-family-grid">
-          <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
-          <button class="font-family-btn" data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
-          <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
-          <button class="font-family-btn" data-font="Reem Kufi" style="font-family:'Reem Kufi',sans-serif;">Reem Kufi</button>
-        </div>
+ <div class="sheet-content" data-sheet="effects">
+  <h3 class="sheet-title">التأثيرات</h3>
+
+  <div class="font-group">
+    <label class="font-label">الخط</label>
+    <div class="font-family-grid">
+      <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
+      <button class="font-family-btn" data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
+      <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
+      <button class="font-family-btn" data-font="Reem Kufi" style="font-family:'Reem Kufi',sans-serif;">Reem Kufi</button>
+    </div>
+  </div>
+
+  <div class="font-group">
+    <label class="font-label">الحجم: <span id="fontSizeVal">24</span>px</label>
+    <input type="range" id="fontSizeRange" min="12" max="48" value="24" class="font-slider">
+  </div>
+
+  <div class="font-group">
+    <label class="font-label">اللون</label>
+    <div class="color-grid">
+      <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;"></button>
+      <button class="color-btn" data-color="#ffd60a" style="background:#ffd60a;"></button>
+      <button class="color-btn" data-color="#0a84ff" style="background:#0a84ff;"></button>
+      <button class="color-btn" data-color="#ff453a" style="background:#ff453a;"></button>
+      <button class="color-btn" data-color="#32d74b" style="background:#32d74b;"></button>
+      <button class="color-btn" data-color="#bf5af2" style="background:#bf5af2;"></button>
+    </div>
+  </div>
+
+  <div class="font-group">
+    <label class="font-label">الحركة</label>
+    <div class="effect-row">
+      <button class="effect-btn" data-anim="none">بدون</button>
+      <button class="effect-btn active" data-anim="fadeUp">من تحت</button>
+      <button class="effect-btn" data-anim="fadeIn">شفافية</button>
+    </div>
+  </div>
+
+  <div class="font-group" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-color);">
+    <label class="font-label">تأثيرات صوتية</label>
+
+    <div class="fade-row">
+      <div class="fade-item" id="fadeInItem">
+        <div class="fade-item-title">Fade In</div>
+        <input type="range" id="fadeInSlider" class="fade-slider" min="0.3" max="3" step="0.1" value="1">
+        <div class="fade-value" id="fadeInVal">1s</div>
       </div>
-      <div class="font-group">
-        <label class="font-label">الحجم: <span id="fontSizeVal">24</span>px</label>
-        <input type="range" id="fontSizeRange" min="12" max="48" value="24" class="font-slider">
-      </div>
-      <div class="font-group">
-        <label class="font-label">اللون</label>
-        <div class="color-grid">
-          <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;"></button>
-          <button class="color-btn" data-color="#ffd60a" style="background:#ffd60a;"></button>
-          <button class="color-btn" data-color="#0a84ff" style="background:#0a84ff;"></button>
-          <button class="color-btn" data-color="#ff453a" style="background:#ff453a;"></button>
-          <button class="color-btn" data-color="#32d74b" style="background:#32d74b;"></button>
-          <button class="color-btn" data-color="#bf5af2" style="background:#bf5af2;"></button>
-        </div>
-      </div>
-      <div class="font-group">
-        <label class="font-label">الحركة</label>
-        <div class="effect-row">
-          <button class="effect-btn" data-anim="none">بدون</button>
-          <button class="effect-btn active" data-anim="fadeUp">من تحت</button>
-          <button class="effect-btn" data-anim="fadeIn">شفافية</button>
-        </div>
+      <div class="fade-item" id="fadeOutItem">
+        <div class="fade-item-title">Fade Out</div>
+        <input type="range" id="fadeOutSlider" class="fade-slider" min="0.3" max="3" step="0.1" value="1">
+        <div class="fade-value" id="fadeOutVal">1s</div>
       </div>
     </div>
+
+    <div class="audio-effects-grid">
+      <div class="audio-effect-card" data-effect="speed">
+        <div class="audio-effect-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="audio-effect-label">السرعة</div>
+        <div class="audio-effect-desc">1x</div>
+      </div>
+      <div class="audio-effect-card" data-effect="reverb">
+        <div class="audio-effect-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><path d="M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+        </div>
+        <div class="audio-effect-label">Reverb</div>
+        <div class="audio-effect-desc">OFF</div>
+      </div>
+    </div>
+  </div>
+</div>
 
     <div class="sheet-content" data-sheet="template">
       <h3 class="sheet-title">القوالب</h3>
