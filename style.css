@@ -836,3 +836,10 @@ body.menu-open .editor-nav {
 
 /* UTILS */
 .hidden { display: none !important; }
+/* ▶️ تأكد من ظهور أزرار التحكم */
+.playback-controls {
+  min-height: 46px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
