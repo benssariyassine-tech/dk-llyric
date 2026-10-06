@@ -715,3 +715,25 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
+/* ============================================
+   🎯 Scroll Timeline to Lyric
+   ============================================ */
+function scrollTimelineToLyric(index) {
+  const scroll = document.getElementById('timelineScroll');
+  const track = document.getElementById('trackText');
+  if (!scroll || !track) return;
+  
+  const segs = track.querySelectorAll('.text-segment');
+  const seg = segs[index];
+  if (!seg) return;
+  
+  const segLeft = parseInt(seg.style.left) || 0;
+  const segWidth = parseInt(seg.style.width) || 0;
+  const scrollWidth = scroll.clientWidth;
+  
+  // اسكرول باش السطر يبان في الوسط
+  scroll.scrollTo({
+    left: Math.max(0, segLeft - scrollWidth / 2 + segWidth / 2),
+    behavior: 'smooth'
+  });
+}
