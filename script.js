@@ -1,8 +1,7 @@
 /* ============================================
-   🎯 dk.llyric — Editor Logic
+   🎯 dk.llyric — Editor Logic (CapCut Style)
    ============================================ */
 
-// ===== State =====
 const state = {
   coverUrl: null,
   coverName: '',
@@ -11,9 +10,11 @@ const state = {
   songName: 'اسم الأغنية',
   artistName: 'اسم الفنان',
   lyrics: [
-    { text: 'راجع بتقولي اللي ما بينا', time: 0 }
+    { text: 'راجع بتقولي اللي ما بينا', time: 3 }
   ]
 };
+
+let currentTab = null;
 
 // ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,6 +24,41 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLyrics();
   renderPreview();
 });
+
+/* ============================================
+   🎛️ Tabs (Bottom Nav)
+   ============================================ */
+function openTab(tabName, btnEl) {
+  // إلا نفس التاب مفتوح → سد الـ sheet
+  if (currentTab === tabName) {
+    closeSheet();
+    return;
+  }
+  
+  currentTab = tabName;
+  
+  // حدّث الـ nav
+  document.querySelectorAll('.editor-nav-item').forEach(el => el.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  
+  // بدّل محتوى الـ sheet
+  document.querySelectorAll('.sheet-content').forEach(el => el.classList.remove('active'));
+  const target = document.querySelector(`[data-sheet="${tabName}"]`);
+  if (target) target.classList.add('active');
+  
+  // افتح الـ sheet
+  document.getElementById('bottomSheet').classList.add('open');
+  document.getElementById('sheetBackdrop').classList.add('open');
+  
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
+}
+
+function closeSheet() {
+  currentTab = null;
+  document.querySelectorAll('.editor-nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('bottomSheet').classList.remove('open');
+  document.getElementById('sheetBackdrop').classList.remove('open');
+}
 
 /* ============================================
    📸 صورة الغلاف
@@ -35,20 +71,15 @@ function initCoverUpload() {
     const file = e.target.files[0];
     if (!file) return;
     
-    // تحقق من الحجم (5 ميجا max)
     if (file.size > 5 * 1024 * 1024) {
       alert('الصورة كبيرة بزاف (الأقصى 5MB)');
       return;
     }
     
-    // نظف القديم
     if (state.coverUrl) URL.revokeObjectURL(state.coverUrl);
-    
-    // أنشئ URL جديد
     state.coverUrl = URL.createObjectURL(file);
     state.coverName = file.name;
     
-    // حدّث الـ UI
     showCoverPreview(state.coverUrl, file.name);
     renderPreview();
     updateAmbient();
@@ -87,22 +118,17 @@ function initAudioUpload() {
     const file = e.target.files[0];
     if (!file) return;
     
-    // تحقق من الحجم (20 ميجا max)
-    if (file.size > 20 * 1024 * 1024) {
-      alert('الملف كبير بزاف (الأقصى 20MB)');
+    if (file.size > 30 * 1024 * 1024) {
+      alert('الملف كبير بزاف (الأقصى 30MB)');
       return;
     }
     
-    // نظف القديم
     if (state.audioUrl) URL.revokeObjectURL(state.audioUrl);
-    
     state.audioUrl = URL.createObjectURL(file);
     state.audioName = file.name;
     
-    // عرض الملف
     showAudioPreview(file);
     
-    // شغّل الصوت
     const player = document.getElementById('audioPlayer');
     player.src = state.audioUrl;
     player.classList.remove('hidden');
@@ -132,21 +158,25 @@ function removeAudio() {
 }
 
 /* ============================================
-   ✏️ Inputs (اسم الأغنية، الفنان)
+   ✏️ المعلومات
    ============================================ */
 function initTextInputs() {
   const songInput = document.getElementById('songNameInput');
   const artistInput = document.getElementById('artistNameInput');
   
-  songInput.addEventListener('input', (e) => {
-    state.songName = e.target.value || 'اسم الأغنية';
-    renderPreview();
-  });
+  if (songInput) {
+    songInput.addEventListener('input', (e) => {
+      state.songName = e.target.value || 'اسم الأغنية';
+      renderPreview();
+    });
+  }
   
-  artistInput.addEventListener('input', (e) => {
-    state.artistName = e.target.value || 'اسم الفنان';
-    renderPreview();
-  });
+  if (artistInput) {
+    artistInput.addEventListener('input', (e) => {
+      state.artistName = e.target.value || 'اسم الفنان';
+      renderPreview();
+    });
+  }
 }
 
 /* ============================================
@@ -186,7 +216,6 @@ function renderLyrics() {
     const row = document.createElement('div');
     row.className = 'lyric-row';
     
-    // حقل النص
     const textInput = document.createElement('input');
     textInput.type = 'text';
     textInput.className = 'lyric-text-input';
@@ -194,7 +223,6 @@ function renderLyrics() {
     textInput.value = lyric.text;
     textInput.addEventListener('input', (e) => updateLyricText(index, e.target.value));
     
-    // حقل الوقت
     const timeInput = document.createElement('input');
     timeInput.type = 'number';
     timeInput.className = 'lyric-time-input';
@@ -204,7 +232,6 @@ function renderLyrics() {
     timeInput.value = lyric.time;
     timeInput.addEventListener('input', (e) => updateLyricTime(index, e.target.value));
     
-    // زر الحذف
     const removeBtn = document.createElement('button');
     removeBtn.className = 'lyric-remove-btn';
     removeBtn.textContent = '×';
@@ -221,26 +248,26 @@ function renderLyrics() {
    👁️ المعاينة
    ============================================ */
 function renderPreview() {
-  // اسم الأغنية
-  document.getElementById('previewSong').textContent = state.songName;
-  document.getElementById('previewArtist').textContent = state.artistName;
-  
-  // صورة الغلاف
+  const songEl = document.getElementById('previewSong');
+  const artistEl = document.getElementById('previewArtist');
   const cover = document.getElementById('previewCover');
-  if (state.coverUrl) {
-    cover.src = state.coverUrl;
-  } else {
-    cover.src = 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80';
+  const lyricEl = document.getElementById('previewLyric');
+  
+  if (songEl) songEl.textContent = state.songName;
+  if (artistEl) artistEl.textContent = state.artistName;
+  
+  if (cover) {
+    cover.src = state.coverUrl || 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80';
   }
   
-  // أول سطر من الكلمات
-  const firstLyric = state.lyrics.find(l => l.text.trim() !== '');
-  document.getElementById('previewLyric').textContent = 
-    firstLyric ? firstLyric.text : 'اكتب الكلمات...';
+  if (lyricEl) {
+    const firstLyric = state.lyrics.find(l => l.text.trim() !== '');
+    lyricEl.textContent = firstLyric ? firstLyric.text : 'اكتب الكلمات من القائمة السفلية';
+  }
 }
 
 /* ============================================
-   🌫️ الخلفية (تتبع صورة الغلاف)
+   🌫️ الخلفية
    ============================================ */
 function updateAmbient() {
   const ambient = document.getElementById('ambientBg');
@@ -251,4 +278,11 @@ function updateAmbient() {
   } else {
     ambient.style.removeProperty('--ambient-image');
   }
+}
+
+/* ============================================
+   📥 تصدير (مؤقتاً رسالة)
+   ============================================ */
+function exportVideo() {
+  alert('التصدير راح يكون متاح في المرحلة القادمة! 🎬');
 }
