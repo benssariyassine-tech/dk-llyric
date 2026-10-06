@@ -155,11 +155,25 @@
     </div>
 
     <!-- ✍️ TEXT -->
-    <div class="sheet-content" data-sheet="text">
-      <h3 class="sheet-title">الكلمات</h3>
-      <p class="sheet-hint">كل سطر راح يظهر: سابق + حالي + جاي</p>
-      <div id="lyricsList"></div>
-      <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر</button>
+<div class="sheet-content" data-sheet="text">
+      <h3 class="sheet-title">النصوص</h3>
+
+      <div class="font-group">
+        <label class="font-label">اسم الأغنية</label>
+        <input type="text" id="songNameInput" class="lyric-text-input" placeholder="اكتب اسم الأغنية..." value="">
+      </div>
+
+      <div class="font-group">
+        <label class="font-label">اسم الفنان</label>
+        <input type="text" id="artistNameInput" class="lyric-text-input" placeholder="اكتب اسم الفنان..." value="">
+      </div>
+
+      <div class="font-group" style="margin-top:24px;">
+        <label class="font-label">الكلمات</label>
+        <p class="sheet-hint" style="margin-top:-6px;margin-bottom:10px;">يجب ملئ الحقول</p>
+        <div id="lyricsList"></div>
+        <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر</button>
+      </div>
     </div>
 
     <!-- ✨ EFFECTS -->
