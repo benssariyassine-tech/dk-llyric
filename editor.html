@@ -12,6 +12,13 @@
 </head>
 <body class="editor-body">
 
+  <!-- ========== Entry Animation Layer ========== -->
+  <div id="entryLayer" class="entry-layer">
+    <div class="entry-card">
+      <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+    </div>
+  </div>
+
   <header class="editor-topbar">
     <button class="etb-btn" onclick="closeEditor()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -27,23 +34,36 @@
   </header>
 
   <div class="preview-wrap">
-    <div class="preview-frame">
-      <div class="preview-card">
+    <div class="preview-frame" id="previewFrame">
+
+      <!-- 📸 Background Layer (قابل للتعديل) -->
+      <div class="bg-layer" id="bgLayer" onclick="selectBackground()">
+        <img id="bgImage" src="" alt="">
+        <button class="bg-add-btn" id="bgAddBtn" onclick="event.stopPropagation();openBackgroundPicker()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+
+      <!-- 🃏 The Card -->
+      <div class="preview-card" id="mainCard">
         <div class="preview-header">
-          <img class="preview-cover" id="previewCover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+          <div class="cover-wrap" onclick="selectCover()">
+            <img class="preview-cover" id="previewCover" src="" alt="">
+            <button class="cover-add-btn" id="coverAddBtn" onclick="event.stopPropagation();openCoverPicker()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
           <div class="preview-header-text">
-            <div class="preview-song" id="previewSong">راجع</div>
-            <div class="preview-artist" id="previewArtist">عمرو دياب</div>
+            <div class="preview-song" id="previewSong" contenteditable="true">راجع</div>
+            <div class="preview-artist" id="previewArtist" contenteditable="true">عمرو دياب</div>
           </div>
         </div>
         <div class="preview-lyrics">
-          <div class="lyric-element" id="lyricElement" onclick="selectLyric()">
+          <div class="lyric-element" id="lyricElement" onclick="selectLyricInPreview()">
             <span class="lyric-text" id="previewLyric">راجع بتقولي اللي ما بينا</span>
             <div class="lyric-handles">
-              <span class="lh lh-tl"></span>
-              <span class="lh lh-tr"></span>
-              <span class="lh lh-bl"></span>
-              <span class="lh lh-br"></span>
+              <span class="lh lh-tl"></span><span class="lh lh-tr"></span>
+              <span class="lh lh-bl"></span><span class="lh lh-br"></span>
             </div>
           </div>
         </div>
@@ -51,35 +71,31 @@
           <span class="pf-text">Spotify</span>
         </div>
       </div>
+
     </div>
   </div>
 
   <div class="playback-controls">
-    <button class="pc-btn" id="playBtn" onclick="togglePlay()">
-      <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    </button>
-    <div class="pc-time" id="timeDisplay">00:00 / 00:00</div>
     <button class="pc-btn" onclick="undoAction()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 14 4 9 9 4"/>
-        <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
     </button>
     <button class="pc-btn" onclick="redoAction()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 14 20 9 15 4"/>
-        <path d="M4 20v-7a4 4 0 0 1 4-4h12"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
+    </button>
+    <div class="pc-time" id="timeDisplay">00:00 / 00:00</div>
+    <button class="pc-btn" id="playBtn" onclick="togglePlay()">
+      <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
     </button>
   </div>
 
   <div class="timeline-wrap">
     <div class="timeline-ruler" id="timelineRuler"></div>
-    <div class="timeline-scroll" id="timelineScroll">
-      <div class="timeline-tracks" id="timelineTracks">
+    <div class="timeline-viewport" id="timelineViewport">
+      <div class="timeline-content" id="timelineContent">
         <div class="track track-text" id="trackText"></div>
         <div class="track track-audio" id="trackAudio">
           <div class="audio-segment hidden" id="audioSegment">
+            <div class="audio-wave"></div>
             <div class="audio-label" id="audioLabel">Imported audio</div>
           </div>
           <button class="audio-add-btn" id="audioAddBtn" onclick="openAudioPicker()">
@@ -87,42 +103,37 @@
           </button>
         </div>
       </div>
-      <div class="playhead" id="playhead"></div>
+      <div class="playhead" id="playhead">
+        <div class="playhead-cap"></div>
+      </div>
     </div>
   </div>
 
   <nav class="editor-nav">
     <button class="editor-nav-item" data-tab="audio" onclick="openTab('audio', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       <span>صوت</span>
     </button>
     <button class="editor-nav-item" data-tab="text" onclick="openTab('text', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
       <span>نص</span>
     </button>
     <button class="editor-nav-item" data-tab="effects" onclick="openTab('effects', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       <span>تأثيرات</span>
     </button>
     <button class="editor-nav-item" data-tab="template" onclick="openTab('template', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       <span>قوالب</span>
     </button>
   </nav>
 
+  <!-- 📦 Sheet: عام -->
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
   <div class="bottom-sheet" id="bottomSheet">
     <div class="sheet-handle"></div>
 
+    <!-- صوت -->
     <div class="sheet-content" data-sheet="audio">
       <h3 class="sheet-title">الصوت</h3>
       <label for="audioInput" class="upload-btn" id="audioUploadBtn">
@@ -140,99 +151,58 @@
       <audio id="audioPlayer" class="hidden"></audio>
     </div>
 
+    <!-- نص -->
     <div class="sheet-content" data-sheet="text">
       <h3 class="sheet-title">النص (الكلمات)</h3>
-      <p class="sheet-hint">اكتب كل سطر — كل سطر راح يظهر وحده</p>
+      <p class="sheet-hint">اكتب كل سطر — اضغط مطولاً على السطر في الـ Timeline للتحكم</p>
       <div id="lyricsList"></div>
       <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر جديد</button>
     </div>
 
- <div class="sheet-content" data-sheet="effects">
-  <h3 class="sheet-title">التأثيرات</h3>
-
-  <div class="font-group">
-    <label class="font-label">الخط</label>
-    <div class="font-family-grid">
-      <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
-      <button class="font-family-btn" data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
-      <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
-      <button class="font-family-btn" data-font="Reem Kufi" style="font-family:'Reem Kufi',sans-serif;">Reem Kufi</button>
-    </div>
-  </div>
-
-  <div class="font-group">
-    <label class="font-label">الحجم: <span id="fontSizeVal">24</span>px</label>
-    <input type="range" id="fontSizeRange" min="12" max="48" value="24" class="font-slider">
-  </div>
-
-  <div class="font-group">
-    <label class="font-label">اللون</label>
-    <div class="color-grid">
-      <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;"></button>
-      <button class="color-btn" data-color="#ffd60a" style="background:#ffd60a;"></button>
-      <button class="color-btn" data-color="#0a84ff" style="background:#0a84ff;"></button>
-      <button class="color-btn" data-color="#ff453a" style="background:#ff453a;"></button>
-      <button class="color-btn" data-color="#32d74b" style="background:#32d74b;"></button>
-      <button class="color-btn" data-color="#bf5af2" style="background:#bf5af2;"></button>
-    </div>
-  </div>
-
-  <div class="font-group">
-    <label class="font-label">الحركة</label>
-    <div class="effect-row">
-      <button class="effect-btn" data-anim="none">بدون</button>
-      <button class="effect-btn active" data-anim="fadeUp">من تحت</button>
-      <button class="effect-btn" data-anim="fadeIn">شفافية</button>
-    </div>
-  </div>
-
-  <div class="font-group" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-color);">
-    <label class="font-label">تأثيرات صوتية</label>
-
-    <div class="fade-row">
-      <div class="fade-item" id="fadeInItem">
-        <div class="fade-item-title">Fade In</div>
-        <input type="range" id="fadeInSlider" class="fade-slider" min="0.3" max="3" step="0.1" value="1">
-        <div class="fade-value" id="fadeInVal">1s</div>
-      </div>
-      <div class="fade-item" id="fadeOutItem">
-        <div class="fade-item-title">Fade Out</div>
-        <input type="range" id="fadeOutSlider" class="fade-slider" min="0.3" max="3" step="0.1" value="1">
-        <div class="fade-value" id="fadeOutVal">1s</div>
-      </div>
-    </div>
-
-    <div class="audio-effects-grid">
-      <div class="audio-effect-card" data-effect="speed">
-        <div class="audio-effect-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <!-- تأثيرات -->
+    <div class="sheet-content" data-sheet="effects">
+      <h3 class="sheet-title">التأثيرات</h3>
+      <div class="font-group">
+        <label class="font-label">الخط</label>
+        <div class="font-family-grid">
+          <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
+          <button class="font-family-btn" data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
+          <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
+          <button class="font-family-btn" data-font="Reem Kufi" style="font-family:'Reem Kufi',sans-serif;">Reem Kufi</button>
         </div>
-        <div class="audio-effect-label">السرعة</div>
-        <div class="audio-effect-desc">1x</div>
       </div>
-      <div class="audio-effect-card" data-effect="reverb">
-        <div class="audio-effect-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><path d="M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+      <div class="font-group">
+        <label class="font-label">الحجم: <span id="fontSizeVal">24</span>px</label>
+        <input type="range" id="fontSizeRange" min="12" max="48" value="24" class="font-slider">
+      </div>
+      <div class="font-group">
+        <label class="font-label">اللون</label>
+        <div class="color-grid">
+          <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;"></button>
+          <button class="color-btn" data-color="#ffd60a" style="background:#ffd60a;"></button>
+          <button class="color-btn" data-color="#0a84ff" style="background:#0a84ff;"></button>
+          <button class="color-btn" data-color="#ff453a" style="background:#ff453a;"></button>
+          <button class="color-btn" data-color="#32d74b" style="background:#32d74b;"></button>
+          <button class="color-btn" data-color="#bf5af2" style="background:#bf5af2;"></button>
         </div>
-        <div class="audio-effect-label">Reverb</div>
-        <div class="audio-effect-desc">OFF</div>
+      </div>
+      <div class="font-group">
+        <label class="font-label">الحركة</label>
+        <div class="effect-row">
+          <button class="effect-btn" data-anim="none">بدون</button>
+          <button class="effect-btn active" data-anim="fadeUp">من تحت</button>
+          <button class="effect-btn" data-anim="fadeIn">شفافية</button>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
+    <!-- قوالب -->
     <div class="sheet-content" data-sheet="template">
       <h3 class="sheet-title">القوالب</h3>
       <p class="sheet-hint">القوالب مقفولة — التصميم ما يتغيرش</p>
       <div class="template-locked">
         <div class="template-thumb active">
-          <div class="tt-card-mini">
-            <div class="tt-cover"></div>
-            <div class="tt-info">
-              <span class="tt-title">راجع</span>
-              <span class="tt-artist">عمرو دياب</span>
-            </div>
-          </div>
+          <div class="tt-card-mini"><div class="tt-cover"></div></div>
           <span class="tt-label">Spotify Style ✓</span>
         </div>
       </div>
@@ -240,6 +210,64 @@
 
   </div>
 
-  <script src="script.js"></script>
+  <!-- 🎬 Sheet: قائمة الكلمة (Bottom Sheet) -->
+  <div class="word-menu-backdrop" id="wordMenuBackdrop" onclick="closeWordMenu()"></div>
+  <div class="word-menu-sheet" id="wordMenuSheet">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">تحرير السطر</h3>
+
+    <div class="word-menu-grid">
+      <button class="word-menu-item" onclick="wordAction('edit')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>تعديل</span>
+      </button>
+      <button class="word-menu-item" onclick="wordAction('copy')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>نسخ</span>
+      </button>
+      <button class="word-menu-item" onclick="wordAction('duplicate')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="13" height="13" rx="2"/><path d="M8 21h11a2 2 0 0 0 2-2V8"/></svg>
+        <span>تكرار</span>
+      </button>
+      <button class="word-menu-item danger" onclick="wordAction('delete')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        <span>حذف</span>
+      </button>
+      <button class="word-menu-item" onclick="wordAction('glass')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 12h18M12 3v18" opacity="0.3"/></svg>
+        <span>زجاجي</span>
+      </button>
+      <button class="word-menu-item" onclick="wordAction('duration')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>المدة</span>
+      </button>
+    </div>
+
+    <!-- قسم المدة -->
+    <div class="word-duration-box" id="wordDurationBox" style="display:none;">
+      <label class="font-label">مدة الظهور: <span id="wordDurationVal">3.0</span>s</label>
+      <input type="range" id="wordDurationRange" min="0.5" max="15" step="0.1" value="3" class="font-slider">
+    </div>
+  </div>
+
+  <!-- 🎵 Sheet: قص الصوت -->
+  <div class="audio-trim-sheet" id="audioTrimSheet">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">قص الصوت</h3>
+    <div class="audio-trim-info">
+      <span>البداية: <span id="trimStartVal">0.0</span>s</span>
+      <span>النهاية: <span id="trimEndVal">0.0</span>s</span>
+    </div>
+    <div class="trim-track" id="trimTrack">
+      <div class="trim-handle trim-left" id="trimLeft"></div>
+      <div class="trim-selection" id="trimSelection"></div>
+      <div class="trim-handle trim-right" id="trimRight"></div>
+    </div>
+    <button class="btnfunction-primary" onclick="applyAudioTrim()">تطبيق fmt</button>
+    <button class="btn-secondary" onclick(s="closeAudioTrim()" style="margin)-top:8px;">إلغاء</button {
+>
+  </div>
+
+  <script src=" script.js"></script>
 </body>
 </html>
