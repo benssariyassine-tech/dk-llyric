@@ -781,25 +781,36 @@ function renderLyricFromPlayhead(idx) {
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
-  const maxEnd = (state.audioUrl && state.audioDuration > 0)
-    ? state.audioEnd
-    : getTimelineDuration();
+  const hasAudio = state.audioUrl && state.audioDuration > 0;
+  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
 
   if (state.isPlaying) {
-    if (player && state.audioUrl) player.pause();
+    if (player && hasAudio) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
-    if (state.currentTime >= maxEnd - 0.1) {
-      state.currentTime = 0;
-      setPlayheadPosition(0);
-      if (player && state.audioUrl) {
-        try { player.currentTime = state.audioStart; } catch (e) {}
-      }
+    let startAt = state.currentTime;
+
+    // ✅ القص الفعلي: إذا كان الوقت الحالي قبل audioStart، ننتقل لـ audioStart
+    if (hasAudio && startAt < state.audioStart) {
+      startAt = state.audioStart;
+    }
+    // إذا وصلنا لآخر الأغنية، نرجع للبداية الفعلية
+    if (hasAudio && startAt >= state.audioEnd - 0.05) {
+      startAt = state.audioStart;
+    }
+    // بلا أغنية: إذا وصلنا للنهاية، نرجع لـ 0
+    if (!hasAudio && startAt >= maxEnd - 0.05) {
+      startAt = 0;
     }
 
-    if (player && state.audioUrl) {
-      try { player.currentTime = state.currentTime; } catch (e) {}
+    state.currentTime = startAt;
+    setPlayheadPosition(startAt);
+
+    if (player && hasAudio) {
+      try {
+        player.currentTime = startAt;
+      } catch (e) {}
       player.play().catch(e => console.warn('play err:', e));
     }
     state.isPlaying = true;
