@@ -277,7 +277,9 @@ function renderTimeline() {
     trackText.appendChild(seg);
   });
 }
-
+// ✅ تحقق من التداخلات بعد الرندر
+  setTimeout(checkAllTextOverlaps, 10);
+}
 /* ============================================
    Selection + Menu
    ============================================ */
