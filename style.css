@@ -370,8 +370,8 @@ html, body {
 .timeline-viewport::-webkit-scrollbar { display: none; }
 .timeline-content {
   position: relative;
-  padding: 0 20px;
   min-width: max-content;
+  padding: 0 60px 0 0;
 }
 .timeline-ruler {
   position: relative;
@@ -482,19 +482,27 @@ html, body {
 
 /* Playhead */
 .playhead {
-  position: absolute; top: 0; bottom: 0;
-  width: 2px; background: #ff453a;
-  z-index: 30; pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: #ff453a;
+  z-index: 30;
+  pointer-events: none;
   box-shadow: 0 0 10px rgba(255,69,58,0.8);
   transform: translateX(0);
   will-change: transform;
 }
 .playhead-cap {
   position: absolute;
-  top: -4px; left: 50%;
+  top: -4px;
+  left: 50%;
   transform: translateX(-50%);
-  width: 20px; height: 8px;
-  background: #ff453a; border-radius: 4px;
+  width: 20px;
+  height: 8px;
+  background: #ff453a;
+  border-radius: 4px;
   pointer-events: auto;
   cursor: ew-resize;
 }
