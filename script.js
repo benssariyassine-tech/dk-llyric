@@ -15,15 +15,13 @@ const state = {
   songName: 'راجع',
   artistName: 'عمرو دياب',
   lyrics: [
-    { text: 'راجع بتقولي اللي ما بينا', start: 1, duration: 4, glass: false },
-    { text: 'راجع', start: 6, duration: 3, glass: false }
+    { text: 'راجع بتقولي اللي ما بينا', start: 0, duration: 4, glass: false },
+    { text: 'راجع', start: 5, duration: 3, glass: false }
   ],
   selectedType: null,
   selectedIndex: -1,
   activeSegment: -1,
-  font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff' },
-  coverUrl: null,
-  bgUrl: null
+  font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff' }
 };
 
 let currentTab = null;
@@ -43,8 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFont();
   setupPlayheadDrag();
   setupFontControls();
-  updateTimeDisplay();
-  setPlayheadPosition(0);
+
+  // ⏱️ ضع المؤشر في 0s بعد الرندر
+  requestAnimationFrame(() => {
+    state.currentTime = 0;
+    setPlayheadPosition(0);
+    updateTimeDisplay();
+  });
 });
 
 function renderAll() {
@@ -66,7 +69,7 @@ function openTab(tabName, btnEl) {
   if (target) target.classList.add('active');
   document.getElementById('bottomSheet').classList.add('open');
   document.getElementById('sheetBackdrop').classList.add('open');
-  if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch (e) {}
 }
 function closeSheet() {
   currentTab = null;
@@ -97,6 +100,7 @@ function initAudioUpload() {
       updateAudioSegment();
       updateTimeDisplay();
       renderAll();
+      setPlayheadPosition(0);
     };
     document.getElementById('audioUploadBtn').classList.add('hidden');
     document.getElementById('audioPreview').classList.remove('hidden');
@@ -126,6 +130,7 @@ function removeAudio() {
   document.getElementById('audioAddBtn').classList.remove('hidden');
   updateTimeDisplay();
   renderAll();
+  setPlayheadPosition(0);
 }
 
 function openAudioPicker() {
@@ -199,7 +204,10 @@ function renderLyricsList() {
    ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
-  return Math.max(state.audioDuration || 0, lastLyricEnd, MIN_TIMELINE_SEC);
+  if (state.audioUrl && state.audioDuration > 0) {
+    return Math.max(state.audioEnd, lastLyricEnd, MIN_TIMELINE_SEC);
+  }
+  return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
 /* ============================================
@@ -210,7 +218,7 @@ function renderRuler() {
   if (!ruler) return;
   const total = getTimelineDuration();
   ruler.innerHTML = '';
-  ruler.style.width = (total * PX_PER_SEC + 60) + 'px';
+  ruler.style.width = (total * PX_PER_SEC) + 'px';
   for (let s = 0; s <= total; s++) {
     const tick = document.createElement('div');
     tick.className = 'ruler-tick';
@@ -228,7 +236,7 @@ function renderTimeline() {
   if (!trackText) return;
   const total = getTimelineDuration();
   trackText.innerHTML = '';
-  trackText.style.width = (total * PX_PER_SEC + 60) + 'px';
+  trackText.style.width = (total * PX_PER_SEC) + 'px';
 
   state.lyrics.forEach((lyric, index) => {
     const seg = document.createElement('div');
@@ -509,14 +517,18 @@ function startLongPress(e, index, segEl) {
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
-  const x = Math.max(0, sec) * PX_PER_SEC;
+  const maxEnd = (state.audioUrl && state.audioDuration > 0)
+    ? state.audioEnd
+    : getTimelineDuration();
+  const clampedSec = Math.max(0, Math.min(sec, maxEnd));
+  const x = clampedSec * PX_PER_SEC;
   ph.style.transform = `translateX(${x}px)`;
-  state.currentTime = Math.max(0, sec);
+  state.currentTime = clampedSec;
   updateTimeDisplay();
 }
 
 /* ============================================
-   Playhead Drag (Cap)
+   Playhead Drag
    ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
@@ -533,8 +545,10 @@ function setupPlayheadDrag() {
   };
 
   const seekTo = (sec) => {
-    const maxEnd = getTimelineDuration();
-    sec = Math.min(sec, maxEnd);
+    const maxEnd = (state.audioUrl && state.audioDuration > 0)
+      ? state.audioEnd
+      : getTimelineDuration();
+    sec = Math.max(0, Math.min(sec, maxEnd));
     const player = document.getElementById('audioPlayer');
     if (player && state.audioUrl) {
       try { player.currentTime = sec; } catch (e) {}
@@ -600,7 +614,7 @@ function setupPlayheadDrag() {
 }
 
 /* ============================================
-   ▶️ Playhead Loop (RAF)
+   Playhead Loop
    ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
@@ -619,7 +633,7 @@ function startPlayheadLoop() {
       state.currentTime += dt;
     }
 
-    const maxEnd = state.audioUrl && state.audioDuration
+    const maxEnd = (state.audioUrl && state.audioDuration > 0)
       ? state.audioEnd
       : getTimelineDuration();
 
@@ -706,11 +720,11 @@ function renderLyricFromPlayhead(idx) {
 }
 
 /* ============================================
-   ▶️ Play / Pause
+   Play / Pause
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
-  const maxEnd = state.audioUrl && state.audioDuration
+  const maxEnd = (state.audioUrl && state.audioDuration > 0)
     ? state.audioEnd
     : getTimelineDuration();
 
@@ -748,10 +762,11 @@ function updatePlayIcon() {
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
-  const maxEnd = state.audioUrl && state.audioDuration
+  const maxEnd = (state.audioUrl && state.audioDuration > 0)
     ? state.audioEnd
     : getTimelineDuration();
-  el.textContent = fmt(state.currentTime) + ' / ' + fmt(maxEnd);
+  const cur = Math.max(0, Math.min(state.currentTime, maxEnd));
+  el.textContent = fmt(cur) + ' / ' + fmt(maxEnd);
 }
 
 function fmt(s) {
