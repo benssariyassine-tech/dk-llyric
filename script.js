@@ -1,5 +1,6 @@
 /* ============================================
-   dk.llyric Editor — Final v6.0 (Clean)
+   dk.llyric Editor — Part 1/3
+   Constants + State + Init + Helpers + Tabs + Audio + Lyrics
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 1000;
@@ -25,7 +26,7 @@ const state = {
   selectedType: null,
   selectedIndex: -1,
   activeSegment: -1,
-  font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff' }
+  font: { family: 'Cairo', size: 20, weight: 700, color: '#ffffff' }
 };
 
 let currentTab = null;
@@ -69,8 +70,8 @@ function renderAll() {
 function playCardAnimation() {
   const card = document.getElementById('mainCard');
   const header = document.querySelector('.card-header');
-  const lyrics = document.getElementById('previewLyrics');
-  const footer = document.getElementById('previewFooter');
+  const lyrics = document.querySelector('.card-lyrics');
+  const footer = document.querySelector('.card-footer');
   if (!card) return;
 
   if (header) {
@@ -310,7 +311,7 @@ function initAudioSegmentListeners() {
 }
 
 /* ============================================
-   Lyrics
+   Lyrics List
    ============================================ */
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
@@ -352,6 +353,10 @@ function renderLyricsList() {
     container.appendChild(row);
   });
 }
+/* ============================================
+   dk.llyric Editor — Part 2/3
+   Timeline + Selection + Menu + Resize + Long Press
+   ============================================ */
 
 /* ============================================
    Timeline Duration
@@ -451,8 +456,9 @@ function selectAudio() {
   renderTimeline();
   renderAudioSelection();
   showCapcutMenu('audio');
-if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
+
 function renderAudioSelection() {
   const seg = document.getElementById('audioSegment');
   if (!seg) return;
@@ -478,7 +484,7 @@ function showCapcutMenu(type) {
       const svg = item.querySelector('svg');
       if (!svg) return;
       const svgData = svg.outerHTML;
-if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
+      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
         item.style.display = 'none';
       } else {
         item.style.display = '';
@@ -837,6 +843,10 @@ function startLongPressAudio(e, segEl) {
     }
   }, LONG_PRESS_MS);
 }
+/* ============================================
+   dk.llyric Editor — Part 3/3
+   Playhead + Sync + Play/Pause + Font + Background + Instagram + Misc
+   ============================================ */
 
 /* ============================================
    Playhead Position
@@ -1046,7 +1056,17 @@ function renderLyricFromPlayhead(idx) {
   const nextEl = document.getElementById('lyricNext');
   if (!currEl) return;
 
-  if (idx < 0) {
+  if (idx < 0 || idx >= state.lyrics.length || !state.lyrics[idx]) {
+    if (state.lyrics.length > 0 && state.lyrics[0].text) {
+      if (prevEl) prevEl.textContent = '';
+      currEl.textContent = state.lyrics[0].text;
+      if (nextEl) nextEl.textContent = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
+      currEl.style.opacity = '1';
+      currEl.classList.remove('animate-in');
+      void currEl.offsetWidth;
+      currEl.classList.add('animate-in');
+      return;
+    }
     if (prevEl) prevEl.textContent = '';
     if (nextEl) nextEl.textContent = '';
     currEl.textContent = 'اكتب الكلمات';
@@ -1197,7 +1217,10 @@ function removeBackground() {
   if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
   state.bgUrl = null;
   const bgImg = document.getElementById('bgImage');
-  if (bgImg) bgImg.src = '';
+  if (bgImg) {
+    bgImg.removeAttribute('src');
+    bgImg.src = '';
+  }
   document.getElementById('bgUploadBtn').classList.remove('hidden');
   document.getElementById('bgPreview').classList.add('hidden');
   document.getElementById('bgInput').value = '';
