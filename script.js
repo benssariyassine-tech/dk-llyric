@@ -1,6 +1,5 @@
 /* ============================================
-   dk.llyric Editor — Final v3.0
-   (Separated block position + file trim)
+   dk.llyric Editor — Final v4.0
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 1000;
@@ -9,16 +8,16 @@ const MIN_TIMELINE_SEC = 15;
 const state = {
   audioUrl: null,
   audioDuration: 0,
-  // Block position on timeline
   audioStart: 0,
   audioEnd: 0,
-  // Trim position in file (NEW)
   audioTrimIn: 0,
   audioTrimOut: 0,
   currentTime: 0,
   isPlaying: false,
   songName: 'راجع',
   artistName: 'عمرو دياب',
+  igName: 'dk.llyric',
+  bgUrl: null,
   lyrics: [
     { text: 'راجع بتقولي اللي ما بينا', start: 0, duration: 4, glass: false },
     { text: 'راجع', start: 5, duration: 3, glass: false }
@@ -42,15 +41,21 @@ let _longPressTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
   initAudioSegmentListeners();
+  initBgUpload();
+  initIgInput();
   renderAll();
   applyFont();
   setupPlayheadDrag();
   setupFontControls();
+  updateTimeDisplay();
 
   requestAnimationFrame(() => {
     state.currentTime = 0;
     setPlayheadPosition(0);
     updateTimeDisplay();
+    renderLyricFromPlayhead(0);
+    state.activeSegment = 0;
+    playCardAnimation();
   });
 });
 
@@ -61,20 +66,34 @@ function renderAll() {
 }
 
 /* ============================================
-   Helpers — Time conversions
+   Card Entry Animation
    ============================================ */
+function playCardAnimation() {
+  const banner = document.getElementById('cardBanner');
+  const info = document.getElementById('cardInfo');
+  const lyrics = document.getElementById('previewLyrics');
+  const footer = document.getElementById('previewFooter');
+  if (!banner) return;
+
+  setTimeout(() => banner.classList.add('expanded'), 300);
+  setTimeout(() => { if (info) info.classList.add('show'); }, 900);
+  setTimeout(() => { if (lyrics) lyrics.classList.add('show'); }, 1200);
+  setTimeout(() => { if (footer) footer.classList.add('show'); }, 1500);
+}
+
+/* ============================================
+   Helpers
+   ============================================ */
+function hasAudio() {
+  return state.audioUrl && state.audioDuration > 0;
+}
+
 function timelineToFile(timelineSec) {
-  // Timeline time → File time
   return state.audioTrimIn + (timelineSec - state.audioStart);
 }
 
 function fileToTimeline(fileSec) {
-  // File time → Timeline time
   return state.audioStart + (fileSec - state.audioTrimIn);
-}
-
-function hasAudio() {
-  return state.audioUrl && state.audioDuration > 0;
 }
 
 /* ============================================
@@ -86,12 +105,13 @@ function openTab(tabName, btnEl) {
   document.querySelectorAll('.editor-nav-item').forEach(el => el.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
   document.querySelectorAll('.sheet-content').forEach(el => el.classList.remove('active'));
-  const target = document.querySelector(`[data-sheet="${tabName}"]`);
+  const target = document.querySelector('[data-sheet="' + tabName + '"]');
   if (target) target.classList.add('active');
   document.getElementById('bottomSheet').classList.add('open');
   document.getElementById('sheetBackdrop').classList.add('open');
   if (navigator.vibrate) try { navigator.vibrate(8); } catch (e) {}
 }
+
 function closeSheet() {
   currentTab = null;
   document.querySelectorAll('.editor-nav-item').forEach(el => el.classList.remove('active'));
@@ -194,22 +214,26 @@ function initAudioSegmentListeners() {
 }
 
 /* ============================================
-   Lyrics
+   Lyrics List
    ============================================ */
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
   state.lyrics.push({ text: '', start: startAt, duration: 3, glass: false });
   renderAll();
 }
+
 function removeLyricLine(index) {
   if (state.lyrics.length <= 1) return;
   state.lyrics.splice(index, 1);
   renderAll();
 }
+
 function updateLyricText(index, text) {
   state.lyrics[index].text = text;
   renderTimeline();
+  if (index === state.activeSegment) renderLyricFromPlayhead(index);
 }
+
 function renderLyricsList() {
   const container = document.getElementById('lyricsList');
   if (!container) return;
@@ -234,7 +258,7 @@ function renderLyricsList() {
 }
 
 /* ============================================
-   Timeline Duration (Dynamic)
+   Timeline Duration
    ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
@@ -257,13 +281,13 @@ function renderRuler() {
     const tick = document.createElement('div');
     tick.className = 'ruler-tick';
     tick.style.left = (s * PX_PER_SEC) + 'px';
-    tick.innerHTML = `<span>${s}s</span><i></i>`;
+    tick.innerHTML = '<span>' + s + 's</span><i></i>';
     ruler.appendChild(tick);
   }
 }
 
 /* ============================================
-   Timeline Tracks
+   Timeline
    ============================================ */
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
@@ -279,7 +303,7 @@ function renderTimeline() {
     if (lyric.glass) seg.classList.add('glass');
     seg.style.left = (lyric.start * PX_PER_SEC) + 'px';
     seg.style.width = (lyric.duration * PX_PER_SEC) + 'px';
-    seg.textContent = lyric.text || `السطر ${index + 1}`;
+    seg.textContent = lyric.text || ('السطر ' + (index + 1));
     seg.dataset.index = index;
 
     const hL = document.createElement('div');
@@ -315,7 +339,7 @@ function renderTimeline() {
 }
 
 /* ============================================
-   Selection + Menu
+   Selection
    ============================================ */
 function selectText(index) {
   state.selectedType = 'text';
@@ -324,6 +348,7 @@ function selectText(index) {
   showCapcutMenu('text');
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
+
 function selectAudio() {
   state.selectedType = 'audio';
   state.selectedIndex = -1;
@@ -332,11 +357,13 @@ function selectAudio() {
   showCapcutMenu('audio');
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
+
 function renderAudioSelection() {
   const seg = document.getElementById('audioSegment');
   if (!seg) return;
   seg.classList.toggle('selected', state.selectedType === 'audio');
 }
+
 function clearSelection() {
   state.selectedType = null;
   state.selectedIndex = -1;
@@ -356,7 +383,7 @@ function showCapcutMenu(type) {
       const svg = item.querySelector('svg');
       if (!svg) return;
       const svgData = svg.outerHTML;
-      if (svgData.includes('M11 4H4') || svgData.includes('rx="4"')) {
+      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
         item.style.display = 'none';
       } else {
         item.style.display = '';
@@ -366,6 +393,7 @@ function showCapcutMenu(type) {
     menu.querySelectorAll('.cm-item').forEach(item => item.style.display = '');
   }
 }
+
 function hideCapcutMenu() {
   const menu = document.getElementById('capcutMenu');
   if (menu) menu.classList.remove('open');
@@ -404,26 +432,19 @@ function cmAction(action) {
   } else if (action === 'split') {
     const curT = state.currentTime;
 
-    // Split text
     if (state.selectedType === 'text') {
       const idx = state.selectedIndex;
       const l = state.lyrics[idx];
       if (curT > l.start && curT < l.start + l.duration) {
-        const first = { ...l, duration: Math.round((curT - l.start) * 10) / 10 };
-        const second = {
-          ...l,
-          start: Math.round(curT * 10) / 10,
-          duration: Math.round((l.start + l.duration - curT) * 10) / 10
-        };
+        const first = { text: l.text, start: l.start, duration: Math.round((curT - l.start) * 10) / 10, glass: l.glass };
+        const second = { text: l.text, start: Math.round(curT * 10) / 10, duration: Math.round((l.start + l.duration - curT) * 10) / 10, glass: l.glass };
         state.lyrics.splice(idx, 1, first, second);
         renderAll();
       }
     }
 
-    // Split audio — نخليو الجزء الأول فقط
     if (state.selectedType === 'audio') {
       if (hasAudio() && curT > state.audioStart && curT < state.audioEnd) {
-        // Trim out = ملف الموقع المقابل لـ curT
         const fileAtCursor = timelineToFile(curT);
         state.audioTrimOut = Math.round(fileAtCursor * 10) / 10;
         state.audioEnd = Math.round(curT * 10) / 10;
@@ -440,7 +461,7 @@ function cmAction(action) {
 }
 
 /* ============================================
-   Resize Handles
+   Resize
    ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
@@ -448,14 +469,12 @@ function startResize(e, index, side) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   _resize = {
     active: true,
-    index,
-    side,
+    index: index,
+    side: side,
     startX: cx,
     isAudio: state.selectedType === 'audio',
-    // For text:
     startDur: state.lyrics[index] ? state.lyrics[index].duration : 0,
     startStart: state.lyrics[index] ? state.lyrics[index].start : 0,
-    // For audio:
     startBlockStart: state.audioStart,
     startBlockEnd: state.audioEnd,
     startTrimIn: state.audioTrimIn,
@@ -478,47 +497,36 @@ function onResizeMove(e) {
   const deltaSec = dx / PX_PER_SEC;
 
   if (_resize.isAudio) {
-    // ====== قص الصوت ======
     if (_resize.side === 'left') {
-      // سحب المقبض الأيسر: audioStart و audioTrimIn كيتحركو مع بعض
       let newTrimIn = _resize.startTrimIn + deltaSec;
       let newBlockStart = _resize.startBlockStart + deltaSec;
-      // Constraint: trimIn ما تقدرش تكون أصغر من 0
       if (newTrimIn < 0) {
         newBlockStart -= newTrimIn;
         newTrimIn = 0;
       }
-      // Constraint: القص ما يعديش audioTrimOut - 0.5
       if (newTrimIn > _resize.startTrimOut - 0.5) {
         newTrimIn = _resize.startTrimOut - 0.5;
         newBlockStart = _resize.startBlockStart + (newTrimIn - _resize.startTrimIn);
       }
       state.audioTrimIn = Math.round(newTrimIn * 10) / 10;
       state.audioStart = Math.round(newBlockStart * 10) / 10;
-      // audioEnd / audioTrimOut يبقاو ثابتين
       state.audioEnd = _resize.startBlockEnd;
       state.audioTrimOut = _resize.startTrimOut;
     } else {
-      // سحب المقبض الأيمن: audioEnd و audioTrimOut كيتحركو مع بعض
       let newTrimOut = _resize.startTrimOut + deltaSec;
-      // Constraint: trimOut <= audioDuration
       if (newTrimOut > state.audioDuration) newTrimOut = state.audioDuration;
-      // Constraint: trimOut >= trimIn + 0.5
       if (newTrimOut < state.audioTrimIn + 0.5) newTrimOut = state.audioTrimIn + 0.5;
       state.audioTrimOut = Math.round(newTrimOut * 10) / 10;
       state.audioEnd = Math.round((state.audioStart + (state.audioTrimOut - state.audioTrimIn)) * 10) / 10;
-      // audioStart / audioTrimIn يبقاو ثابتين
       state.audioStart = _resize.startBlockStart;
       state.audioTrimIn = _resize.startTrimIn;
     }
-    // تحديث الـ DOM مباشرة (سلس)
     const seg = document.getElementById('audioSegment');
     if (seg) {
       seg.style.left = (state.audioStart * PX_PER_SEC) + 'px';
       seg.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     }
   } else {
-    // ====== قص الكلمة ======
     const idx = _resize.index;
     let newStart = _resize.startStart;
     let newDuration = _resize.startDur;
@@ -563,7 +571,7 @@ function onResizeEnd() {
 }
 
 /* ============================================
-   Text Overlap Detection
+   Text Overlap
    ============================================ */
 function checkTextOverlap() {
   const segs = document.querySelectorAll('.text-segment');
@@ -571,10 +579,12 @@ function checkTextOverlap() {
 
   for (let i = 0; i < state.lyrics.length; i++) {
     const a = state.lyrics[i];
-    const aS = a.start, aE = a.start + a.duration;
+    const aS = a.start;
+    const aE = a.start + a.duration;
     for (let j = i + 1; j < state.lyrics.length; j++) {
       const b = state.lyrics[j];
-      const bS = b.start, bE = b.start + b.duration;
+      const bS = b.start;
+      const bE = b.start + b.duration;
       if (aS < bE && aE > bS) {
         if (segs[i]) segs[i].classList.add('overlap');
         if (segs[j]) segs[j].classList.add('overlap');
@@ -582,12 +592,13 @@ function checkTextOverlap() {
     }
   }
 }
+
 function checkAllTextOverlaps() {
   checkTextOverlap();
 }
 
 /* ============================================
-   Long Press → Move Text Block
+   Long Press → Text
    ============================================ */
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -620,10 +631,10 @@ function startLongPressText(e, index, segEl) {
     _move = {
       active: true,
       isAudio: false,
-      index,
+      index: index,
       startX: cx,
       startStart: state.lyrics[index].start,
-      segEl
+      segEl: segEl
     };
 
     const onMoveFn = (ev) => {
@@ -636,6 +647,7 @@ function startLongPressText(e, index, segEl) {
       _move.segEl.style.left = (state.lyrics[_move.index].start * PX_PER_SEC) + 'px';
       checkTextOverlap();
     };
+
     const onEndFn = () => {
       if (_move && _move.segEl) _move.segEl.classList.remove('moving');
       _move = null;
@@ -646,22 +658,23 @@ function startLongPressText(e, index, segEl) {
       renderRuler();
       setTimeout(checkAllTextOverlaps, 20);
     };
+
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
       document.addEventListener('touchend', onEndFn);
     } else {
       document.addEventListener('mousemove', onMoveFn);
-      document.addEventListener('mouseup', onEndFn);
+      document.addEventListener('mouseup',[ onEndFn);
     }
   }, LONG_PRESS_MS);
 }
 
 /* ============================================
-   Long Press → Move Audio Block (ki yt7rek ghir block, trimIn/Out thabtin)
+0   Long Press → Audio
    ============================================ */
-function startLongPressAudio(e, segEl) {
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+function start].LongPressAudio(e, segEl) {
+  const cxclient = e.touches ? e.touches[Y0].clientX : e.clientX;
+  : const cy = e.touches ? e.touches e.clientY;
   let cancelled = false;
 
   const cancelIfMove = (ev) => {
@@ -695,7 +708,7 @@ function startLongPressAudio(e, segEl) {
       startX: cx,
       startStart: state.audioStart,
       width: blockWidth,
-      segEl
+      segEl: segEl
     };
 
     const onMoveFn = (ev) => {
@@ -706,10 +719,10 @@ function startLongPressAudio(e, segEl) {
       const newStart = Math.max(0, _move.startStart + deltaSec);
       state.audioStart = Math.round(newStart * 10) / 10;
       state.audioEnd = Math.round((newStart + _move.width) * 10) / 10;
-      // ⚠️ trimIn/trimOut ما كيتبدلوش
       _move.segEl.style.left = (state.audioStart * PX_PER_SEC) + 'px';
       _move.segEl.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     };
+
     const onEndFn = () => {
       if (_move && _move.segEl) _move.segEl.classList.remove('moving');
       _move = null;
@@ -719,6 +732,7 @@ function startLongPressAudio(e, segEl) {
       document.removeEventListener('touchend', onEndFn);
       renderRuler();
     };
+
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
       document.addEventListener('touchend', onEndFn);
@@ -738,7 +752,7 @@ function setPlayheadPosition(sec) {
   const maxEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
   const clampedSec = Math.max(0, Math.min(sec, maxEnd));
   const x = clampedSec * PX_PER_SEC;
-  ph.style.transform = `translateX(${x}px)`;
+  ph.style.transform = 'translateX(' + x + 'px)';
   state.currentTime = clampedSec;
   updateTimeDisplay();
 }
@@ -765,9 +779,8 @@ function setupPlayheadDrag() {
     sec = Math.max(0, Math.min(sec, maxEnd));
     const player = document.getElementById('audioPlayer');
     if (player && hasAudio()) {
-      // ⚠️ تحويل من timeline → file
       const fileSec = timelineToFile(sec);
-      try { player.currentTime = Math.max(0, Math.min(fileSec, state.audioDuration)); } catch (e) {}
+      try { player.currentTime = Math.max(0, Math.min(fileSec, state.audioDuration)); } catch (err) {}
     }
     setPlayheadPosition(sec);
     syncPlayheadToLyric();
@@ -811,7 +824,7 @@ function setupPlayheadDrag() {
     const onRulerTouch = (e) => {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       seekTo(pxToTime(clientX));
-      if (navigator.vibrate) try { navigator.vibrate(8); } catch (e) {}
+      if (navigator.vibrate) try { navigator.vibrate(8); } catch (err) {}
     };
     ruler.addEventListener('mousedown', onRulerTouch);
     ruler.addEventListener('touchstart', onRulerTouch, { passive: true });
@@ -845,16 +858,14 @@ function startPlayheadLoop() {
     const isAudioActive = hasAudio();
 
     if (isAudioActive && player && !player.paused && !player.ended) {
-      // ⚠️ تحويل من file → timeline
       const fileTime = player.currentTime;
       const timelineTime = fileToTimeline(fileTime);
       state.currentTime = timelineTime;
 
-      // إذا وصلنا لآخر القص → وقف
       if (fileTime >= state.audioTrimOut) {
         player.pause();
         state.currentTime = state.audioEnd;
-        if (ph) ph.style.transform = `translateX(${state.audioEnd * PX_PER_SEC}px)`;
+        if (ph) ph.style.transform = 'translateX(' + (state.audioEnd * PX_PER_SEC) + 'px)';
         updateTimeDisplay();
         syncPlayheadToLyric();
         state.isPlaying = false;
@@ -870,7 +881,7 @@ function startPlayheadLoop() {
 
     if (state.currentTime >= maxEnd) {
       state.currentTime = maxEnd;
-      if (ph) ph.style.transform = `translateX(${maxEnd * PX_PER_SEC}px)`;
+      if (ph) ph.style.transform = 'translateX(' + (maxEnd * PX_PER_SEC) + 'px)';
       updateTimeDisplay();
       syncPlayheadToLyric();
       state.isPlaying = false;
@@ -879,7 +890,7 @@ function startPlayheadLoop() {
       return;
     }
 
-    if (ph) ph.style.transform = `translateX(${state.currentTime * PX_PER_SEC}px)`;
+    if (ph) ph.style.transform = 'translateX(' + (state.currentTime * PX_PER_SEC) + 'px)';
     updateTimeDisplay();
     syncPlayheadToLyric();
 
@@ -923,7 +934,10 @@ function syncPlayheadToLyric() {
   let idx = -1;
   for (let i = 0; i < state.lyrics.length; i++) {
     const l = state.lyrics[i];
-    if (t >= l.start && t < l.start + l.duration) { idx = i; break; }
+    if (t >= l.start && t < l.start + l.duration) {
+      idx = i;
+      break;
+    }
   }
   if (idx !== state.activeSegment) {
     state.activeSegment = idx;
@@ -932,60 +946,55 @@ function syncPlayheadToLyric() {
 }
 
 function renderLyricFromPlayhead(idx) {
-  const lyricEl = document.getElementById('previewLyric');
-  const el = document.getElementById('lyricElement');
-  if (!lyricEl || !el) return;
+  const prevEl = document.getElementById('lyricPrev');
+  const currEl = document.getElementById('lyricCurrent');
+  const nextEl = document.getElementById('lyricNext');
+  if (!currEl) return;
 
   if (idx < 0) {
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = 'lyricFadeOut 0.3s ease forwards';
+    if (prevEl) prevEl.textContent = '';
+    if (nextEl) nextEl.textContent = '';
+    currEl.textContent = 'اكتب الكلمات';
+    currEl.style.opacity = '0.5';
     return;
   }
 
-  lyricEl.textContent = state.lyrics[idx].text || 'اكتب الكلمات';
-  el.classList.toggle('glass-mode', !!state.lyrics[idx].glass);
-  el.style.animation = 'none';
-  void el.offsetWidth;
-  el.style.animation = 'lyricFadeIn 0.4s ease';
+  currEl.style.opacity = '1';
+  if (prevEl) prevEl.textContent = state.lyrics[idx - 1] ? (state.lyrics[idx - 1].text || '') : '';
+  currEl.textContent = state.lyrics[idx].text || 'اكتب الكلمات';
+  if (nextEl) nextEl.textContent = state.lyrics[idx + 1] ? (state.lyrics[idx + 1].text || '') : '';
+
+  currEl.classList.remove('animate-in');
+  void currEl.offsetWidth;
+  currEl.classList.add('animate-in');
 }
 
 /* ============================================
-   Play / Pause — Trim Aware
+   Play / Pause
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
-  const hasAudioTrack = hasAudio();
-  const maxEnd = hasAudioTrack ? state.audioEnd : getTimelineDuration();
+  const isAudioActive = hasAudio();
+  const maxEnd = isAudioActive ? state.audioEnd : getTimelineDuration();
 
   if (state.isPlaying) {
-    if (player && hasAudioTrack) player.pause();
+    if (player && isAudioActive) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
     let startAt = state.currentTime;
 
-    // إذا الوقت الحالي قبل بداية الكتلة → روح لبداية الكتلة
-    if (hasAudioTrack && startAt < state.audioStart) {
-      startAt = state.audioStart;
-    }
-    // إذا وصلنا لآخر الكتلة → رجع لبداية الكتلة
-    if (hasAudioTrack && startAt >= state.audioEnd - 0.05) {
-      startAt = state.audioStart;
-    }
-    // بلا أغنية: إذا وصلنا للنهاية → رجع لـ 0
-    if (!hasAudioTrack && startAt >= maxEnd - 0.05) {
-      startAt = 0;
-    }
+    if (isAudioActive && startAt < state.audioStart) startAt = state.audioStart;
+    if (isAudioActive && startAt >= state.audioEnd - 0.05) startAt = state.audioStart;
+    if (!isAudioActive && startAt >= maxEnd - 0.05) startAt = 0;
 
     state.currentTime = startAt;
     setPlayheadPosition(startAt);
 
-    if (player && hasAudioTrack) {
-      // ⚠️ تحويل من timeline → file
+    if (player && isAudioActive) {
       const fileStart = timelineToFile(startAt);
-      try { player.currentTime = Math.max(0, fileStart); } catch (e) {}
-      player.play().catch(e => console.warn('play err:', e));
+      try { player.currentTime = Math.max(0, fileStart); } catch (err) {}
+      player.play().catch(err => console.warn('play err:', err));
     }
     state.isPlaying = true;
     startPlayheadLoop();
@@ -1004,8 +1013,8 @@ function updatePlayIcon() {
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
-  const hasAudioTrack = hasAudio();
-  const maxEnd = hasAudioTrack ? state.audioEnd : getTimelineDuration();
+  const isAudioActive = hasAudio();
+  const maxEnd = isAudioActive ? state.audioEnd : getTimelineDuration();
   const cur = Math.max(0, Math.min(state.currentTime, maxEnd));
   el.textContent = fmt(cur) + ' / ' + fmt(maxEnd);
 }
@@ -1044,13 +1053,93 @@ function setupFontControls() {
 }
 
 function applyFont() {
-  const el = document.getElementById('previewLyric');
-  if (!el) return;
-  el.style.fontFamily = `'${state.font.family}', sans-serif`;
-  el.style.fontSize = state.font.size + 'px';
-  el.style.fontWeight = state.font.weight;
-  el.style.color = state.font.color;
-  el.style.textShadow = '0 4px 20px rgba(0,0,0,0.6)';
+  const curr = document.getElementById('lyricCurrent');
+  if (curr) {
+    curr.style.fontFamily = "'" + state.font.family + "', sans-serif";
+    curr.style.fontSize = state.font.size + 'px';
+    curr.style.fontWeight = state.font.weight;
+    curr.style.color = state.font.color;
+    curr.style.textShadow = '0 2px 20px rgba(0,0,0,0.5)';
+  }
+  const prev = document.getElementById('lyricPrev');
+  const next = document.getElementById('lyricNext');
+  [prev, next].forEach(el => {
+    if (el) el.style.fontFamily = "'" + state.font.family + "', sans-serif";
+  });
+}
+
+/* ============================================
+   Font Filter
+   ============================================ */
+function setFontFilter(filter, btnEl) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  document.querySelectorAll('.font-family-btn').forEach(btn => {
+    const lang = btn.dataset.lang || 'ar';
+    if (filter === 'all' || filter === lang) btn.classList.remove('hidden');
+    else btn.classList.add('hidden');
+  });
+}
+
+/* ============================================
+   Aspect Ratio
+   ============================================ */
+function setAspectRatio(ratio, btnEl) {
+  const frame = document.getElementById('previewFrame');
+  if (!frame) return;
+  frame.setAttribute('data-ratio', ratio);
+  document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch (err) {}
+}
+
+/* ============================================
+   Background Upload
+   ============================================ */
+function initBgUpload() {
+  const bgInput = document.getElementById('bgInput');
+  if (!bgInput) return;
+  bgInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
+    state.bgUrl = URL.createObjectURL(file);
+    const bgImg = document.getElementById('bgImage');
+    if (bgImg) bgImg.src = state.bgUrl;
+    document.getElementById('bgUploadBtn').classList.add('hidden');
+    document.getElementById('bgPreview').classList.remove('hidden');
+    document.getElementById('bgPreviewImg').src = state.bgUrl;
+    document.getElementById('bgPreviewName').textContent = file.name;
+  });
+}
+
+function removeBackground() {
+  if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
+  state.bgUrl = null;
+  const bgImg = document.getElementById('bgImage');
+  if (bgImg) bgImg.src = '';
+  document.getElementById('bgUploadBtn').classList.remove('hidden');
+  document.getElementById('bgPreview').classList.add('hidden');
+  document.getElementById('bgInput').value = '';
+}
+
+/* ============================================
+   Instagram
+   ============================================ */
+function initIgInput() {
+  const igInput = document.getElementById('igNameInput');
+  if (!igInput) return;
+  igInput.addEventListener('input', (e) => {
+    const val = e.target.value.trim() || 'dk.llyric';
+    const igNameEl = document.getElementById('igName');
+    if (igNameEl) igNameEl.textContent = val;
+    state.igName = val;
+  });
+}
+
+function openInstagram() {
+  const name = state.igName || 'dk.llyric';
+  window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
 }
 
 /* ============================================
@@ -1076,97 +1165,10 @@ document.addEventListener('click', (e) => {
 function closeEditor() {
   if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
 }
-function exportVideo() { alert('التصدير راح يتوفر قريباً!'); }
+
+function exportVideo() {
+  alert('التصدير راح يتوفر قريباً!');
+}
+
 function undoAction() {}
 function redoAction() {}
-/* ============================================
-   🖼️ Background Upload
-   ============================================ */
-document.addEventListener('DOMContentLoaded', () => {
-  const bgInput = document.getElementById('bgInput');
-  if (bgInput) {
-    bgInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
-      state.bgUrl = URL.createObjectURL(file);
-      const bgImg = document.getElementById('bgImage');
-      if (bgImg) bgImg.src = state.bgUrl;
-      document.getElementById('bgUploadBtn').classList.add('hidden');
-      document.getElementById('bgPreview').classList.remove('hidden');
-      document.getElementById('bgPreviewImg').src = state.bgUrl;
-      document.getElementById('bgPreviewName').textContent = file.name;
-    });
-  }
-
-  const igInput = document.getElementById('igNameInput');
-  if (igInput) {
-    igInput.addEventListener('input', (e) => {
-      const val = e.target.value.trim() || 'dk.llyric';
-      document.getElementById('igName').textContent = val;
-      state.igName = val;
-    });
-  }
-});
-
-function removeBackground() {
-  if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
-  state.bgUrl = null;
-  document.getElementById('bgImage').src = '';
-  document.getElementById('bgUploadBtn').classList.remove('hidden');
-  document.getElementById('bgPreview').classList.add('hidden');
-  document.getElementById('bgInput').value = '';
-}
-
-/* ============================================
-   📐 Aspect Ratio
-   ============================================ */
-function setAspectRatio(ratio, btnEl) {
-  const frame = document.getElementById('previewFrame');
-  if (!frame) return;
-  frame.setAttribute('data-ratio', ratio);
-  document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
-  if (btnEl) btnEl.classList.add('active');
-  if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
-}
-
-/* ============================================
-   🔤 Font Filter
-   ============================================ */
-function setFontFilter(filter, btnEl) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  if (btnEl) btnEl.classList.add('active');
-  document.querySelectorAll('.font-family-btn').forEach(btn => {
-    const lang = btn.dataset.lang || 'ar';
-    if (filter === 'all' || filter === lang) {
-      btn.classList.remove('hidden');
-    } else {
-      btn.classList.add('hidden');
-    }
-  });
-}
-
-/* ============================================
-   📸 Open Instagram
-   ============================================ */
-function openInstagram() {
-  window.open('https://instagram.com/dk.llyric', '_blank');
-}
-
-/* ============================================
-   🎬 Entry Animation
-   ============================================ */
-function playEntryAnimation() {
-  const stage = document.createElement('div');
-  stage.className = 'entry-stage';
-  stage.innerHTML = `<img class="entry-img" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">`;
-  document.body.appendChild(stage);
-
-  setTimeout(() => stage.classList.add('expand'), 400);
-  setTimeout(() => stage.classList.add('hide'), 1400);
-  setTimeout(() => stage.remove(), 2100);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  playEntryAnimation();
-});
