@@ -587,27 +587,12 @@ function setPlayheadPosition(sec) {
 /* ============================================
    Playhead Drag
    ============================================ */
-function setupPlayheadDrag() {
-  const ph = document.getElementById('playhead');
-  const vp = document.getElementById('timelineViewport');
-  const content = document.getElementById('timelineContent');
-  if (!ph || !vp || !content) return;
-
-  let dragging = false;
-
-  const pxToTime = (clientX) => {
-    const rect = content.getBoundingClientRect();
-    const x = clientX - rect.left;
-    return Math.max(0, x / PX_PER_SEC);
-  };
-
-  const seekTo = (sec) => {
-    const maxEnd = (state.audioUrl && state.audioDuration > 0)
-      ? state.audioEnd
-      : getTimelineDuration();
+const seekTo = (sec) => {
+    const hasAudio = state.audioUrl && state.audioDuration > 0;
+    const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
     sec = Math.max(0, Math.min(sec, maxEnd));
     const player = document.getElementById('audioPlayer');
-    if (player && state.audioUrl) {
+    if (player && hasAudio) {
       try { player.currentTime = sec; } catch (e) {}
     }
     setPlayheadPosition(sec);
