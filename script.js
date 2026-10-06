@@ -1,9 +1,9 @@
 /* ============================================
-   dk.llyric Editor v7 — CapCut Style (Final)
+   dk.llyric Editor — Final v1.0
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 2000;
-const MIN_TIMELINE_SEC = 30;
+const MIN_TIMELINE_SEC = 15;
 
 const state = {
   audioUrl: null,
@@ -39,18 +39,19 @@ let _longPressTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
   initAudioSegmentListeners();
-  renderRuler();
-  renderTimeline();
-  renderLyricsList();
+  renderAll();
   applyFont();
   setupPlayheadDrag();
   setupFontControls();
   updateTimeDisplay();
-
-  // ✅ ضع المؤشر في البداية (0s)
-  state.currentTime = 0;
   setPlayheadPosition(0);
 });
+
+function renderAll() {
+  renderRuler();
+  renderTimeline();
+  renderLyricsList();
+}
 
 /* ============================================
    Tabs
@@ -65,6 +66,7 @@ function openTab(tabName, btnEl) {
   if (target) target.classList.add('active');
   document.getElementById('bottomSheet').classList.add('open');
   document.getElementById('sheetBackdrop').classList.add('open');
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
 }
 function closeSheet() {
   currentTab = null;
@@ -94,8 +96,7 @@ function initAudioUpload() {
       state.audioEnd = player.duration;
       updateAudioSegment();
       updateTimeDisplay();
-      renderRuler();
-      renderTimeline();
+      renderAll();
     };
     document.getElementById('audioUploadBtn').classList.add('hidden');
     document.getElementById('audioPreview').classList.remove('hidden');
@@ -124,17 +125,13 @@ function removeAudio() {
   document.getElementById('audioSegment').classList.add('hidden');
   document.getElementById('audioAddBtn').classList.remove('hidden');
   updateTimeDisplay();
-  renderRuler();
-  renderTimeline();
+  renderAll();
 }
 
 function openAudioPicker() {
   document.getElementById('audioInput').click();
 }
 
-/* ============================================
-   Audio Segment Listeners
-   ============================================ */
 function initAudioSegmentListeners() {
   const audioSeg = document.getElementById('audioSegment');
   if (!audioSeg) return;
@@ -163,14 +160,12 @@ function initAudioSegmentListeners() {
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
   state.lyrics.push({ text: '', start: startAt, duration: 3, glass: false });
-  renderLyricsList();
-  renderTimeline();
+  renderAll();
 }
 function removeLyricLine(index) {
   if (state.lyrics.length <= 1) return;
   state.lyrics.splice(index, 1);
-  renderLyricsList();
-  renderTimeline();
+  renderAll();
 }
 function updateLyricText(index, text) {
   state.lyrics[index].text = text;
@@ -200,13 +195,16 @@ function renderLyricsList() {
 }
 
 /* ============================================
-   Timeline
+   Timeline Duration (Dynamic)
    ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
   return Math.max(state.audioDuration || 0, lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
+/* ============================================
+   Ruler
+   ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
   if (!ruler) return;
@@ -222,6 +220,9 @@ function renderRuler() {
   }
 }
 
+/* ============================================
+   Timeline Tracks
+   ============================================ */
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
   if (!trackText) return;
@@ -343,14 +344,14 @@ function cmAction(action) {
         glass: src.glass
       };
       state.lyrics.splice(state.selectedIndex + 1, 0, newLine);
-      renderTimeline();
-      renderLyricsList();
+      renderAll();
     }
     hideCapcutMenu();
   } else if (action === 'glass') {
     if (state.selectedType === 'text') {
       state.lyrics[state.selectedIndex].glass = !state.lyrics[state.selectedIndex].glass;
       renderTimeline();
+      renderLyricFromPlayhead(state.selectedIndex);
     }
     hideCapcutMenu();
   } else if (action === 'edit') {
@@ -365,8 +366,7 @@ function cmAction(action) {
         const first = { ...l, duration: splitAt - l.start };
         const second = { ...l, start: splitAt, duration: l.start + l.duration - splitAt };
         state.lyrics.splice(idx, 1, first, second);
-        renderTimeline();
-        renderLyricsList();
+        renderAll();
       }
     }
     hideCapcutMenu();
@@ -415,7 +415,7 @@ function onResizeMove(e) {
     updateAudioSegment();
   } else {
     if (_resize.side === 'right') {
-      const d = Math.max(0.5, Math.min(60, _resize.startDur + deltaSec));
+      const d = Math.max(0.5, Math.min(300, _resize.startDur + deltaSec));
       state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
     } else {
       const s = Math.max(0, _resize.startStart + deltaSec);
@@ -424,6 +424,7 @@ function onResizeMove(e) {
       state.lyrics[_resize.index].duration = Math.round(d * 10) / 10;
     }
     renderTimeline();
+    renderRuler();
   }
 }
 function onResizeEnd() {
@@ -490,6 +491,7 @@ function startLongPress(e, index, segEl) {
       document.removeEventListener('mouseup', onEndFn);
       document.removeEventListener('touchmove', onMoveFn);
       document.removeEventListener('touchend', onEndFn);
+      renderRuler();
     };
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
@@ -514,7 +516,7 @@ function setPlayheadPosition(sec) {
 }
 
 /* ============================================
-   Playhead Drag
+   Playhead Drag (Cap)
    ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
@@ -531,11 +533,14 @@ function setupPlayheadDrag() {
   };
 
   const seekTo = (sec) => {
+    const maxEnd = getTimelineDuration();
+    sec = Math.min(sec, maxEnd);
     const player = document.getElementById('audioPlayer');
     if (player && state.audioUrl) {
       try { player.currentTime = sec; } catch (e) {}
     }
     setPlayheadPosition(sec);
+    syncPlayheadToLyric();
   };
 
   const onMove = (e) => {
@@ -595,7 +600,7 @@ function setupPlayheadDrag() {
 }
 
 /* ============================================
-   ▶️ Playhead Loop — Clock + Audio Sync
+   ▶️ Playhead Loop (RAF)
    ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
@@ -608,35 +613,31 @@ function startPlayheadLoop() {
     const player = document.getElementById('audioPlayer');
     const ph = document.getElementById('playhead');
 
-    // ✅ الوقت: من الأغنية أو من الساعة اليدوية
     if (player && state.audioUrl && !player.paused && !player.ended) {
       state.currentTime = player.currentTime;
     } else {
       state.currentTime += dt;
     }
 
-    // ✅ نهاية المدة
     const maxEnd = state.audioUrl && state.audioDuration
-      ? state.audioDuration
+      ? state.audioEnd
       : getTimelineDuration();
 
-    // ✅ إذا وصلنا للنهاية → وقف
     if (state.currentTime >= maxEnd) {
       state.currentTime = maxEnd;
       if (ph) ph.style.transform = `translateX(${maxEnd * PX_PER_SEC}px)`;
       updateTimeDisplay();
+      syncPlayheadToLyric();
       state.isPlaying = false;
       updatePlayIcon();
       stopPlayheadLoop();
       return;
     }
 
-    // ✅ حرّك المؤشر
     if (ph) ph.style.transform = `translateX(${state.currentTime * PX_PER_SEC}px)`;
     updateTimeDisplay();
     syncPlayheadToLyric();
 
-    // ✅ auto-scroll
     if (state.audioUrl && player && !player.paused) {
       autoScrollPlayhead();
     }
@@ -670,7 +671,7 @@ function autoScrollPlayhead() {
 }
 
 /* ============================================
-   Sync Playhead <-> Lyric
+   Sync Playhead → Lyric
    ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
@@ -710,21 +711,19 @@ function renderLyricFromPlayhead(idx) {
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const maxEnd = state.audioUrl && state.audioDuration
-    ? state.audioDuration
+    ? state.audioEnd
     : getTimelineDuration();
 
   if (state.isPlaying) {
-    // ⏸ إيقاف
     if (player && state.audioUrl) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
-    // ▶️ تشغيل — إذا كنا في النهاية، ارجع للبداية
     if (state.currentTime >= maxEnd - 0.1) {
       state.currentTime = 0;
       setPlayheadPosition(0);
       if (player && state.audioUrl) {
-        try { player.currentTime = 0; } catch (e) {}
+        try { player.currentTime = state.audioStart; } catch (e) {}
       }
     }
 
@@ -749,7 +748,10 @@ function updatePlayIcon() {
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
-  el.textContent = fmt(state.currentTime) + ' / ' + fmt(state.audioDuration || 0);
+  const maxEnd = state.audioUrl && state.audioDuration
+    ? state.audioEnd
+    : getTimelineDuration();
+  el.textContent = fmt(state.currentTime) + ' / ' + fmt(maxEnd);
 }
 
 function fmt(s) {
@@ -796,7 +798,7 @@ function applyFont() {
 }
 
 /* ============================================
-   Tap on empty area → hide menu
+   Tap → Hide Menu
    ============================================ */
 document.addEventListener('click', (e) => {
   if (state.selectedType) {
