@@ -12,11 +12,8 @@
 </head>
 <body class="editor-body">
 
-  <div class="ambient-bg" id="ambientBg"></div>
-
-  <!-- 🔝 Topbar -->
   <header class="editor-topbar">
-    <button class="etb-btn" onclick="closeEditor()" aria-label="Close">
+    <button class="etb-btn" onclick="closeEditor()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"/>
         <line x1="6" y1="6" x2="18" y2="18"/>
@@ -24,25 +21,22 @@
     </button>
     <div class="etb-title-wrap">
       <span class="etb-title">مشروع جديد</span>
-      <svg class="etb-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
     <span class="etb-badge">HD</span>
     <button class="etb-export" onclick="exportVideo()">حفظ</button>
   </header>
 
-  <!-- 🎬 Preview Area -->
   <div class="preview-wrap">
-    <div class="preview-frame" id="previewFrame">
+    <div class="preview-frame">
       <div class="preview-card">
         <div class="preview-header">
-          <img class="preview-cover" id="previewCover"
-               src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+          <img class="preview-cover" id="previewCover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
           <div class="preview-header-text">
             <div class="preview-song" id="previewSong">راجع</div>
             <div class="preview-artist" id="previewArtist">عمرو دياب</div>
           </div>
         </div>
-        <div class="preview-lyrics" id="previewLyrics">
+        <div class="preview-lyrics">
           <div class="lyric-element" id="lyricElement" onclick="selectLyric()">
             <span class="lyric-text" id="previewLyric">راجع بتقولي اللي ما بينا</span>
             <div class="lyric-handles">
@@ -54,26 +48,24 @@
           </div>
         </div>
         <div class="preview-footer">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14.5c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 4-.9 7.5-.5 10.3 1.2.3.2.4.6.3.8zm1.2-2.7c-.2.4-.7.5-1.1.3-2.9-1.8-7.3-2.3-10.6-1.2-.4.1-.8-.1-1-.5-.1-.4.1-.8.5-1 3.8-1.2 8.7-.6 12 1.4.4.2.5.7.2 1zm.1-2.8C14.1 8.8 8.4 8.6 5.1 9.6c-.5.1-1-.2-1.1-.7-.1-.5.2-1 .7-1.1 3.8-1.2 10.1-.9 14.1 1.4.4.3.6.9.3 1.3-.3.4-.9.6-1.="3.3z"/></svg>
-          <0span>Spotify</span>
-        </div >
+          <span class="pf-text">Spotify</span>
+        </div>
       </div>
     </div>
-0  </div>
+  </div>
 
-  <!-- 🎮 Playback Controls -->
-  < div class="playback-controls">
-    <24button class="pc-btn" id="playBtn" onclick="togglePlay()" aria-label="Play">
-      <svg id="playIcon" viewBox 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  <div class="playback-controls">
+    <button class="pc-btn" id="playBtn" onclick="togglePlay()">
+      <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
     </button>
     <div class="pc-time" id="timeDisplay">00:00 / 00:00</div>
-    <button class="pc-btn" onclick="undoAction()" aria-label="Undo">
+    <button class="pc-btn" onclick="undoAction()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 14 4 9 9 4"/>
         <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
       </svg>
     </button>
-    <button class="pc-btn" onclick="redoAction()" aria-label="Redo">
+    <button class="pc-btn" onclick="redoAction()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 14 20 9 15 4"/>
         <path d="M4 20v-7a4 4 0 0 1 4-4h12"/>
@@ -81,24 +73,13 @@
     </button>
   </div>
 
-  <!-- 🎞️ Timeline -->
   <div class="timeline-wrap">
-    <div class="timeline-ruler" id="timelineRuler">
-      <!-- Dynamic ticks -->
-    </div>
+    <div class="timeline-ruler" id="timelineRuler"></div>
     <div class="timeline-scroll" id="timelineScroll">
       <div class="timeline-tracks" id="timelineTracks">
-        <!-- Text Track -->
         <div class="track track-text" id="trackText"></div>
-        <!-- Audio Track -->
         <div class="track track-audio" id="trackAudio">
           <div class="audio-segment hidden" id="audioSegment">
-            <div class="audio-waveform">
-              <span></span><span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
             <div class="audio-label" id="audioLabel">Imported audio</div>
           </div>
           <button class="audio-add-btn" id="audioAddBtn" onclick="openAudioPicker()">
@@ -106,12 +87,10 @@
           </button>
         </div>
       </div>
-      <!-- Playhead -->
       <div class="playhead" id="playhead"></div>
     </div>
   </div>
 
-  <!-- 🎛️ Bottom Nav -->
   <nav class="editor-nav">
     <button class="editor-nav-item" data-tab="audio" onclick="openTab('audio', this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -140,12 +119,10 @@
     </button>
   </nav>
 
-  <!-- 📦 Bottom Sheet -->
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
   <div class="bottom-sheet" id="bottomSheet">
     <div class="sheet-handle"></div>
 
-    <!-- صوت -->
     <div class="sheet-content" data-sheet="audio">
       <h3 class="sheet-title">الصوت</h3>
       <label for="audioInput" class="upload-btn" id="audioUploadBtn">
@@ -163,20 +140,18 @@
       <audio id="audioPlayer" class="hidden"></audio>
     </div>
 
-    <!-- نص -->
     <div class="sheet-content" data-sheet="text">
       <h3 class="sheet-title">النص (الكلمات)</h3>
-      <p class="sheet-hint">اكتب كل سطر — كل سطر راح يظهر وحده في الوقت المحدد</p>
+      <p class="sheet-hint">اكتب كل سطر — كل سطر راح يظهر وحده</p>
       <div id="lyricsList"></div>
       <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر جديد</button>
     </div>
 
-    <!-- تأثيرات -->
     <div class="sheet-content" data-sheet="effects">
       <h3 class="sheet-title">التأثيرات</h3>
       <div class="font-group">
         <label class="font-label">الخط</label>
-        <div class="font-family-grid" id="fontFamilyGrid">
+        <div class="font-family-grid">
           <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
           <button class="font-family-btn" data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
           <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
@@ -199,7 +174,7 @@
         </div>
       </div>
       <div class="font-group">
-        <label class="font-label">الحركة (Fade In)</label>
+        <label class="font-label">الحركة</label>
         <div class="effect-row">
           <button class="effect-btn" data-anim="none">بدون</button>
           <button class="effect-btn active" data-anim="fadeUp">من تحت</button>
@@ -208,7 +183,6 @@
       </div>
     </div>
 
-    <!-- قوالب -->
     <div class="sheet-content" data-sheet="template">
       <h3 class="sheet-title">القوالب</h3>
       <p class="sheet-hint">القوالب مقفولة — التصميم ما يتغيرش</p>
