@@ -17,13 +17,13 @@ const state = {
   bgEnd: 15,
   currentTime: 0,
   isPlaying: false,
-  songName: 'راجع',
-  artistName: 'عمرو دياب',
+  songName: '',
+  artistName: '',
   igName: 'dk.llyric',
   bgUrl: null,
   lyrics: [
-    { text: 'راجع بتقولي اللي ما بينا', start: 0, duration: 4, glass: false },
-    { text: 'راجع', start: 5, duration: 3, glass: false }
+    { text: '', start: 0, duration: 4, glass: false },
+    { text: '', start: 5, duration: 3, glass: false }
   ],
   selectedType: null,
   selectedIndex: -1,
