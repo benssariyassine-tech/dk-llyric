@@ -1,9 +1,9 @@
 /* ============================================
-   dk.llyric Editor — Final v2.0
-   (Smooth crop + Audio trim + Overlap detection)
+   dk.llyric Editor — Final v2.1
+   (Smooth crop + Audio move + Audio split)
    ============================================ */
 const PX_PER_SEC = 30;
-const LONG_PRESS_MS = 2000;
+const LONG_PRESS_MS = 1000;
 const MIN_TIMELINE_SEC = 15;
 
 const state = {
@@ -157,6 +157,14 @@ function initAudioSegmentListeners() {
   hR.addEventListener('mousedown', e => startResize(e, 0, 'right'));
   hR.addEventListener('touchstart', e => startResize(e, 0, 'right'), { passive: false });
   audioSeg.appendChild(hR);
+
+  // ✅ Long Press = Move Audio Block
+  const lp = (e) => {
+    if (e.target.classList.contains('seg-handle')) return;
+    startLongPressAudio(e, audioSeg);
+  };
+  audioSeg.addEventListener('mousedown', lp);
+  audioSeg.addEventListener('touchstart', lp, { passive: true });
 }
 
 /* ============================================
@@ -267,17 +275,16 @@ function renderTimeline() {
 
     seg.addEventListener('mousedown', e => {
       if (e.target.classList.contains('seg-handle')) return;
-      startLongPress(e, index, seg);
+      startLongPressText(e, index, seg);
     });
     seg.addEventListener('touchstart', e => {
       if (e.target.classList.contains('seg-handle')) return;
-      startLongPress(e, index, seg);
+      startLongPressText(e, index, seg);
     }, { passive: true });
 
     trackText.appendChild(seg);
   });
 
-  // ✅ تحقق من التداخلات بعد الرندر
   setTimeout(checkAllTextOverlaps, 10);
 }
 
@@ -369,15 +376,34 @@ function cmAction(action) {
     hideCapcutMenu();
     openTab('text', document.querySelector('.editor-nav-item[data-tab="text"]'));
   } else if (action === 'split') {
+    const curT = state.currentTime;
+
+    // ✅ تقسيم النص
     if (state.selectedType === 'text') {
       const idx = state.selectedIndex;
       const l = state.lyrics[idx];
-      const splitAt = state.currentTime;
-      if (splitAt > l.start && splitAt < l.start + l.duration) {
-        const first = { ...l, duration: splitAt - l.start };
-        const second = { ...l, start: splitAt, duration: l.start + l.duration - splitAt };
+      if (curT > l.start && curT < l.start + l.duration) {
+        const first = { ...l, duration: Math.round((curT - l.start) * 10) / 10 };
+        const second = {
+          ...l,
+          start: Math.round(curT * 10) / 10,
+          duration: Math.round((l.start + l.duration - curT) * 10) / 10
+        };
         state.lyrics.splice(idx, 1, first, second);
         renderAll();
+      }
+    }
+
+    // ✅ تقسيم الصوت (نخليو الجزء الأول فقط)
+    if (state.selectedType === 'audio') {
+      const hasAudio = state.audioUrl && state.audioDuration > 0;
+      if (hasAudio && curT > state.audioStart && curT < state.audioEnd) {
+        state.audioEnd = Math.round(curT * 10) / 10;
+        updateAudioSegment();
+        if (state.currentTime > state.audioEnd) {
+          state.currentTime = state.audioEnd;
+          setPlayheadPosition(state.currentTime);
+        }
       }
     }
     hideCapcutMenu();
@@ -385,7 +411,7 @@ function cmAction(action) {
 }
 
 /* ============================================
-   Resize Handles — SMOOTH (bلا re-render)
+   Resize Handles — SMOOTH (بدون re-render)
    ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
@@ -425,7 +451,6 @@ function onResizeMove(e) {
       const ns = Math.max(0, Math.min(state.audioEnd - 0.5, _resize.startStart + deltaSec));
       state.audioStart = Math.round(ns * 10) / 10;
     }
-    // ✅ تحديث DOM مباشرة (سلس)
     const seg = document.getElementById('audioSegment');
     if (seg) {
       seg.style.left = (state.audioStart * PX_PER_SEC) + 'px';
@@ -447,7 +472,6 @@ function onResizeMove(e) {
     state.lyrics[idx].start = Math.round(newStart * 10) / 10;
     state.lyrics[idx].duration = Math.round(newDuration * 10) / 10;
 
-    // ✅ تحديث DOM مباشرة (سلس — بلا re-render)
     const segs = document.querySelectorAll('.text-segment');
     const seg = segs[idx];
     if (seg) {
@@ -455,7 +479,6 @@ function onResizeMove(e) {
       seg.style.width = (state.lyrics[idx].duration * PX_PER_SEC) + 'px';
     }
 
-    // ✅ تحقق التداخل + إطار أحمر
     checkTextOverlap();
   }
 }
@@ -470,7 +493,6 @@ function onResizeEnd() {
   document.removeEventListener('touchmove', onResizeMove);
   document.removeEventListener('touchend', onResizeEnd);
 
-  // ✅ بعد القص، نحدّثو الـ ruler + نتحققو من التداخلات
   if (wasText) {
     renderRuler();
     setTimeout(checkAllTextOverlaps, 20);
@@ -497,15 +519,14 @@ function checkTextOverlap() {
     }
   }
 }
-
 function checkAllTextOverlaps() {
   checkTextOverlap();
 }
 
 /* ============================================
-   Long Press = Move Block
+   Long Press → Move Text Block (1s)
    ============================================ */
-function startLongPress(e, index, segEl) {
+function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
   let cancelled = false;
@@ -535,6 +556,7 @@ function startLongPress(e, index, segEl) {
 
     _move = {
       active: true,
+      isAudio: false,
       index,
       startX: cx,
       startStart: state.lyrics[index].start,
@@ -572,6 +594,78 @@ function startLongPress(e, index, segEl) {
 }
 
 /* ============================================
+   Long Press → Move Audio Block (1s)
+   ============================================ */
+function startLongPressAudio(e, segEl) {
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  let cancelled = false;
+
+  const cancelIfMove = (ev) => {
+    const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    const my = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    if (Math.abs(mx - cx) > 10 || Math.abs(my - cy) > 10) {
+      cancelled = true;
+      clearTimeout(_longPressTimer);
+    }
+  };
+
+  if (e.touches) {
+    document.addEventListener('touchmove', cancelIfMove, { passive: true });
+    document.addEventListener('touchend', () => { clearTimeout(_longPressTimer); }, { once: true });
+  } else {
+    document.addEventListener('mousemove', cancelIfMove, { passive: true });
+    document.addEventListener('mouseup', () => { clearTimeout(_longPressTimer); }, { once: true });
+  }
+
+  _longPressTimer = setTimeout(() => {
+    if (cancelled) return;
+    selectAudio();
+    segEl.classList.add('moving');
+    if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+
+    const dur = state.audioEnd - state.audioStart;
+
+    _move = {
+      active: true,
+      isAudio: true,
+      startX: cx,
+      startStart: state.audioStart,
+      duration: dur,
+      segEl
+    };
+
+    const onMoveFn = (ev) => {
+      if (!_move || !_move.active) return;
+      const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+      const dx = mx - _move.startX;
+      const deltaSec = dx / PX_PER_SEC;
+      const newStart = Math.max(0, _move.startStart + deltaSec);
+      state.audioStart = Math.round(newStart * 10) / 10;
+      state.audioEnd = Math.round((newStart + _move.duration) * 10) / 10;
+      _move.segEl.style.left = (state.audioStart * PX_PER_SEC) + 'px';
+      _move.segEl.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
+    };
+    const onEndFn = () => {
+      if (_move && _move.segEl) _move.segEl.classList.remove('moving');
+      _move = null;
+      document.removeEventListener('mousemove', onMoveFn);
+      document.removeEventListener('mouseup', onEndFn);
+      document.removeEventListener('touchmove', onMoveFn);
+      document.removeEventListener('touchend', onEndFn);
+      renderRuler();
+    };
+    if (e.touches) {
+      document.addEventListener('touchmove', onMoveFn, { passive: false });
+      document.addEventListener('touchend', onEndFn);
+    } else {
+      document.addEventListener('mousemove', onMoveFn);
+      document.addEventListener('mouseup', onEndFn);
+    }
+  }, LONG_PRESS_MS);
+}
+
+/* ============================================
    Playhead Position
    ============================================ */
 function setPlayheadPosition(sec) {
@@ -587,7 +681,7 @@ function setPlayheadPosition(sec) {
 }
 
 /* ============================================
-   Playhead Drag (Cap)
+   Playhead Drag
    ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
@@ -672,7 +766,7 @@ function setupPlayheadDrag() {
 }
 
 /* ============================================
-   Playhead Loop — Clock + Audio Sync + Trim
+   Playhead Loop
    ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
@@ -687,10 +781,7 @@ function startPlayheadLoop() {
     const hasAudio = state.audioUrl && state.audioDuration > 0;
 
     if (hasAudio && player && !player.paused && !player.ended) {
-      // ✅ الوقت من الصوت
       state.currentTime = player.currentTime;
-
-      // ✅ القص الفعلي: إذا وصلنا لنهاية القص، وقف
       if (state.currentTime >= state.audioEnd) {
         player.pause();
         state.currentTime = state.audioEnd;
@@ -703,7 +794,6 @@ function startPlayheadLoop() {
         return;
       }
     } else {
-      // ساعة يدوية (بلا أغنية)
       state.currentTime += dt;
     }
 
@@ -792,7 +882,7 @@ function renderLyricFromPlayhead(idx) {
 }
 
 /* ============================================
-   Play / Pause — Trim Aware
+   Play / Pause
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
@@ -806,15 +896,12 @@ function togglePlay() {
   } else {
     let startAt = state.currentTime;
 
-    // ✅ القص الفعلي: إذا كان الوقت الحالي قبل audioStart، ننتقل لـ audioStart
     if (hasAudio && startAt < state.audioStart) {
       startAt = state.audioStart;
     }
-    // إذا وصلنا لآخر الأغنية، نرجع للبداية الفعلية
     if (hasAudio && startAt >= state.audioEnd - 0.05) {
       startAt = state.audioStart;
     }
-    // بلا أغنية: إذا وصلنا للنهاية، نرجع لـ 0
     if (!hasAudio && startAt >= maxEnd - 0.05) {
       startAt = 0;
     }
