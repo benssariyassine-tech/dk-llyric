@@ -266,12 +266,12 @@ function showCapcutMenu(type) {
   const menu = document.getElementById('capcutMenu');
   if (!menu) return;
   menu.classList.add('open');
-  // في حالة الصوت، نخبيو "تعديل" و "زجاجي"
+  document.body.classList.add('menu-open'); // ← زيد هذا
+
   if (type === 'audio') {
     menu.querySelectorAll('.cm-item').forEach(item => {
-      const svg = item.querySelector('svg');
-      const svgData = svg.outerHTML;
-      if (svgData.includes('M11 4H4') || svgData.includes('rect x="3" y="3" width="18" height="18" rx="4"')) {
+      const svgData = item.querySelector('svg').outerHTML;
+      if (svgData.includes('M11 4H4') || svgData.includes('rx="4"')) {
         item.style.display = 'none';
       } else {
         item.style.display = '';
@@ -284,6 +284,7 @@ function showCapcutMenu(type) {
 function hideCapcutMenu() {
   const menu = document.getElementById('capcutMenu');
   if (menu) menu.classList.remove('open');
+  document.body.classList.remove('menu-open'); // ← زيد هذا
 }
 
 function cmAction(action) {
@@ -666,3 +667,25 @@ function closeEditor() {
 function exportVideo() { alert('التصدير راح يتوفر قريباً!'); }
 function undoAction() {}
 function redoAction() {}
+/* ============================================
+   🎯 Tap على الشاشة → إخفاء القائمة
+   ============================================ */
+document.addEventListener('click', (e) => {
+  // إذا كاين اختيار
+  if (state.selectedType) {
+    // كليكي على قائمة CapCut → تجاهل
+    if (e.target.closest('.capcut-menu')) return;
+    // كليكي على قائمة رئيسية → تجاهل
+    if (e.target.closest('.editor-nav')) return;
+    // كليكي على Bottom Sheet → تجاهل
+    if (e.target.closest('.bottom-sheet')) return;
+    if (e.target.closest('.sheet-backdrop')) return;
+    // كليكي على كلمة/أغنية → تجاهل (الدالة الخاصة تديرها)
+    if (e.target.closest('.text-segment')) return;
+    if (e.target.closest('.audio-segment')) return;
+    if (e.target.closest('.playhead')) return;
+    
+    // كليكي في أي مكان آخر → خفي الكل
+    clearSelection();
+  }
+}, true); // ← capture phase باش يشتغل قبل ما ينشر
