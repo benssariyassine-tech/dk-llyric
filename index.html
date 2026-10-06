@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>dk.llyric — Music Cards</title>
+<meta name="description" content="Interactive Lyric Video Maker">
+<meta name="theme-color" content="#0b0b0f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     🎨 iStore Design System
+     (نفس الألوان والخطوط تاع iStore)
+     ============================================ */
+  :root {
+    --bg-color: #0b0b0f;
+    --card-bg: #16161c;
+    --text-color: #ffffff;
+    --subtext-color: #8e8e93;
+    --accent: #0a84ff;
+    --accent2: #0062d2;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --radius-lg: 22px;
+    --radius-xl: 28px;
+    --radius-2xl: 32px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    padding-top: calc(24px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    background-image:
+      radial-gradient(ellipse 60% 50% at 15% 15%, rgba(10, 132, 255, 0.15) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 85% 85%, rgba(0, 98, 210, 0.12) 0%, transparent 65%);
+    background-attachment: fixed;
+  }
+
+  /* ============================================
+     🃏 البطاقة الأساسية
+     ============================================ */
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes cardAppear {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* ============================================
+     🖼️ صورة الغلاف
+     ============================================ */
+  .cover {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, #1a1a24, #0b0b0f);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card:hover .cover img {
+    transform: scale(1.05);
+  }
+
+  /* توهج فوق الصورة */
+  .cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* ============================================
+     📝 المعلومات (اسم الأغنية + الفنان)
+     ============================================ */
+  .info {
+    padding: 24px 24px 28px;
+    text-align: center;
+    position: relative;
+  }
+
+  .song-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text-color);
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #ffffff, #b8b8c0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .artist-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  /* خط فاصل صغير */
+  .divider {
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    margin: 0 auto 16px;
+    box-shadow: 0 0 12px rgba(10, 132, 255, 0.5);
+  }
+
+  /* زر تشغيل تجريبي (ماشي مفعّل دابا) */
+  .play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    box-shadow:
+      0 8px 24px rgba(10, 132, 255, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+
+  .play-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.5);
+  }
+
+  .play-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #ffffff;
+  }
+
+  /* ============================================
+     📱 الجوال - تعديلات صغيرة
+     ============================================ */
+  @media (max-width: 400px) {
+    body { padding: 20px 16px; }
+    .card { max-width: 100%; }
+    .info { padding: 20px 20px 24px; }
+    .song-title { font-size: 20px; }
+    .artist-name { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 🃏 البطاقة -->
+  <div class="card">
+
+    <!-- 🖼️ صورة الغلاف -->
+    <div class="cover">
+      <!-- 🎨 غير رابط الصورة هنا بأي صورة تحب -->
+      <img 
+        src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80" 
+        alt="Cover"
+        onerror="this.style.display='none'"
+      >
+    </div>
+
+    <!-- 📝 المعلومات -->
+    <div class="info">
+      <div class="divider"></div>
+      <h1 class="song-title">اسم الأغنية هنا</h1>
+      <p class="artist-name">اسم الفنان</p>
+      
+      <!-- زر تشغيل تجريبي -->
+      <button class="play-btn" type="button">
+        <svg viewBox="0 0 24 24">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        تشغيل
+      </button>
+    </div>
+
+  </div>
+
+</body>
+</html>
