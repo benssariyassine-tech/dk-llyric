@@ -35,6 +35,14 @@ let _longPressTimer = null;
 // ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
+   // كي تكمل الـ sync
+requestAnimationFrame(() => {
+  const playhead = document.getElementById('playhead');
+  if (playhead) {
+    playhead.style.left = '0px';
+    playhead.style.transform = 'translateX(-50%)';
+  }
+});
   renderRuler();
   renderTimeline();
   renderPreview();
