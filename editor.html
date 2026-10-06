@@ -205,7 +205,7 @@
     </div>
 
     <!-- 🖼️ BACKGROUND -->
-    <div class="sheet-content" data-sheet="bg">
+<div class="sheet-content" data-sheet="bg">
       <h3 class="sheet-title">الخلفية</h3>
       <p class="sheet-hint">صورة خلفية — إذا ما حطيتش، تكون سوداء</p>
       <label for="bgInput" class="upload-btn" id="bgUploadBtn">
@@ -220,6 +220,42 @@
           <div class="upload-preview-meta">تم الرفع ✓</div>
         </div>
         <button class="upload-preview-remove" onclick="removeBackground()">×</button>
+      </div>
+
+      <div id="bgFiltersBox" style="display:none;">
+        <div class="font-group" style="margin-top:20px;">
+          <label class="font-label">الضبابية: <span id="bgBlurVal">0</span>px</label>
+          <input type="range" id="bgBlurRange" min="0" max="30" step="1" value="0" class="font-slider">
+        </div>
+
+        <div class="font-group">
+          <label class="font-label">السطوع: <span id="bgBrightnessVal">100</span>%</label>
+          <input type="range" id="bgBrightnessRange" min="20" max="200" step="5" value="100" class="font-slider">
+        </div>
+
+        <div class="font-group">
+          <label class="font-label">التشبع: <span id="bgSaturationVal">100</span>%</label>
+          <input type="range" id="bgSaturationRange" min="0" max="200" step="5" value="100" class="font-slider">
+        </div>
+
+        <div class="font-group">
+          <label class="font-label">التباين: <span id="bgContrastVal">100</span>%</label>
+          <input type="range" id="bgContrastRange" min="50" max="200" step="5" value="100" class="font-slider">
+        </div>
+
+        <div class="font-group">
+          <label class="font-label">الشفافية: <span id="bgOpacityVal">100</span>%</label>
+          <input type="range" id="bgOpacityRange" min="10" max="100" step="5" value="100" class="font-slider">
+        </div>
+
+        <div class="font-group">
+          <label class="font-label">تدوير اللون: <span id="bgHueVal">0</span>°</label>
+          <input type="range" id="bgHueRange" min="0" max="360" step="5" value="0" class="font-slider">
+        </div>
+
+        <button onclick="resetBgFilters()" style="width:100%;padding:12px;background:rgba(10,132,255,0.15);color:#0a84ff;border:1px solid rgba(10,132,255,0.3);border-radius:12px;font-weight:700;font-family:inherit;font-size:13px;cursor:pointer;margin-top:4px;">
+          إعادة ضبط الفلاتر
+        </button>
       </div>
     </div>
 
