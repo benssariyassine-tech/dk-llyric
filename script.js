@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
   initAudioSegmentListeners();
   initBgUpload();
+  initBgFilters();
   initIgInput();
   initCardControls();
   renderAll();
