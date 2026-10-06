@@ -185,10 +185,15 @@ function applyAudioEffects() {
    ✍️ Lyrics
    ============================================ */
 function addLyricLine() {
-  const lastEnd = state.lyrics.reduce((max, l) => Math.max(max, l.start + l.duration), 0);
-  state.lyrics.push({ text: '', start: lastEnd, duration: 3 });
+  // ✅ الكلمة الجديدة تروح عند المؤشر الحالي
+  const startAt = Math.round(state.currentTime * 10) / 10;
+  state.lyrics.push({ text: '', start: startAt, duration: 3 });
+  state.activeSegment = state.lyrics.length - 1;
   renderLyricsList();
   renderTimeline();
+  renderLyricFromPlayhead(state.activeSegment);
+  // اسكرول باش نبانو
+  scrollTimelineToLyric(state.activeSegment);
 }
 function removeLyricLine(index) {
   if (state.lyrics.length <= 1) return;
