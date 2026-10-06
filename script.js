@@ -1267,17 +1267,29 @@ function initBgSegmentListeners() {
     selectBg();
   });
 
-  // Handles (Resize) — يمين ويسار
+  // ✅ فرض selectedType = 'bg' قبل startResize
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
-  hL.addEventListener('mousedown', function(e) { startResize(e, 0, 'left'); });
-  hL.addEventListener('touchstart', function(e) { startResize(e, 0, 'left'); }, { passive: false });
+  hL.addEventListener('mousedown', function(e) {
+    state.selectedType = 'bg';
+    startResize(e, 0, 'left');
+  });
+  hL.addEventListener('touchstart', function(e) {
+    state.selectedType = 'bg';
+    startResize(e, 0, 'left');
+  }, { passive: false });
   seg.appendChild(hL);
 
   const hR = document.createElement('div');
   hR.className = 'seg-handle handle-right';
-  hR.addEventListener('mousedown', function(e) { startResize(e, 0, 'right'); });
-  hR.addEventListener('touchstart', function(e) { startResize(e, 0, 'right'); }, { passive: false });
+  hR.addEventListener('mousedown', function(e) {
+    state.selectedType = 'bg';
+    startResize(e, 0, 'right');
+  });
+  hR.addEventListener('touchstart', function(e) {
+    state.selectedType = 'bg';
+    startResize(e, 0, 'right');
+  }, { passive: false });
   seg.appendChild(hR);
 }
 function removeBackground() {
