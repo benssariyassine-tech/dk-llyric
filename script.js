@@ -13,6 +13,8 @@ const state = {
   audioEnd: 0,
   audioTrimIn: 0,
   audioTrimOut: 0,
+  bgStart: 0,
+  bgEnd: 15,
   currentTime: 0,
   isPlaying: false,
   songName: 'راجع',
