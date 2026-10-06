@@ -683,16 +683,30 @@ function startPlayheadLoop() {
 
     const player = document.getElementById('audioPlayer');
     const ph = document.getElementById('playhead');
+    const hasAudio = state.audioUrl && state.audioDuration > 0;
 
-    if (player && state.audioUrl && !player.paused && !player.ended) {
+    if (hasAudio && player && !player.paused && !player.ended) {
+      // ✅ الوقت الحقيقي من الصوت
       state.currentTime = player.currentTime;
+
+      // ✅ القص الفعلي: إذا وصلنا لآخر القص، وقف
+      if (state.currentTime >= state.audioEnd) {
+        player.pause();
+        state.currentTime = state.audioEnd;
+        if (ph) ph.style.transform = `translateX(${state.audioEnd * PX_PER_SEC}px)`;
+        updateTimeDisplay();
+        syncPlayheadToLyric();
+        state.isPlaying = false;
+        updatePlayIcon();
+        stopPlayheadLoop();
+        return;
+      }
     } else {
+      // بلا أغنية: الساعة اليدوية
       state.currentTime += dt;
     }
 
-    const maxEnd = (state.audioUrl && state.audioDuration > 0)
-      ? state.audioEnd
-      : getTimelineDuration();
+    const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
 
     if (state.currentTime >= maxEnd) {
       state.currentTime = maxEnd;
@@ -709,7 +723,7 @@ function startPlayheadLoop() {
     updateTimeDisplay();
     syncPlayheadToLyric();
 
-    if (state.audioUrl && player && !player.paused) {
+    if (hasAudio && player && !player.paused) {
       autoScrollPlayhead();
     }
 
