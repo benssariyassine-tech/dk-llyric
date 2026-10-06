@@ -478,7 +478,7 @@ function showCapcutMenu(type) {
       const svg = item.querySelector('svg');
       if (!svg) return;
       const svgData = svg.outerHTML;
-      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4" !== -1) {
+if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
         item.style.display = 'none';
       } else {
         item.style.display = '';
