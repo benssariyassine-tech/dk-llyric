@@ -11,20 +11,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   /* ============================================
-     🎨 iStore Design System
-     (نفس الألوان والخطوط تاع iStore)
+     🎨 الإعدادات الأساسية
      ============================================ */
   :root {
     --bg-color: #0b0b0f;
-    --card-bg: #16161c;
     --text-color: #ffffff;
-    --subtext-color: #8e8e93;
+    --subtext-color: #b8b8c0;
     --accent: #0a84ff;
-    --accent2: #0062d2;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --radius-lg: 22px;
-    --radius-xl: 28px;
-    --radius-2xl: 32px;
   }
 
   * {
@@ -37,7 +30,7 @@
   html, body {
     background: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Inter', 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     overflow-x: hidden;
@@ -50,192 +43,221 @@
     padding: 24px 20px;
     padding-top: calc(24px + env(safe-area-inset-top, 0px));
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-    background-image:
-      radial-gradient(ellipse 60% 50% at 15% 15%, rgba(10, 132, 255, 0.15) 0%, transparent 65%),
-      radial-gradient(ellipse 55% 45% at 85% 85%, rgba(0, 98, 210, 0.12) 0%, transparent 65%);
-    background-attachment: fixed;
+    position: relative;
+    isolation: isolate;
   }
 
   /* ============================================
-     🃏 البطاقة الأساسية
+     🌫️ الخلفية (صورة مبلورة داكنة)
      ============================================ */
-  .card {
-    width: 100%;
-    max-width: 380px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-2xl);
+  .ambient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
     overflow: hidden;
-    box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.03),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    position: relative;
-    animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #1a0a05;
   }
 
-  @keyframes cardAppear {
-    from {
-      opacity: 0;
-      transform: translateY(30px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  .ambient-bg::before {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) saturate(180%) brightness(0.4);
+    transform: scale(1.4);
+    opacity: 0.9;
   }
 
-  /* ============================================
-     🖼️ صورة الغلاف
-     ============================================ */
-  .cover {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: linear-gradient(135deg, #1a1a24, #0b0b0f);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .card:hover .cover img {
-    transform: scale(1.05);
-  }
-
-  /* توهج فوق الصورة */
-  .cover::after {
+  /* طبقة تعتيم خفيفة */
+  .ambient-bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      180deg,
+    background: radial-gradient(
+      ellipse at center,
       transparent 0%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.6) 100%
+      rgba(0, 0, 0, 0.4) 100%
     );
-    pointer-events: none;
   }
 
   /* ============================================
-     📝 المعلومات (اسم الأغنية + الفنان)
+     🃏 البطاقة (Glass + شفافة كيما Spotify)
      ============================================ */
-  .info {
-    padding: 24px 24px 28px;
-    text-align: center;
+  .card {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 9 / 16;                  /* نفس نسبة قصة انستغرام */
+    background: rgba(20, 15, 12, 0.55);    /* شفافية */
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow:
+      0 30px 80px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     position: relative;
+    overflow: hidden;
+    animation: cardAppear 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .song-title {
-    font-size: 22px;
+  @keyframes cardAppear {
+    from { opacity: 0; transform: translateY(40px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ============================================
+     🔝 الجزء 1: صورة مربعة + اسم الأغنية
+     ============================================ */
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .card-cover {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .card-header-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .card-song-name {
+    font-size: 18px;
     font-weight: 900;
-    color: var(--text-color);
-    letter-spacing: -0.5px;
-    line-height: 1.3;
-    margin-bottom: 6px;
-    background: linear-gradient(135deg, #ffffff, #b8b8c0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .artist-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
+  .card-artist-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* خط فاصل صغير */
-  .divider {
-    width: 40px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 3px;
-    margin: 0 auto 16px;
-    box-shadow: 0 0 12px rgba(10, 132, 255, 0.5);
+  /* ============================================
+     🎯 الجزء 2: الكلمات (وسط البطاقة)
+     ============================================ */
+  .card-lyrics {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px 8px;
   }
 
-  /* زر تشغيل تجريبي (ماشي مفعّل دابا) */
-  .play-btn {
-    display: inline-flex;
+  .lyric-line {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.5;
+    letter-spacing: -0.3px;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    animation: lyricAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes lyricAppear {
+    from { opacity: 0; transform: translateY(15px); filter: blur(8px); }
+    to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  /* ============================================
+     🔻 الجزء 3: اللوجو (تحت البطاقة)
+     ============================================ */
+  .card-footer {
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #ffffff;
-    border: none;
-    border-radius: 50px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    box-shadow:
-      0 8px 24px rgba(10, 132, 255, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .play-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.5);
-  }
-
-  .play-btn svg {
-    width: 16px;
-    height: 16px;
+  .card-footer svg {
+    width: 22px;
+    height: 22px;
     fill: #ffffff;
+    opacity: 0.9;
+  }
+
+  .card-footer-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.2px;
   }
 
   /* ============================================
-     📱 الجوال - تعديلات صغيرة
+     📱 الجوال
      ============================================ */
-  @media (max-width: 400px) {
-    body { padding: 20px 16px; }
-    .card { max-width: 100%; }
-    .info { padding: 20px 20px 24px; }
-    .song-title { font-size: 20px; }
-    .artist-name { font-size: 13px; }
+  @media (max-width: 420px) {
+    body { padding: 16px 14px; }
+    .card { padding: 24px 20px; border-radius: 24px; }
+    .card-cover { width: 58px; height: 58px; border-radius: 12px; }
+    .card-song-name { font-size: 17px; }
+    .card-artist-name { font-size: 12px; }
+    .lyric-line { font-size: 22px; }
+    .card-footer-text { font-size: 14px; }
   }
 </style>
 </head>
 <body>
 
+  <!-- 🌫️ الخلفية المبلورة -->
+  <div class="ambient-bg"></div>
+
   <!-- 🃏 البطاقة -->
   <div class="card">
 
-    <!-- 🖼️ صورة الغلاف -->
-    <div class="cover">
-      <!-- 🎨 غير رابط الصورة هنا بأي صورة تحب -->
+    <!-- 🔝 الجزء 1: صورة + اسم الأغنية -->
+    <div class="card-header">
       <img 
-        src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80" 
+        class="card-cover"
+        src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" 
         alt="Cover"
-        onerror="this.style.display='none'"
       >
+      <div class="card-header-text">
+        <div class="card-song-name">راجع</div>
+        <div class="card-artist-name">عمرو دياب</div>
+      </div>
     </div>
 
-    <!-- 📝 المعلومات -->
-    <div class="info">
-      <div class="divider"></div>
-      <h1 class="song-title">اسم الأغنية هنا</h1>
-      <p class="artist-name">اسم الفنان</p>
-      
-      <!-- زر تشغيل تجريبي -->
-      <button class="play-btn" type="button">
-        <svg viewBox="0 0 24 24">
-          <polygon points="5 3 19 12 5 21 5 3"/>
-        </svg>
-        تشغيل
-      </button>
+    <!-- 🎯 الجزء 2: الكلمات -->
+    <div class="card-lyrics">
+      <div class="lyric-line">راجع بتقولي اللي ما بينا</div>
+    </div>
+
+    <!-- 🔻 الجزء 3: اللوجو -->
+    <div class="card-footer">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14.5c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 4-.9 7.5-.5 10.3 1.2.3.2.4.6.3.8zm1.2-2.7c-.2.4-.7.5-1.1.3-2.9-1.8-7.3-2.3-10.6-1.2-.4.1-.8-.1-1-.5-.1-.4.1-.8.5-1 3.8-1.2 8.7-.6 12 1.4.4.2.5.7.2 1zm.1-2.8C14.1 8.8 8.4 8.6 5.1 9.6c-.5.1-1-.2-1.1-.7-.1-.5.2-1 .7-1.1 3.8-1.2 10.1-.9 14.1 1.4.4.3.6.9.3 1.3-.3.4-.9.6-1.3.3z"/>
+      </svg>
+      <span class="card-footer-text">Spotify</span>
     </div>
 
   </div>
