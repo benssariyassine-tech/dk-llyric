@@ -26,27 +26,22 @@
       <div class="bg-layer" id="bgLayer">
         <img id="bgImage" src="" alt="">
       </div>
-      <div class="preview-card" id="mainCard">
 
-        <!-- 🎬 Banner (image grows from thumbnail to banner) -->
-        <div class="card-banner" id="cardBanner">
-          <img class="banner-img" id="previewCover" src="https://images.unsplash.com/qphoto-149322=5457124-a803eb161ff"a5f? altw=800&="">
+<div class="preview-card" id="mainCard">
+        <div class="card-header">
+          <div class="card-cover-corner">
+            <img class="preview-cover" id="previewCover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+          </div>
+          <div class="card-header-text">
+            <div class="preview-song" id="previewSong">راجع</div>
+            <div class="preview-artist" id="previewArtist">عمرو دياب</div>
+          </div>
         </div>
-
-        <!-- Song + Artist -->
-        <div class="card-info" id="cardInfo">
-          <div class="preview-song" id="previewSong">راجع</div>
-          <div class="preview-artist" id="previewArtist">عمرو دياب</div>
-        </div>
-
-        <!-- 3-line Lyrics -->
         <div class="preview-lyrics" id="previewLyrics">
           <div class="lyric-prev" id="lyricPrev"></div>
           <div class="lyric-current" id="lyricCurrent">راجع بتقولي اللي ما بينا</div>
           <div class="lyric-next" id="lyricNext"></div>
         </div>
-
-        <!-- Instagram footer -->
         <div class="preview-footer" id="previewFooter" onclick="openInstagram()">
           <svg class="ig-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -55,6 +50,7 @@
           </svg>
           <span class="ig-name" id="igName">dk.llyric</span>
         </div>
+      </div>
 
       </div>
     </div>
