@@ -1075,3 +1075,32 @@ body {
   align-items: center;
 }
 .lyric-time-input { display: none; }
+/* ============================================
+   🔧 FIX — Bottom Sheet Layout
+   ============================================ */
+.bottom-sheet {
+  min-height: 200px;
+  max-height: 70vh;
+  padding: 12px 20px calc(90px + env(safe-area-inset-bottom, 0px));
+}
+
+.bottom-sheet .sheet-content.active {
+  display: block !important;
+  min-height: 100px;
+  padding-bottom: 10px;
+}
+
+/* نخليو الـ text inputs مرئية بزاف */
+.bottom-sheet .lyric-text-input,
+.bottom-sheet .lyric-time-input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  padding: 12px 14px;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.bottom-sheet .lyric-text-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
