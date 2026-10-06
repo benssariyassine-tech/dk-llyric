@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBgFilters();
   initBgSegmentListeners();
   initIgInput();
+  initSongInputs();
   initCardControls();
   renderAll();
   applyFont();
@@ -1495,4 +1496,27 @@ function renderBgSelection() {
   const seg = document.getElementById('bgSegment');
   if (!seg) return;
   seg.classList.toggle('selected', state.selectedType === 'bg');
+}
+/* ============================================
+   📝 Song Name + Artist Name Inputs
+   ============================================ */
+function initSongInputs() {
+  const songInput = document.getElementById('songNameInput');
+  const artistInput = document.getElementById('artistNameInput');
+
+  if (songInput) {
+    songInput.addEventListener('input', function(e) {
+      state.songName = e.target.value;
+      const preview = document.getElementById('previewSong');
+      if (preview) preview.textContent = e.target.value;
+    });
+  }
+
+  if (artistInput) {
+    artistInput.addEventListener('input', function(e) {
+      state.artistName = e.target.value;
+      const preview = document.getElementById('previewArtist');
+      if (preview) preview.textContent = e.target.value;
+    });
+  }
 }
