@@ -1275,3 +1275,135 @@ function exportVideo() {
 
 function undoAction() {}
 function redoAction() {}
+/* ============================================
+   🎨 BACKGROUND SEGMENT + FILTERS
+   ============================================ */
+
+// المتغيرات العامة للخلفية
+state.bgFilters = {
+  blur: 0,
+  brightness: 100,
+  saturation: 100,
+  contrast: 100,
+  opacity: 100,
+  hue: 0
+};
+
+/* ============================================
+   🎨 Update BG Segment in Timeline
+   ============================================ */
+function updateBgSegment() {
+  const seg = document.getElementById('bgSegment');
+  if (!seg) return;
+
+  if (!state.bgUrl) {
+    seg.classList.add('hidden');
+    return;
+  }
+
+  seg.classList.remove('hidden');
+
+  // نفس طول الأغنية (إذا كاينة)، وإلا كيتبع آخر كلمة
+  const start = hasAudio() ? state.audioStart : 0;
+  const end = hasAudio() ? state.audioEnd : getTimelineDuration();
+
+  seg.style.left = (start * PX_PER_SEC) + 'px';
+  seg.style.width = ((end - start) * PX_PER_SEC) + 'px';
+}
+
+/* ============================================
+   🎨 Apply BG Filters to Image
+   ============================================ */
+function applyBgFilters() {
+  const bgImg = document.getElementById('bgImage');
+  if (!bgImg) return;
+
+  const f = state.bgFilters;
+  bgImg.style.filter =
+    'blur(' + f.blur + 'px) ' +
+    'brightness(' + f.brightness + '%) ' +
+    'saturate(' + f.saturation + '%) ' +
+    'contrast(' + f.contrast + '%) ' +
+    'hue-rotate(' + f.hue + 'deg)';
+  bgImg.style.opacity = (f.opacity / 100).toString();
+}
+
+/* ============================================
+   🎨 Init BG Filters Controls
+   ============================================ */
+function initBgFilters() {
+  const pairs = [
+    { range: 'bgBlurRange', val: 'bgBlurVal', key: 'blur' },
+    { range: 'bgBrightnessRange', val: 'bgBrightnessVal', key: 'brightness' },
+    { range: 'bgSaturationRange', val: 'bgSaturationVal', key: 'saturation' },
+    { range: 'bgContrastRange', val: 'bgContrastVal', key: 'contrast' },
+    { range: 'bgOpacityRange', val: 'bgOpacityVal', key: 'opacity' },
+    { range: 'bgHueRange', val: 'bgHueVal', key: 'hue' }
+  ];
+
+  pairs.forEach(function(p) {
+    const r = document.getElementById(p.range);
+    const v = document.getElementById(p.val);
+    if (!r) return;
+
+    r.addEventListener('input', function(e) {
+      const value = parseInt(e.target.value);
+      state.bgFilters[p.key] = value;
+      if (v) v.textContent = value;
+      applyBgFilters();
+    });
+  });
+}
+
+/* ============================================
+   🎨 Reset BG Filters
+   ============================================ */
+function resetBgFilters() {
+  state.bgFilters = {
+    blur: 0,
+    brightness: 100,
+    saturation: 100,
+    contrast: 100,
+    opacity: 100,
+    hue: 0
+  };
+
+  // Reset UI
+  const setVal = function(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  };
+  const setText = function(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  setVal('bgBlurRange', 0); setText('bgBlurVal', 0);
+  setVal('bgBrightnessRange', 100); setText('bgBrightnessVal', 100);
+  setVal('bgSaturationRange', 100); setText('bgSaturationVal', 100);
+  setVal('bgContrastRange', 100); setText('bgContrastVal', 100);
+  setVal('bgOpacityRange', 100); setText('bgOpacityVal', 100);
+  setVal('bgHueRange', 0); setText('bgHueVal', 0);
+
+  applyBgFilters();
+
+  if (navigator.vibrate) try { navigator.vibrate(15); } catch (e) {}
+}
+
+/* ============================================
+   🎨 Select BG Segment
+   ============================================ */
+function selectBg() {
+  state.selectedType = 'bg';
+  state.selectedIndex = -1;
+  renderTimeline();
+  renderBgSelection();
+  showCapcutMenu('bg');
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+}
+
+function renderBgSelection() {
+  const seg = document.getElementById('bgSegment');
+  if (!seg) return;
+  seg.classList.toggle('selected', state.selectedType === 'bg');
+}
