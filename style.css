@@ -779,14 +779,14 @@ body {
   border-radius: 4px;
   margin: 0 auto 18px;
 }
-
 .sheet-content {
-  display: none;
+  display: none !important;
 }
 .sheet-content.active {
-  display: block;
+  display: block !important;
   animation: sheetContentIn 0.3s ease;
 }
+
 
 @keyframes sheetContentIn {
   from { opacity: 0; transform: translateY(10px); }
