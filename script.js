@@ -534,18 +534,80 @@ function renderLyricFromPlayhead(idx) {
    ▶️ Play / Pause / Loop
    ============================================ */
 function togglePlay() {
-  if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
   const player = document.getElementById('audioPlayer');
+  
+  // ✅ إذا كاين أغنية → شغل الصوت
+  // ✅ إذا ماكاينش → غير حرك المؤشر بصرياً
+  
   if (state.isPlaying) {
-    player.pause();
+    // وقف
+    if (player && state.audioUrl) player.pause();
     state.isPlaying = false;
+    stopPlayheadLoop();
   } else {
-    player.currentTime = state.currentTime;
-    player.playbackRate = state.audioEffects.speed || 1;
-    player.play();
+    // شغل
+    if (player && state.audioUrl) {
+      player.currentTime = state.currentTime;
+      player.playbackRate = state.audioEffects.speed || 1;
+      player.play().catch(e => console.warn('Audio play error:', e));
+    }
     state.isPlaying = true;
+    startPlayheadLoop();
   }
   updatePlayIcon();
+}
+
+// ✅ حلقة تحديث مستقلة
+let _playheadLoop = null;
+function startPlayheadLoop() {
+  if (_playheadLoop) clearInterval(_playheadLoop);
+  
+  const startTime = Date.now();
+  const startCurrentTime = state.currentTime;
+  
+  _playheadLoop = setInterval(() => {
+    const player = document.getElementById('audioPlayer');
+    
+    // ✅ إذا كاين أغنية → نقراو من الصوت
+    if (player && state.audioUrl && !player.paused && !player.ended) {
+      state.currentTime = player.currentTime;
+    } else if (state.audioUrl && player && player.ended) {
+      // سمع الأغنية كاملة
+      state.isPlaying = false;
+      updatePlayIcon();
+      stopPlayheadLoop();
+      return;
+    } else {
+      // ✅ بلا أغنية → نحسبو الوقت يدوياً
+      const elapsed = (Date.now() - startTime) / 1000;
+      state.currentTime = startCurrentTime + elapsed;
+      
+      // إذا وصلنا لنهاية كل الكلمات → وقف
+      const totalLyricsEnd = state.lyrics.reduce((max, l) => Math.max(max, l.start + l.duration), 0);
+      if (state.currentTime > totalLyricsEnd) {
+        state.isPlaying = false;
+        updatePlayIcon();
+        stopPlayheadLoop();
+        return;
+      }
+    }
+    
+    // حرك المؤشر
+    const x = state.currentTime * PX_PER_SEC;
+    const playhead = document.getElementById('playhead');
+    if (playhead) {
+      playhead.style.left = x + 'px';
+      playhead.style.transform = 'translateX(-50%)';
+    }
+    updateTimeDisplay();
+    syncPlayheadToLyric();
+  }, 50);
+}
+function stopPlayheadLoop() {
+  if (_playheadLoop) {
+    clearInterval(_playheadLoop);
+    _playheadLoop = null;
+  }
 }
 
 function updatePlayIcon() {
