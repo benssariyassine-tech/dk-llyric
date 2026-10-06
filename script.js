@@ -1101,16 +1101,16 @@ function renderLyricFromPlayhead(idx) {
       currEl.classList.add('animate-in');
       return;
     }
-    if (prevEl) prevEl.textContent = '';
+if (prevEl) prevEl.textContent = '';
     if (nextEl) nextEl.textContent = '';
-    currEl.textContent = 'اكتب الكلمات';
-    currEl.style.opacity = '0.5';
+    currEl.textContent = '';
+    currEl.style.opacity = '0.3';
     return;
   }
 
   currEl.style.opacity = '1';
   if (prevEl) prevEl.textContent = state.lyrics[idx - 1] ? (state.lyrics[idx - 1].text || '') : '';
-  currEl.textContent = state.lyrics[idx].text || 'اكتب الكلمات';
+  currEl.textContent = state.lyrics[idx].text || '';
   if (nextEl) nextEl.textContent = state.lyrics[idx + 1] ? (state.lyrics[idx + 1].text || '') : '';
 
   currEl.classList.remove('animate-in');
