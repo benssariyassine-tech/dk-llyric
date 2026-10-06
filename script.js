@@ -471,6 +471,7 @@ function clearSelection() {
   state.selectedIndex = -1;
   renderTimeline();
   renderAudioSelection();
+  renderBgSelection();
   hideCapcutMenu();
 }
 
