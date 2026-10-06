@@ -114,11 +114,10 @@ body {
 
 /* ============================================
    🎯 MIDDLE — Lyrics Zone
-===   ============================================ */
+   ============================================ */
 .card-lyrics {
-  flex: */
- 1;
-  min-height: 140px.card;
+  flex: 1;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -127,7 +126,6 @@ body {
   padding: 10px 0;
 }
 
-/* السطر السابق واللاحق */
 .lyric-prev,
 .lyric-next {
   font-size: 15px;
@@ -138,7 +136,6 @@ body {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* السطر النشط */
 .lyric-current {
   font-size: 20px;
   font-weight: 700;
@@ -149,7 +146,6 @@ body {
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* أنيميشن دخول السطر النشط */
 .lyric-current.animate-in {
   animation: lyricEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -168,23 +164,27 @@ body {
 }
 
 /* ============================================
-   🔻 FOOTER — Branding
-   =========================================-footer {
+   🔻 FOOTER — Branding (Fixed Alignment)
+   ============================================ */
+.card-footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  /* 🎯 Bottom-Left Positioning */
   justify-content: flex-start;
+  gap: 6px;
   padding-top: 4px;
+  line-height: 1;
+  direction: ltr;
 }
 
 .ig-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   color: #ffffff;
   stroke: #ffffff;
   fill: none;
+  display: block;
+  margin-top: 1px;
 }
 
 .ig-name {
@@ -195,14 +195,13 @@ body {
   letter-spacing: -0.2px;
   white-space: nowrap;
   line-height: 1;
+  display: block;
+  margin-top: 1px;
 }
 </style>
 </head>
 <body>
 
-  <!-- ============================================
-       📦 CARD
-       ============================================ -->
   <div class="card-wrapper">
     <div class="spotify-card">
 
@@ -228,7 +227,7 @@ body {
 
       <!-- 🔻 FOOTER -->
       <div class="card-footer">
-<svg class="ig-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="ig-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
           <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
           <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
