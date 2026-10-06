@@ -1079,3 +1079,94 @@ function closeEditor() {
 function exportVideo() { alert('التصدير راح يتوفر قريباً!'); }
 function undoAction() {}
 function redoAction() {}
+/* ============================================
+   🖼️ Background Upload
+   ============================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  const bgInput = document.getElementById('bgInput');
+  if (bgInput) {
+    bgInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
+      state.bgUrl = URL.createObjectURL(file);
+      const bgImg = document.getElementById('bgImage');
+      if (bgImg) bgImg.src = state.bgUrl;
+      document.getElementById('bgUploadBtn').classList.add('hidden');
+      document.getElementById('bgPreview').classList.remove('hidden');
+      document.getElementById('bgPreviewImg').src = state.bgUrl;
+      document.getElementById('bgPreviewName').textContent = file.name;
+    });
+  }
+
+  const igInput = document.getElementById('igNameInput');
+  if (igInput) {
+    igInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim() || 'dk.llyric';
+      document.getElementById('igName').textContent = val;
+      state.igName = val;
+    });
+  }
+});
+
+function removeBackground() {
+  if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
+  state.bgUrl = null;
+  document.getElementById('bgImage').src = '';
+  document.getElementById('bgUploadBtn').classList.remove('hidden');
+  document.getElementById('bgPreview').classList.add('hidden');
+  document.getElementById('bgInput').value = '';
+}
+
+/* ============================================
+   📐 Aspect Ratio
+   ============================================ */
+function setAspectRatio(ratio, btnEl) {
+  const frame = document.getElementById('previewFrame');
+  if (!frame) return;
+  frame.setAttribute('data-ratio', ratio);
+  document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
+}
+
+/* ============================================
+   🔤 Font Filter
+   ============================================ */
+function setFontFilter(filter, btnEl) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  document.querySelectorAll('.font-family-btn').forEach(btn => {
+    const lang = btn.dataset.lang || 'ar';
+    if (filter === 'all' || filter === lang) {
+      btn.classList.remove('hidden');
+    } else {
+      btn.classList.add('hidden');
+    }
+  });
+}
+
+/* ============================================
+   📸 Open Instagram
+   ============================================ */
+function openInstagram() {
+  window.open('https://instagram.com/dk.llyric', '_blank');
+}
+
+/* ============================================
+   🎬 Entry Animation
+   ============================================ */
+function playEntryAnimation() {
+  const stage = document.createElement('div');
+  stage.className = 'entry-stage';
+  stage.innerHTML = `<img class="entry-img" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">`;
+  document.body.appendChild(stage);
+
+  setTimeout(() => stage.classList.add('expand'), 400);
+  setTimeout(() => stage.classList.add('hide'), 1400);
+  setTimeout(() => stage.remove(), 2100);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  playEntryAnimation();
+});
