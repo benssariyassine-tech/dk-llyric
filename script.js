@@ -614,6 +614,20 @@ function onResizeMove(e) {
   const dx = cx - _resize.startX;
   const deltaSec = dx / PX_PER_SEC;
 
+  if (_resize.isBg) {
+    // Background segment: نفس منطق الصوت
+    if (_resize.side === 'left') {
+      const newStart = Math.max(0, _resize.startStart + deltaSec);
+      state.audioStart = Math.round(newStart * 10) / 10;
+    } else {
+      const newEnd = Math.max(state.audioStart + 0.5, _resize.startDur + deltaSec);
+      state.audioEnd = Math.round(newEnd * 10) / 10;
+    }
+    updateBgSegment();
+    updateAudioSegment();
+    return;
+  }
+
   if (_resize.isAudio) {
     if (_resize.side === 'left') {
       let newTrimIn = _resize.startTrimIn + deltaSec;
