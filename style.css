@@ -239,7 +239,7 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%) scale(var(--card-scale, 1));
   width: 92%;
-  max-width: 440px;
+  max-width: 92%;
   border-radius: var(--card-radius, 26px);
   padding: 20px 22px;
   background: rgba(15, 15, 15, var(--card-opacity, 0.65));
