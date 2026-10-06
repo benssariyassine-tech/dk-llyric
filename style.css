@@ -2232,3 +2232,301 @@ input, textarea, [contenteditable="true"] {
   -webkit-user-select: text !important;
   user-select: text !important;
 }
+/* ============================================
+   🎬 CapCut-Style Timeline (v5)
+   ============================================ */
+
+/* منع تحديد النص */
+* { -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }
+input, textarea { -webkit-user-select: text !important; user-select: text !important; }
+
+/* ===== Preview ===== */
+.preview-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+}
+.preview-frame {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 9/16;
+  position: relative;
+}
+.bg-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.bg-layer img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: blur(40px) saturate(160%) brightness(0.5);
+}
+.preview-card {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,15,12,0.55);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.preview-header { display: flex; align-items: center; gap: 10px; }
+.preview-cover { width: 46px; height: 46px; border-radius: 11px; object-fit: cover; }
+.preview-header-text { flex: 1; min-width: 0; }
+.preview-song { font-size: 13px; font-weight: 900; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.preview-artist { font-size: 10px; color: rgba(255,255,255,0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.preview-lyrics { flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 0; }
+.lyric-element { padding: 6px 10px; border-radius: 6px; max-width: 100%; }
+.lyric-text {
+  display: block;
+  font-family: 'Cairo', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  line-height: 1.4;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+.lyric-element.glass-mode {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.preview-footer { display: flex; align-items: center; justify-content: center; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+.pf-text { font-size: 11px; font-weight: 700; color: #fff; }
+
+/* ===== Timeline ===== */
+.timeline-wrap {
+  flex-shrink: 0;
+  background: rgba(11,11,15,0.6);
+  border-top: 1px solid var(--border-color);
+  padding-bottom: 76px;
+}
+.timeline-viewport {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 02 8px;
+  touch-action: pan-x;
+,}
+.timeline-viewport::-webkit-scrollbar # { display: none; }
+.timeline-content {
+8  position: relative;
+  padding: 0 20px 0 20px;
+  min-width: max-content;
+}
+.timeline-ruler {
+  position: relative;
+  height: 20px;
+  margin-bottom: 4px;
+}
+.ruler-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.ruler-tick span { font-size: 9px; font-weight: 700; color: var(--subtext-color); font-variant-numeric: tabular-nums; }
+.ruler-tick i { display: block; width: 1px; height: 6px; background: var(--subtext-color); opacity: 0.5; }
+
+.track {
+  position: relative;
+  min-height: 46px;
+  margin-bottom: 4px;
+}
+
+/* ===== Text Segment (CapCut Style) ===== */
+.text-segment {
+  position: absolute;
+  top: 2px;
+  height: 42px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #bf5afe44ad);
+  border: 2px solid transparent;
+  padding: 0 16px;
+  display: flex; align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.text-segment.glass {
+  background: rgba(191,90,242,0.4);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.text-segment.selected {
+  border-color: #ffd60a;
+  box-shadow: 0 0 0 2px #ffd60a, 0 0 24px rgba(255,214,10,0.5);
+  z-index: 10;
+}
+.text-segment.moving {
+  opacity: 0.85;
+  box-shadow: 0 0 0 3px #ffd60a, 0 0 30px rgba(255,214,10,0.7);
+  cursor: grabbing;
+  z-index: 20;
+}
+
+/* المقابض - كيما CapCut */
+.seg-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 70%;
+  background: #ffd60a;
+  border-radius: 3px;
+  display: none;
+  z-index: 5;
+  cursor: ew-resize;
+}
+.text-segment.selected .seg-handle,
+.audio-segment.selected .seg-handle {
+  display: block;
+}
+.seg-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 40%;
+  background: #000;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+.handle-left { left: 2px; }
+.handle-right { right: 2px; }
+
+/* ===== Audio Segment (CapCut Style) ===== */
+.audio-segment {
+  position: absolute;
+  top: 2px;
+  height: 42px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff2d92, #d63384);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.audio-segment.selected {
+  border-color: #ffd60a;
+  box-shadow: 0 0 0 2px #ffd60a, 0 0 24px rgba(255,214,10,0.5);
+  z-index: 10;
+}
+.audio-wave {
+  display: flex; align-items: center; gap: 2px;
+  flex: 1; height: 100%;
+  overflow: hidden;
+}
+.audio-wave::before {
+  content: '';
+  flex: 1;
+  height: 60%;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0 2px, transparent 2px 5px);
+}
+.audio-label { flex-shrink: 0; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.audio-add-btn {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 42px; height: 42px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px dashed rgba(255,255,255,0.2);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.audio-add-btn svg { width: 20px; height: 20px; }
+
+/* ===== Playhead ===== */
+.playhead {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: #ff453a;
+  z-index: 30;
+  cursor: ew-resize;
+  box-shadow: 0 0 10px rgba(255,69,58,0.8);
+}
+.playhead-cap {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 8px;
+  background: #ff453a;
+  border-radius: 4px;
+}
+
+/* ===== CapCut Menu (Bottom Icons Bar) ===== */
+.capcut-menu {
+  position: fixed;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  left: 0; right: 0;
+  background: rgba(22,22,28,0.95);
+  backdrop-filter: blur(40px) saturate(180%);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  overflow-x: auto;
+  gap: 4px;
+  padding: 12px 12px 14px;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.25s;
+  z-index: 90;
+  scrollbar-width: none;
+}
+.capcut-menu::-webkit-scrollbar { display: none; }
+.capcut-menu.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+.cm-item {
+  flex: 0 0 auto;
+  min-width: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.cm-item:active { background: rgba(255,255,255,0.06); }
+.cm-item svg { width: 22px; height: 22px; stroke: var(--text-color); }
+.cm-item.danger svg { stroke: var(--danger); }
+.cm-item.danger span { color: var(--danger); }
