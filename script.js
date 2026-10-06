@@ -100,6 +100,11 @@ function initAudioUpload() {
     document.getElementById('audioPreviewMeta').textContent = (file.size/(1024*1024)).toFixed(1) + ' MB';
     document.getElementById('audioSegment').classList.remove('hidden');
     document.getElementById('audioAddBtn').classList.add('hidden');
+     // ✅ الأغنية تاخذ حجمها الحقيقي في الـ Timeline
+const audioSeg = document.getElementById('audioSegment');
+const duration = state.audioDuration || 0;
+audioSeg.style.width = (duration * PX_PER_SEC) + 'px';
+audioSeg.style.marginLeft = '0px';
   });
 }
 function removeAudio() {
