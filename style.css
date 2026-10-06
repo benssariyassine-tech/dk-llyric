@@ -631,3 +631,447 @@ body {
   color: var(--accent);
   font-weight: 800;
 }
+/* ============================================
+   🎬 Editor — CapCut Style Bottom Nav
+   ============================================ */
+
+/* Body خاص بالمحرر */
+.editor-body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+/* منطقة المعاينة */
+.editor-preview-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px 100px;
+  overflow-y: auto;
+}
+
+.editor-preview-wrap .preview-card {
+  max-width: 260px;
+}
+
+/* ============================================
+   🎛️ Bottom Nav (القائمة العائمة)
+   ============================================ */
+.editor-nav {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 8px 10px;
+  background: rgba(28, 28, 34, 0.72);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  width: calc(100% - 32px);
+  max-width: 420px;
+}
+
+.editor-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  min-width: 64px;
+  height: 54px;
+  background: none;
+  border: none;
+  border-radius: 22px;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.editor-nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  transition: transform 0.25s;
+}
+
+.editor-nav-item.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow:
+    0 6px 18px rgba(10, 132, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.editor-nav-item:active svg {
+  transform: scale(0.88);
+}
+
+/* ============================================
+   📦 Bottom Sheet
+   ============================================ */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sheet-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(22, 22, 28, 0.96);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  padding: 12px 20px calc(100px + env(safe-area-inset-bottom, 0px));
+  max-height: 75vh;
+  overflow-y: auto;
+  z-index: 300;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+}
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  margin: 0 auto 18px;
+}
+
+.sheet-content {
+  display: none;
+}
+.sheet-content.active {
+  display: block;
+  animation: sheetContentIn 0.3s ease;
+}
+
+@keyframes sheetContentIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sheet-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-color);
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+}
+
+/* تعديل الـ inputs داخل الـ sheet */
+.bottom-sheet .editor-input {
+  margin-bottom: 10px;
+}
+
+/* تعديل المعاينة داخل editor */
+.editor-body .ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+}
+
+@media (max-width: 380px) {
+  .editor-nav-item { min-width: 56px; font-size: 9.5px; }
+  .editor-nav-item svg { width: 20px; height: 20px; }
+}
+/* ============================================
+   🎞️ Lyric Timeline (CapCut Style)
+   ============================================ */
+.lyric-timeline-wrap {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  height: 0;
+  overflow: hidden;
+  background: rgba(15, 15, 20, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid var(--border-color);
+  transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+}
+.lyric-timeline-wrap.open {
+  height: 110px;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--subtext-color);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.timeline-header span:last-child {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 16px 8px;
+  position: relative;
+  scrollbar-width: none;
+}
+.timeline-scroll::-webkit-scrollbar { display: none; }
+
+.timeline-track {
+  display: flex;
+  gap: 2px;
+  min-height: 40px;
+  position: relative;
+  min-width: max-content;
+}
+
+.timeline-segment {
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.25), rgba(0, 98, 210, 0.25));
+  border: 1.5px solid rgba(10, 132, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 40px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.timeline-segment.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(10, 132, 255, 0.6);
+}
+.timeline-segment .seg-resize {
+  position: absolute;
+  right: -3px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timeline-segment .seg-resize::after {
+  content: '';
+  width: 3px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 3px;
+}
+
+.timeline-playhead {
+  position: absolute;
+  top: 4px;
+  bottom: 8px;
+  width: 2px;
+  background: #ff453a;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(255, 69, 58, 0.8);
+  z-index: 5;
+  transition: left 0.05s linear;
+}
+.timeline-playhead::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff453a;
+  box-shadow: 0 0 8px rgba(255, 69, 58, 0.8);
+}
+
+/* ============================================
+   🔤 Font Controls
+   ============================================ */
+.font-group {
+  margin-bottom: 18px;
+}
+.font-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--subtext-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.font-label span {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.font-family-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.font-family-btn {
+  padding: 12px;
+  background: rgba(11, 11, 15, 0.6);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.font-family-btn.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.font-family-btn:active { transform: scale(0.97); }
+
+.font-slider {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.font-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.5);
+}
+
+.font-weight-row, .effect-row {
+  display: flex;
+  gap: 8px;
+}
+.font-weight-btn, .effect-btn {
+  flex: 1;
+  padding: 11px 8px;
+  background: rgba(11, 11, 15, 0.6);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.font-weight-btn.active, .effect-btn.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.color-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.color-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+.color-btn.active {
+  border-color: #ffffff;
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.sheet-hint {
+  font-size: 11.5px;
+  color: var(--subtext-color);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* تعديل عرض المعاينة كي يطلع الـ timeline */
+.editor-body .editor-preview-wrap {
+  padding-bottom: 20px;
+  transition: padding 0.3s;
+}
+.editor-body.timeline-open .editor-preview-wrap {
+  padding-bottom: 130px;
+}
+.editor-body.timeline-open .preview-card {
+  max-width: 200px;
+}
+
+/* تعديل الـ lyric inputs (بلا رقم) */
+.lyric-row {
+  display: grid;
+  grid-template-columns: 1fr 32px;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.lyric-time-input { display: none; }
