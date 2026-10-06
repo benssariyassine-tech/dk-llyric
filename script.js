@@ -409,23 +409,73 @@ function setupPlayheadDrag() {
   const playhead = document.getElementById('playhead');
   const timelineScroll = document.getElementById('timelineScroll');
   if (!playhead || !timelineScroll) return;
+
   let dragging = false;
+
   const setFromX = (clientX) => {
     const rect = timelineScroll.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const scrollLeft = timelineScroll.scrollLeft;
+    const x = Math.max(0, clientX - rect.left + scrollLeft);
     const sec = x / PX_PER_SEC;
     state.currentTime = sec;
     playhead.style.left = x + 'px';
-    playhead.style.transform = 'translateX(0)';
+    playhead.style.transform = 'translateX(-50%)';
     updateTimeDisplay();
     syncPlayheadToLyric();
   };
-  playhead.addEventListener('mousedown', e => { dragging = true; setFromX(e.clientX); });
-  playhead.addEventListener('touchstart', e => { dragging = true; setFromX(e.touches[0].clientX); }, { passive: true });
-  document.addEventListener('mousemove', e => { if (dragging) setFromX(e.clientX); });
-  document.addEventListener('touchmove', e => { if (dragging) setFromX(e.touches[0].clientX); }, { passive: true });
-  document.addEventListener('mouseup', () => dragging = false);
-  document.addEventListener('touchend', () => dragging = false);
+
+  const onDown = (e) => {
+    dragging = true;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    setFromX(cx);
+    if (e.touches) {
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onUp);
+    } else {
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    }
+  };
+  const onMove = (e) => {
+    if (!dragging) return;
+    e.preventDefault();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    setFromX(cx);
+  };
+  const onUp = () => {
+    dragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchend', onUp);
+  };
+
+  // Playhead نفسه
+  playhead.addEventListener('mousedown', onDown);
+  playhead.addEventListener('touchstart', onDown, { passive: false });
+
+  // خط الزمن كامل — نقدرو نكليكيو في أي مكان
+  timelineScroll.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.text-segment')) return;
+    onDown(e);
+  });
+  timelineScroll.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.text-segment')) return;
+    onDown(e);
+  }, { passive: false });
+
+  // تحديث playhead مع التشغيل
+  setInterval(() => {
+    const player = document.getElementById('audioPlayer');
+    if (player && !player.paused && !player.ended) {
+      state.currentTime = player.currentTime;
+      const x = state.currentTime * PX_PER_SEC;
+      playhead.style.left = x + 'px';
+      playhead.style.transform = 'translateX(-50%)';
+      updateTimeDisplay();
+      syncPlayheadToLyric();
+    }
+  }, 60);
 }
 
 function syncPlayheadToLyric() {
