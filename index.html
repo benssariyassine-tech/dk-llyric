@@ -4,124 +4,88 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>dk.llyric — Music Cards Maker</title>
-<meta name="description" content="صانع فيديوهات الكلمات المتزامنة — Interactive Lyric Video Maker">
 <meta name="theme-color" content="#0b0b0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home-body">
 
-  <!-- 🌫️ الخلفية المبلورة -->
   <div class="ambient-bg"></div>
 
-  <!-- 🔝 الهيدر -->
-  <header class="topbar">
+  <header class="home-topbar">
     <div class="brand-logo">
-      <div class="brand-text">
-        <span class="brand-dk">dk</span><span class="brand-dot">.</span><span class="brand-lyric">llyric</span>
-      </div>
-      <div class="brand-tagline">MUSIC CARDS</div>
+      <span class="brand-dk">dk</span><span class="brand-dot">.</span><span class="brand-lyric">llyric</span>
     </div>
+    <div class="brand-tagline">MUSIC CARDS</div>
   </header>
 
-  <!-- 🎯 المحتوى الرئيسي -->
   <main class="home-content">
 
-    <!-- 🃏 البطاقة التجريبية -->
-    <div class="preview-area">
-      <div class="preview-card">
-        <div class="preview-header">
-          <img class="preview-cover"
-               src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80"
-               alt="Cover">
-          <div class="preview-header-text">
-            <div class="preview-song">راجع</div>
-            <div class="preview-artist">عمرو دياب</div>
+    <div class="home-preview-wrap">
+      <div class="home-preview-card">
+        <div class="home-ph">
+          <img class="home-cover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+          <div class="home-ph-text">
+            <div class="home-song">راجع</div>
+            <div class="home-artist">عمرو دياب</div>
           </div>
         </div>
-        <div class="preview-lyrics">
-          <div class="preview-lyric-line">راجع بتقولي اللي ما بينا</div>
+        <div class="home-lyrics">
+          <div class="home-lyric-text">راجع بتقولي اللي ما بينا</div>
         </div>
-        <div class="preview-footer">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14.5c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 4-.9 7.5-.5 10.3 1.2.3.2.4.6.3.8zm1.2-2.7c-.2.4-.7.5-1.1.3-2.9-1.8-7.3-2.3-10.6-1.2-.4.1-.8-.1-1-.5-.1-.4.1-.8.5-1 3.8-1.2 8.7-.6 12 1.4.4.2.5.7.2 1zm.1-2.8C14.1 8.8 8.4 8.6 5.1 9.6c-.5.1-1-.2-1.1-.7-.1-.5.2-1 .7-1.1 3.8-1.2 10.1-.9 14.1 1.4.4.3.6.9.3 1.3-.3.4-.9.6-1.3.3z"/></svg>
+        <div class="home-footer-card">
           <span>Spotify</span>
         </div>
       </div>
     </div>
 
-    <!-- 🚀 زر الدخول للمحرر -->
-    <div class="cta-area">
-      <a href="editor.html" class="cta-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
-        </svg>
-        <span>ابدأ التصميم الآن</span>
-      </a>
-      <p class="cta-hint">صمّم فيديو الكلمات الخاص بك في دقائق</p>
-    </div>
+    <a href="editor.html" class="home-cta">
+      <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span>ابدأ التصميم</span>
+    </a>
+    <p class="home-hint">صمّم فيديو الكلمات في دقائق</p>
 
-    <!-- ✨ الميزات -->
-    <div class="features">
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="3"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
+    <div class="home-features">
+      <div class="hf-item">
+        <div class="hf-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </div>
-        <div class="feature-text">
-          <div class="feature-title">صورة الغلاف</div>
-          <div class="feature-desc">ارفع صورة من جهازك</div>
+        <div class="hf-text">
+          <div class="hf-title">صورة الغلاف</div>
+          <div class="hf-desc">ارفع صورة من جهازك</div>
         </div>
       </div>
-
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"/>
-            <circle cx="6" cy="18" r="3"/>
-            <circle cx="18" cy="16" r="3"/>
-          </svg>
+      <div class="hf-item">
+        <div class="hf-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         </div>
-        <div class="feature-text">
-          <div class="feature-title">الأغنية</div>
-          <div class="feature-desc">اختر مقطع من جهازك</div>
+        <div class="hf-text">
+          <div class="hf-title">الأغنية</div>
+          <div class="hf-desc">اختر مقطع من جهازك</div>
         </div>
       </div>
-
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="21" y1="6" x2="3" y2="6"/>
-            <line x1="15" y1="12" x2="3" y2="12"/>
-            <line x1="17" y1="18" x2="3" y2="18"/>
-          </svg>
+      <div class="hf-item">
+        <div class="hf-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
         </div>
-        <div class="feature-text">
-          <div class="feature-title">الكلمات المتزامنة</div>
-          <div class="feature-desc">اكتب الكلمات وحدّد الوقت</div>
+        <div class="hf-text">
+          <div class="hf-title">الكلمات المتزامنة</div>
+          <div class="hf-desc">اكتب وحدّد الوقت</div>
         </div>
       </div>
-
-      <div class="feature-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
+      <div class="hf-item">
+        <div class="hf-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </div>
-        <div class="feature-text">
-          <div class="feature-title">تصدير الفيديو</div>
-          <div class="feature-desc">حمّل الفيديو بأعلى جودة</div>
+        <div class="hf-text">
+          <div class="hf-title">تصدير الفيديو</div>
+          <div class="hf-desc">حمّل بأعلى جودة</div>
         </div>
       </div>
     </div>
 
-    <!-- 🔻 الفوتر -->
     <footer class="home-footer">
       <p>صُنع بواسطة <strong>dk.llyric</strong> — 2026</p>
     </footer>
