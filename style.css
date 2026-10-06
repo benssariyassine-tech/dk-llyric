@@ -461,3 +461,173 @@ body {
   .preview-card { max-width: 230px; }
   .lyric-row { grid-template-columns: 1fr 60px 32px; }
 }
+/* ============================================
+   🏠 Home Page Specific Styles
+   ============================================ */
+
+/* الهيدر - الشعار */
+.brand-logo {
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+}
+.brand-text {
+  font-family: 'Inter', 'Cairo', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+}
+.brand-dk { color: #ffffff; }
+.brand-dot { color: var(--accent); margin: 0 1px; }
+.brand-lyric {
+  background: linear-gradient(135deg, #0a84ff, #5ac8fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-tagline {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--subtext-color);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* المحتوى الرئيسي */
+.home-content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* زر الدخول للمحرر */
+.cta-area {
+  width: 100%;
+  text-align: center;
+  margin: 24px 0 32px;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    0 12px 32px rgba(10, 132, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.cta-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 6px 16px rgba(10, 132, 255, 0.5);
+}
+.cta-btn svg {
+  width: 20px;
+  height: 20px;
+}
+.cta-hint {
+  font-size: 12px;
+  color: var(--subtext-color);
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+/* الميزات */
+.features {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.feature-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.feature-item:active {
+  transform: scale(0.97);
+  border-color: rgba(10, 132, 255, 0.4);
+}
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(10, 132, 255, 0.12);
+  border: 1px solid rgba(10, 132, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.feature-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--accent);
+  fill: none;
+}
+.feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.feature-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: -0.2px;
+}
+.feature-desc {
+  font-size: 10.5px;
+  color: var(--subtext-color);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* الفوتر */
+.home-footer {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+.home-footer p {
+  font-size: 11px;
+  color: var(--subtext-color);
+  font-weight: 500;
+  margin: 0;
+}
+.home-footer strong {
+  color: var(--accent);
+  font-weight: 800;
+}
