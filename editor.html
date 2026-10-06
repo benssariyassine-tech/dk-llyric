@@ -59,22 +59,20 @@
 
   <div class="timeline-wrap">
     <div class="timeline-viewport" id="timelineViewport">
-      <div class="timeline-content" id="timelineContent">
-        <div class="timeline-ruler" id="timelineRuler"></div>
-        <div class="track track-text" id="trackText"></div>
-        <div class="track track-audio" id="trackAudio">
-          <div class="audio-segment hidden" id="audioSegment">
-            <div class="audio-wave"></div>
-            <span class="audio-label" id="audioLabel">الصوت</span>
-          </div>
-          <button class="audio-add-btn" id="audioAddBtn" onclick="openAudioPicker()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="playhead" id="playhead"><div class="playhead-cap"></div></div>
+<div class="timeline-content" id="timelineContent">
+  <div class="timeline-ruler" id="timelineRuler"></div>
+  <div class="track track-text" id="trackText"></div>
+  <div class="track track-audio" id="trackAudio">
+    <div class="audio-segment hidden" id="audioSegment">
+      <div class="audio-wave"></div>
+      <span class="audio-label" id="audioLabel">الصوت</span>
     </div>
+    <button class="audio-add-btn" id="audioAddBtn" onclick="openAudioPicker()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
   </div>
+  <div class="playhead" id="playhead"><div class="playhead-cap"></div></div>
+</div>
 
   <nav class="editor-nav">
     <button class="editor-nav-item" data-tab="audio" onclick="openTab('audio', this)">
