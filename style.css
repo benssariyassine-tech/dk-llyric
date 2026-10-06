@@ -1842,3 +1842,7 @@ input, textarea {
   from { opacity: 1; filter: blur(0); }
   to { opacity: 0; filter: blur(6px); }
 }
+.audio-segment {
+  min-width: 0 !important; /* نحيدو الحد الأدنى باش ياخذ الحجم الحقيقي */
+  transition: width 0.2s ease;
+}
