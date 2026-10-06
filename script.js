@@ -489,65 +489,107 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ============================================
    ▶️ Playhead
    ============================================ */
+/* ============================================
+   ▶️ Playhead — CapCut Style (Scrub + Seek)
+   ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
   const vp = document.getElementById('timelineViewport');
-  if (!ph || !vp) return;
+  const content = document.getElementById('timelineContent');
+  if (!ph || !vp || !content) return;
 
   let dragging = false;
+  let longPressTimer = null;
 
-  const setFromX = (clientX) => {
-    const rect = vp.getBoundingClientRect();
-    const sl = vp.scrollLeft;
-    const x = Math.max(0, clientX - rect.left + sl - 20);
-    state.currentTime = x / PX_PER_SEC;
-    ph.style.left = (x + 20) + 'px';
+  // ✅ تحويل وقت → موضع (px)
+  const timeToPx = (sec) => sec * PX_PER_SEC;
+
+  // ✅ تحديث موضع المؤشر
+  const setPlayheadPosition = (sec) => {
+    const x = timeToPx(sec);
+    ph.style.transform = `translateX(${x}px)`;
+    state.currentTime = sec;
     updateTimeDisplay();
   };
 
-  const onDown = (e) => {
-    dragging = true;
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    setFromX(cx);
-    if (e.touches) {
-      document.addEventListener('touchmove', onMove, { passive: false });
-      document.addEventListener('touchend', onUp);
-    } else {
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
-    }
-    e.preventDefault();
+  // ✅ من موضع الماوس/اللمس → وقت
+  const pxToTime = (clientX) => {
+    const rect = content.getBoundingClientRect();
+    const x = clientX - rect.left;
+    return Math.max(0, x / PX_PER_SEC);
   };
+
+  // ✅ Seek: يحدد الوقت والمؤشر
+  const seekTo = (sec) => {
+    const player = document.getElementById('audioPlayer');
+    if (player && state.audioUrl) {
+      player.currentTime = sec;
+    }
+    setPlayheadPosition(sec);
+  };
+
+  // ✅ تحريك المؤشر بالسحب
   const onMove = (e) => {
     if (!dragging) return;
     e.preventDefault();
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    setFromX(cx);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const sec = pxToTime(clientX);
+    seekTo(sec);
   };
+
   const onUp = () => {
     dragging = false;
     document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('touchmove', onMove);
     document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onUp);
   };
 
-  ph.addEventListener('mousedown', onDown);
-  ph.addEventListener('touchstart', onDown, { passive: false });
-   // Tap على الفراغ → خفي القائمة
-  vp.addEventListener('touchstart', (e) => {
-    if (e.target === vp || e.target.classList.contains('timeline-content')) {
-      if (state.selectedType) {
-        clearSelection();
-      }
-    }
-  }, { passive: true });
+  const onDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragging = true;
 
-  // Tap على الـ timeline (ماشي على السطور) = نقل المؤشر
+    // ✅ إذا مسكنا المؤشر، نحركو
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const sec = pxToTime(clientX);
+    seekTo(sec);
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+
+  // ✅ نمسكو غير المقبض العلوي (cap) باش نحركو
+  const cap = ph.querySelector('.playhead-cap');
+  if (cap) {
+    cap.addEventListener('mousedown', onDown);
+    cap.addEventListener('touchstart', onDown, { passive: false });
+  }
+
+  // ✅ المسطرة (ruler) — النقر يحرك المؤشر مباشرة
+  const ruler = document.getElementById('timelineRuler');
+  if (ruler) {
+    const onRulerTouch = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const sec = pxToTime(clientX);
+      seekTo(sec);
+      if (navigator.vibrate) try { navigator.vibrate(8); } catch(e) {}
+    };
+    ruler.addEventListener('mousedown', onRulerTouch);
+    ruler.addEventListener('touchstart', onRulerTouch, { passive: true });
+  }
+
+  // ✅ ضغطة على أي مكان فارغ في الـ timeline → تنقل المؤشر
   vp.addEventListener('click', (e) => {
-    if (e.target.closest('.text-segment') || e.target.closest('.audio-segment') || e.target.closest('.seg-handle') || e.target === ph || e.target.closest('.playhead')) return;
-    setFromX(e.clientX);
+    if (e.target.closest('.text-segment') || e.target.closest('.audio-segment') || e.target.closest('.seg-handle') || e.target.closest('.playhead-cap') || e.target.closest('.ruler-tick')) return;
+    const sec = pxToTime(e.clientX);
+    seekTo(sec);
   });
+
+  // ✅ شغل حلقة التحديث (تتزامن مع الصوت)
+  startPlayheadLoop();
 }
 
 /* ============================================
