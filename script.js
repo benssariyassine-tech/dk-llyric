@@ -451,8 +451,7 @@ function selectAudio() {
   renderTimeline();
   renderAudioSelection();
   showCapcutMenu('audio');
-  if (navigator.v')ibrate) try { navigator.vibrate(10); } catch (e) {}
-}
+if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 
 function renderAudioSelection() {
   const seg = document.getElementById('audioSegment');
