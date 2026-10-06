@@ -452,7 +452,7 @@ function selectAudio() {
   renderAudioSelection();
   showCapcutMenu('audio');
 if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
-
+}
 function renderAudioSelection() {
   const seg = document.getElementById('audioSegment');
   if (!seg) return;
