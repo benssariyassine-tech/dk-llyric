@@ -1,5 +1,5 @@
 /* ============================================
-   dk.llyric Editor v6 — CapCut Style (Final)
+   dk.llyric Editor v7 — CapCut Style (Final)
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 2000;
@@ -20,6 +20,7 @@ const state = {
   ],
   selectedType: null,
   selectedIndex: -1,
+  activeSegment: -1,
   font: { family: 'Cairo', size: 24, weight: 800, color: '#ffffff' },
   coverUrl: null,
   bgUrl: null
@@ -27,6 +28,7 @@ const state = {
 
 let currentTab = null;
 let _playheadRAF = null;
+let _lastRAFTime = 0;
 let _resize = null;
 let _move = null;
 let _longPressTimer = null;
@@ -44,7 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupPlayheadDrag();
   setupFontControls();
   updateTimeDisplay();
-  requestAnimationFrame(() => setPlayheadPosition(0));
+
+  // ✅ ضع المؤشر في البداية (0s)
+  state.currentTime = 0;
+  setPlayheadPosition(0);
 });
 
 /* ============================================
@@ -497,17 +502,20 @@ function startLongPress(e, index, segEl) {
 }
 
 /* ============================================
-   Playhead — CapCut Style
+   Playhead Position
    ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
-  const x = sec * PX_PER_SEC;
+  const x = Math.max(0, sec) * PX_PER_SEC;
   ph.style.transform = `translateX(${x}px)`;
-  state.currentTime = sec;
+  state.currentTime = Math.max(0, sec);
   updateTimeDisplay();
 }
 
+/* ============================================
+   Playhead Drag
+   ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
   const vp = document.getElementById('timelineViewport');
@@ -587,23 +595,48 @@ function setupPlayheadDrag() {
 }
 
 /* ============================================
-   Playhead Loop (RAF + Auto-Scroll)
+   ▶️ Playhead Loop — Clock + Audio Sync
    ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
+  _lastRAFTime = performance.now();
 
-  const tick = () => {
+  const tick = (now) => {
+    const dt = (now - _lastRAFTime) / 1000;
+    _lastRAFTime = now;
+
     const player = document.getElementById('audioPlayer');
     const ph = document.getElementById('playhead');
 
+    // ✅ الوقت: من الأغنية أو من الساعة اليدوية
     if (player && state.audioUrl && !player.paused && !player.ended) {
       state.currentTime = player.currentTime;
+    } else {
+      state.currentTime += dt;
     }
 
+    // ✅ نهاية المدة
+    const maxEnd = state.audioUrl && state.audioDuration
+      ? state.audioDuration
+      : getTimelineDuration();
+
+    // ✅ إذا وصلنا للنهاية → وقف
+    if (state.currentTime >= maxEnd) {
+      state.currentTime = maxEnd;
+      if (ph) ph.style.transform = `translateX(${maxEnd * PX_PER_SEC}px)`;
+      updateTimeDisplay();
+      state.isPlaying = false;
+      updatePlayIcon();
+      stopPlayheadLoop();
+      return;
+    }
+
+    // ✅ حرّك المؤشر
     if (ph) ph.style.transform = `translateX(${state.currentTime * PX_PER_SEC}px)`;
     updateTimeDisplay();
     syncPlayheadToLyric();
 
+    // ✅ auto-scroll
     if (state.audioUrl && player && !player.paused) {
       autoScrollPlayhead();
     }
@@ -672,15 +705,29 @@ function renderLyricFromPlayhead(idx) {
 }
 
 /* ============================================
-   Play / Pause
+   ▶️ Play / Pause
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
+  const maxEnd = state.audioUrl && state.audioDuration
+    ? state.audioDuration
+    : getTimelineDuration();
+
   if (state.isPlaying) {
+    // ⏸ إيقاف
     if (player && state.audioUrl) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
+    // ▶️ تشغيل — إذا كنا في النهاية، ارجع للبداية
+    if (state.currentTime >= maxEnd - 0.1) {
+      state.currentTime = 0;
+      setPlayheadPosition(0);
+      if (player && state.audioUrl) {
+        try { player.currentTime = 0; } catch (e) {}
+      }
+    }
+
     if (player && state.audioUrl) {
       try { player.currentTime = state.currentTime; } catch (e) {}
       player.play().catch(e => console.warn('play err:', e));
@@ -698,11 +745,13 @@ function updatePlayIcon() {
     ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
     : '<polygon points="5 3 19 12 5 21 5 3"/>';
 }
+
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
   el.textContent = fmt(state.currentTime) + ' / ' + fmt(state.audioDuration || 0);
 }
+
 function fmt(s) {
   s = Math.max(0, Math.floor(s));
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
@@ -735,6 +784,7 @@ function setupFontControls() {
     });
   });
 }
+
 function applyFont() {
   const el = document.getElementById('previewLyric');
   if (!el) return;
