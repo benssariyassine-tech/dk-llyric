@@ -1,6 +1,6 @@
 /* ============================================
-   dk.llyric Editor — Final v2.1
-   (Smooth crop + Audio move + Audio split)
+   dk.llyric Editor — Final v3.0
+   (Separated block position + file trim)
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 1000;
@@ -9,8 +9,12 @@ const MIN_TIMELINE_SEC = 15;
 const state = {
   audioUrl: null,
   audioDuration: 0,
+  // Block position on timeline
   audioStart: 0,
   audioEnd: 0,
+  // Trim position in file (NEW)
+  audioTrimIn: 0,
+  audioTrimOut: 0,
   currentTime: 0,
   isPlaying: false,
   songName: 'راجع',
@@ -57,6 +61,23 @@ function renderAll() {
 }
 
 /* ============================================
+   Helpers — Time conversions
+   ============================================ */
+function timelineToFile(timelineSec) {
+  // Timeline time → File time
+  return state.audioTrimIn + (timelineSec - state.audioStart);
+}
+
+function fileToTimeline(fileSec) {
+  // File time → Timeline time
+  return state.audioStart + (fileSec - state.audioTrimIn);
+}
+
+function hasAudio() {
+  return state.audioUrl && state.audioDuration > 0;
+}
+
+/* ============================================
    Tabs
    ============================================ */
 function openTab(tabName, btnEl) {
@@ -97,6 +118,8 @@ function initAudioUpload() {
       state.audioDuration = player.duration;
       state.audioStart = 0;
       state.audioEnd = player.duration;
+      state.audioTrimIn = 0;
+      state.audioTrimOut = player.duration;
       updateAudioSegment();
       updateTimeDisplay();
       renderAll();
@@ -122,6 +145,10 @@ function removeAudio() {
   if (state.audioUrl) URL.revokeObjectURL(state.audioUrl);
   state.audioUrl = null;
   state.audioDuration = 0;
+  state.audioStart = 0;
+  state.audioEnd = 0;
+  state.audioTrimIn = 0;
+  state.audioTrimOut = 0;
   const player = document.getElementById('audioPlayer');
   player.src = '';
   document.getElementById('audioUploadBtn').classList.remove('hidden');
@@ -158,7 +185,6 @@ function initAudioSegmentListeners() {
   hR.addEventListener('touchstart', e => startResize(e, 0, 'right'), { passive: false });
   audioSeg.appendChild(hR);
 
-  // ✅ Long Press = Move Audio Block
   const lp = (e) => {
     if (e.target.classList.contains('seg-handle')) return;
     startLongPressAudio(e, audioSeg);
@@ -212,7 +238,7 @@ function renderLyricsList() {
    ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
-  if (state.audioUrl && state.audioDuration > 0) {
+  if (hasAudio()) {
     return Math.max(state.audioEnd, lastLyricEnd, MIN_TIMELINE_SEC);
   }
   return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
@@ -378,7 +404,7 @@ function cmAction(action) {
   } else if (action === 'split') {
     const curT = state.currentTime;
 
-    // ✅ تقسيم النص
+    // Split text
     if (state.selectedType === 'text') {
       const idx = state.selectedIndex;
       const l = state.lyrics[idx];
@@ -394,12 +420,15 @@ function cmAction(action) {
       }
     }
 
-    // ✅ تقسيم الصوت (نخليو الجزء الأول فقط)
+    // Split audio — نخليو الجزء الأول فقط
     if (state.selectedType === 'audio') {
-      const hasAudio = state.audioUrl && state.audioDuration > 0;
-      if (hasAudio && curT > state.audioStart && curT < state.audioEnd) {
+      if (hasAudio() && curT > state.audioStart && curT < state.audioEnd) {
+        // Trim out = ملف الموقع المقابل لـ curT
+        const fileAtCursor = timelineToFile(curT);
+        state.audioTrimOut = Math.round(fileAtCursor * 10) / 10;
         state.audioEnd = Math.round(curT * 10) / 10;
         updateAudioSegment();
+        renderRuler();
         if (state.currentTime > state.audioEnd) {
           state.currentTime = state.audioEnd;
           setPlayheadPosition(state.currentTime);
@@ -411,7 +440,7 @@ function cmAction(action) {
 }
 
 /* ============================================
-   Resize Handles — SMOOTH (بدون re-render)
+   Resize Handles
    ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
@@ -422,9 +451,15 @@ function startResize(e, index, side) {
     index,
     side,
     startX: cx,
-    startDur: state.selectedType === 'audio' ? state.audioEnd : state.lyrics[index].duration,
-    startStart: state.selectedType === 'audio' ? state.audioStart : state.lyrics[index].start,
-    isAudio: state.selectedType === 'audio'
+    isAudio: state.selectedType === 'audio',
+    // For text:
+    startDur: state.lyrics[index] ? state.lyrics[index].duration : 0,
+    startStart: state.lyrics[index] ? state.lyrics[index].start : 0,
+    // For audio:
+    startBlockStart: state.audioStart,
+    startBlockEnd: state.audioEnd,
+    startTrimIn: state.audioTrimIn,
+    startTrimOut: state.audioTrimOut
   };
   if (e.touches) {
     document.addEventListener('touchmove', onResizeMove, { passive: false });
@@ -443,21 +478,47 @@ function onResizeMove(e) {
   const deltaSec = dx / PX_PER_SEC;
 
   if (_resize.isAudio) {
-    // ===== قص الصوت =====
-    if (_resize.side === 'right') {
-      const ne = Math.max(state.audioStart + 0.5, Math.min(state.audioDuration, _resize.startDur + deltaSec));
-      state.audioEnd = Math.round(ne * 10) / 10;
+    // ====== قص الصوت ======
+    if (_resize.side === 'left') {
+      // سحب المقبض الأيسر: audioStart و audioTrimIn كيتحركو مع بعض
+      let newTrimIn = _resize.startTrimIn + deltaSec;
+      let newBlockStart = _resize.startBlockStart + deltaSec;
+      // Constraint: trimIn ما تقدرش تكون أصغر من 0
+      if (newTrimIn < 0) {
+        newBlockStart -= newTrimIn;
+        newTrimIn = 0;
+      }
+      // Constraint: القص ما يعديش audioTrimOut - 0.5
+      if (newTrimIn > _resize.startTrimOut - 0.5) {
+        newTrimIn = _resize.startTrimOut - 0.5;
+        newBlockStart = _resize.startBlockStart + (newTrimIn - _resize.startTrimIn);
+      }
+      state.audioTrimIn = Math.round(newTrimIn * 10) / 10;
+      state.audioStart = Math.round(newBlockStart * 10) / 10;
+      // audioEnd / audioTrimOut يبقاو ثابتين
+      state.audioEnd = _resize.startBlockEnd;
+      state.audioTrimOut = _resize.startTrimOut;
     } else {
-      const ns = Math.max(0, Math.min(state.audioEnd - 0.5, _resize.startStart + deltaSec));
-      state.audioStart = Math.round(ns * 10) / 10;
+      // سحب المقبض الأيمن: audioEnd و audioTrimOut كيتحركو مع بعض
+      let newTrimOut = _resize.startTrimOut + deltaSec;
+      // Constraint: trimOut <= audioDuration
+      if (newTrimOut > state.audioDuration) newTrimOut = state.audioDuration;
+      // Constraint: trimOut >= trimIn + 0.5
+      if (newTrimOut < state.audioTrimIn + 0.5) newTrimOut = state.audioTrimIn + 0.5;
+      state.audioTrimOut = Math.round(newTrimOut * 10) / 10;
+      state.audioEnd = Math.round((state.audioStart + (state.audioTrimOut - state.audioTrimIn)) * 10) / 10;
+      // audioStart / audioTrimIn يبقاو ثابتين
+      state.audioStart = _resize.startBlockStart;
+      state.audioTrimIn = _resize.startTrimIn;
     }
+    // تحديث الـ DOM مباشرة (سلس)
     const seg = document.getElementById('audioSegment');
     if (seg) {
       seg.style.left = (state.audioStart * PX_PER_SEC) + 'px';
       seg.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     }
   } else {
-    // ===== قص الكلمة (سلس) =====
+    // ====== قص الكلمة ======
     const idx = _resize.index;
     let newStart = _resize.startStart;
     let newDuration = _resize.startDur;
@@ -496,6 +557,8 @@ function onResizeEnd() {
   if (wasText) {
     renderRuler();
     setTimeout(checkAllTextOverlaps, 20);
+  } else {
+    renderRuler();
   }
 }
 
@@ -524,7 +587,7 @@ function checkAllTextOverlaps() {
 }
 
 /* ============================================
-   Long Press → Move Text Block (1s)
+   Long Press → Move Text Block
    ============================================ */
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -594,7 +657,7 @@ function startLongPressText(e, index, segEl) {
 }
 
 /* ============================================
-   Long Press → Move Audio Block (1s)
+   Long Press → Move Audio Block (ki yt7rek ghir block, trimIn/Out thabtin)
    ============================================ */
 function startLongPressAudio(e, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
@@ -624,14 +687,14 @@ function startLongPressAudio(e, segEl) {
     segEl.classList.add('moving');
     if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
 
-    const dur = state.audioEnd - state.audioStart;
+    const blockWidth = state.audioEnd - state.audioStart;
 
     _move = {
       active: true,
       isAudio: true,
       startX: cx,
       startStart: state.audioStart,
-      duration: dur,
+      width: blockWidth,
       segEl
     };
 
@@ -642,7 +705,8 @@ function startLongPressAudio(e, segEl) {
       const deltaSec = dx / PX_PER_SEC;
       const newStart = Math.max(0, _move.startStart + deltaSec);
       state.audioStart = Math.round(newStart * 10) / 10;
-      state.audioEnd = Math.round((newStart + _move.duration) * 10) / 10;
+      state.audioEnd = Math.round((newStart + _move.width) * 10) / 10;
+      // ⚠️ trimIn/trimOut ما كيتبدلوش
       _move.segEl.style.left = (state.audioStart * PX_PER_SEC) + 'px';
       _move.segEl.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     };
@@ -671,8 +735,7 @@ function startLongPressAudio(e, segEl) {
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
-  const hasAudio = state.audioUrl && state.audioDuration > 0;
-  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+  const maxEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
   const clampedSec = Math.max(0, Math.min(sec, maxEnd));
   const x = clampedSec * PX_PER_SEC;
   ph.style.transform = `translateX(${x}px)`;
@@ -698,12 +761,13 @@ function setupPlayheadDrag() {
   };
 
   const seekTo = (sec) => {
-    const hasAudio = state.audioUrl && state.audioDuration > 0;
-    const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+    const maxEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
     sec = Math.max(0, Math.min(sec, maxEnd));
     const player = document.getElementById('audioPlayer');
-    if (player && hasAudio) {
-      try { player.currentTime = sec; } catch (e) {}
+    if (player && hasAudio()) {
+      // ⚠️ تحويل من timeline → file
+      const fileSec = timelineToFile(sec);
+      try { player.currentTime = Math.max(0, Math.min(fileSec, state.audioDuration)); } catch (e) {}
     }
     setPlayheadPosition(sec);
     syncPlayheadToLyric();
@@ -778,11 +842,16 @@ function startPlayheadLoop() {
 
     const player = document.getElementById('audioPlayer');
     const ph = document.getElementById('playhead');
-    const hasAudio = state.audioUrl && state.audioDuration > 0;
+    const isAudioActive = hasAudio();
 
-    if (hasAudio && player && !player.paused && !player.ended) {
-      state.currentTime = player.currentTime;
-      if (state.currentTime >= state.audioEnd) {
+    if (isAudioActive && player && !player.paused && !player.ended) {
+      // ⚠️ تحويل من file → timeline
+      const fileTime = player.currentTime;
+      const timelineTime = fileToTimeline(fileTime);
+      state.currentTime = timelineTime;
+
+      // إذا وصلنا لآخر القص → وقف
+      if (fileTime >= state.audioTrimOut) {
         player.pause();
         state.currentTime = state.audioEnd;
         if (ph) ph.style.transform = `translateX(${state.audioEnd * PX_PER_SEC}px)`;
@@ -797,7 +866,7 @@ function startPlayheadLoop() {
       state.currentTime += dt;
     }
 
-    const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+    const maxEnd = isAudioActive ? state.audioEnd : getTimelineDuration();
 
     if (state.currentTime >= maxEnd) {
       state.currentTime = maxEnd;
@@ -814,7 +883,7 @@ function startPlayheadLoop() {
     updateTimeDisplay();
     syncPlayheadToLyric();
 
-    if (hasAudio && player && !player.paused) {
+    if (isAudioActive && player && !player.paused) {
       autoScrollPlayhead();
     }
 
@@ -882,35 +951,40 @@ function renderLyricFromPlayhead(idx) {
 }
 
 /* ============================================
-   Play / Pause
+   Play / Pause — Trim Aware
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
-  const hasAudio = state.audioUrl && state.audioDuration > 0;
-  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+  const hasAudioTrack = hasAudio();
+  const maxEnd = hasAudioTrack ? state.audioEnd : getTimelineDuration();
 
   if (state.isPlaying) {
-    if (player && hasAudio) player.pause();
+    if (player && hasAudioTrack) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
     let startAt = state.currentTime;
 
-    if (hasAudio && startAt < state.audioStart) {
+    // إذا الوقت الحالي قبل بداية الكتلة → روح لبداية الكتلة
+    if (hasAudioTrack && startAt < state.audioStart) {
       startAt = state.audioStart;
     }
-    if (hasAudio && startAt >= state.audioEnd - 0.05) {
+    // إذا وصلنا لآخر الكتلة → رجع لبداية الكتلة
+    if (hasAudioTrack && startAt >= state.audioEnd - 0.05) {
       startAt = state.audioStart;
     }
-    if (!hasAudio && startAt >= maxEnd - 0.05) {
+    // بلا أغنية: إذا وصلنا للنهاية → رجع لـ 0
+    if (!hasAudioTrack && startAt >= maxEnd - 0.05) {
       startAt = 0;
     }
 
     state.currentTime = startAt;
     setPlayheadPosition(startAt);
 
-    if (player && hasAudio) {
-      try { player.currentTime = startAt; } catch (e) {}
+    if (player && hasAudioTrack) {
+      // ⚠️ تحويل من timeline → file
+      const fileStart = timelineToFile(startAt);
+      try { player.currentTime = Math.max(0, fileStart); } catch (e) {}
       player.play().catch(e => console.warn('play err:', e));
     }
     state.isPlaying = true;
@@ -930,8 +1004,8 @@ function updatePlayIcon() {
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
-  const hasAudio = state.audioUrl && state.audioDuration > 0;
-  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+  const hasAudioTrack = hasAudio();
+  const maxEnd = hasAudioTrack ? state.audioEnd : getTimelineDuration();
   const cur = Math.max(0, Math.min(state.currentTime, maxEnd));
   el.textContent = fmt(cur) + ' / ' + fmt(maxEnd);
 }
