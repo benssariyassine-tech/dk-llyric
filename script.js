@@ -218,32 +218,42 @@ function renderLyricsList() {
   });
 }
 
-/* ============================================
-   🎞️ Timeline (LTR)
-   ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
   if (!ruler) return;
   ruler.innerHTML = '';
+  ruler.style.position = 'relative';
+  ruler.style.height = '20px';
   const totalSec = Math.max(state.audioDuration || 30, 10);
   for (let s = 0; s <= totalSec; s++) {
     const tick = document.createElement('div');
     tick.className = 'ruler-tick';
+    tick.style.position = 'absolute';
+    tick.style.left = (s * PX_PER_SEC) + 'px';
+    tick.style.transform = 'translateX(-50%)';
     tick.innerHTML = `<span>${s}s</span><i></i>`;
     ruler.appendChild(tick);
   }
+  ruler.style.width = (totalSec * PX_PER_SEC + 40) + 'px';
+  ruler.style.minWidth = '100%';
 }
 
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
   if (!trackText) return;
+  trackText.style.position = 'relative';
+  trackText.style.height = '46px';
+  const totalSec = Math.max(state.audioDuration || 30, 10);
+  trackText.style.width = (totalSec * PX_PER_SEC + 40) + 'px';
   trackText.innerHTML = '';
+
   state.lyrics.forEach((lyric, index) => {
     const seg = document.createElement('div');
     seg.className = 'text-segment' + (index === state.activeSegment ? ' active' : '');
-    // نستعملو margin-left باش نحترمو الـ start (LTR)
+    seg.style.position = 'absolute';
+    seg.style.left = (lyric.start * PX_PER_SEC) + 'px';
     seg.style.width = (lyric.duration * PX_PER_SEC) + 'px';
-    seg.style.marginLeft = (lyric.start * PX_PER_SEC) + 'px';
+    seg.style.marginLeft = '0';
     seg.textContent = lyric.text || `السطر ${index + 1}`;
     seg.dataset.index = index;
 
@@ -261,7 +271,7 @@ function renderTimeline() {
     hR.addEventListener('touchstart', e => startResize(e, index, 'right'), { passive: false });
     seg.appendChild(hR);
 
-    // سحب الكامل (Move)
+    // Long Press للتحريك
     seg.addEventListener('mousedown', e => {
       if (e.target.classList.contains('seg-handle')) return;
       startLongPress(e, index, seg);
