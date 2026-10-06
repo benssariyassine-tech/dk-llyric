@@ -438,8 +438,28 @@ function syncPlayheadToLyric() {
   if (idx !== state.activeSegment) {
     state.activeSegment = idx;
     renderTimeline();
-    renderPreview();
+    renderLyricFromPlayhead(idx);
   }
+}
+
+function renderLyricFromPlayhead(idx) {
+  const lyricEl = document.getElementById('previewLyric');
+  const el = document.getElementById('lyricElement');
+  if (!lyricEl || !el) return;
+
+  // فراغ → fade out
+  if (idx < 0) {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = 'lyricFadeOut 0.3s ease forwards';
+    return;
+  }
+
+  // سطر جديد → fade in
+  lyricEl.textContent = state.lyrics[idx].text || 'اكتب الكلمات';
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'lyricFadeIn 0.4s ease';
 }
 
 /* ============================================
