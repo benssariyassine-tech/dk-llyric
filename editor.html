@@ -7,15 +7,14 @@
 <meta name="theme-color" content="#0b0b0f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&family=Almarai:wght@400;700;800&family=Reem+Kufi:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="editor-body">
 
-  <!-- 🌫️ الخلفية -->
   <div class="ambient-bg" id="ambientBg"></div>
 
-  <!-- 🔝 Top Bar -->
+  <!-- 🔝 Topbar -->
   <header class="topbar">
     <a href="index.html" class="topbar-back" aria-label="Back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -23,25 +22,24 @@
       </svg>
     </a>
     <div class="topbar-title">المحرر</div>
-    <button class="topbar-action" onclick="alert('التصدير راح يكون في المرحلة القادمة')">
+    <button class="topbar-action" onclick="exportVideo()" aria-label="Export">
       <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
     </button>
   </header>
 
-  <!-- 👁️ المعاينة المباشرة -->
-  <div class="preview-area">
+  <!-- 🎬 Preview -->
+  <div class="editor-preview-wrap">
     <div class="preview-card">
       <div class="preview-header">
-        <img class="preview-cover" id="previewCover" 
-             src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" 
-             alt="">
+        <img class="preview-cover" id="previewCover"
+             src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
         <div class="preview-header-text">
           <div class="preview-song" id="previewSong">اسم الأغنية</div>
           <div class="preview-artist" id="previewArtist">اسم الفنان</div>
         </div>
       </div>
       <div class="preview-lyrics">
-        <div class="preview-lyric-line" id="previewLyric">راجع بتقولي اللي ما بينا</div>
+        <div class="preview-lyric-line" id="previewLyric">اكتب الكلمات من القائمة السفلية</div>
       </div>
       <div class="preview-footer">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.5 14.5c-.2.3-.6.4-.9.2-2.5-1.5-5.6-1.9-9.3-1-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 4-.9 7.5-.5 10.3 1.2.3.2.4.6.3.8zm1.2-2.7c-.2.4-.7.5-1.1.3-2.9-1.8-7.3-2.3-10.6-1.2-.4.1-.8-.1-1-.5-.1-.4.1-.8.5-1 3.8-1.2 8.7-.6 12 1.4.4.2.5.7.2 1zm.1-2.8C14.1 8.8 8.4 8.6 5.1 9.6c-.5.1-1-.2-1.1-.7-.1-.5.2-1 .7-1.1 3.8-1.2 10.1-.9 14.1 1.4.4.3.6.9.3 1.3-.3.4-.9.6-1.3.3z"/></svg>
@@ -50,17 +48,75 @@
     </div>
   </div>
 
-  <!-- 📋 Editor Content -->
-  <main class="editor-content">
-
-    <!-- 📸 القسم 1: صورة الغلاف -->
-    <section class="editor-section">
-      <div class="editor-section-title">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        صورة الغلاف
+  <!-- 🎞️ Timeline (يظهر فقط في تاب "كلمات") -->
+  <div class="lyric-timeline-wrap" id="timelineWrap">
+    <div class="timeline-header">
+      <span>الخط الزمني</span>
+      <span id="timelineTotal">30.0s</span>
+    </div>
+    <div class="timeline-scroll" id="timelineScroll">
+      <div class="timeline-track" id="timelineTrack">
+        <!-- Segments dynamic -->
       </div>
+      <div class="timeline-playhead" id="timelinePlayhead"></div>
+    </div>
+    <div class="timeline-ruler" id="timelineRuler"></div>
+  </div>
+
+  <!-- 🎛️ Bottom Nav -->
+  <nav class="editor-nav">
+    <button class="editor-nav-item" data-tab="cover" onclick="openTab('cover', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="3"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+      </svg>
+      <span>صورة</span>
+    </button>
+    <button class="editor-nav-item" data-tab="audio" onclick="openTab('audio', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+      </svg>
+      <span>صوت</span>
+    </button>
+    <button class="editor-nav-item" data-tab="lyrics" onclick="openTab('lyrics', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="21" y1="6" x2="3" y2="6"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+        <line x1="17" y1="18" x2="3" y2="18"/>
+      </svg>
+      <span>كلمات</span>
+    </button>
+    <button class="editor-nav-item" data-tab="font" onclick="openTab('font', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="4 7 4 4 20 4 20 7"/>
+        <line x1="9" y1="20" x2="15" y2="20"/>
+        <line x1="12" y1="4" x2="12" y2="20"/>
+      </svg>
+      <span>خط</span>
+    </button>
+    <button class="editor-nav-item" data-tab="info" onclick="openTab('info', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>معلومات</span>
+    </button>
+  </nav>
+
+  <!-- 📦 Bottom Sheet -->
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+
+    <!-- صورة -->
+    <div class="sheet-content" data-sheet="cover">
+      <h3 class="sheet-title">صورة الغلاف</h3>
       <label for="coverInput" class="upload-btn" id="coverUploadBtn">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <span>اختر صورة من الجهاز</span>
       </label>
       <input type="file" id="coverInput" accept="image/*" hidden>
@@ -72,50 +128,94 @@
         </div>
         <button class="upload-preview-remove" onclick="removeCover()">×</button>
       </div>
-    </section>
+    </div>
 
-    <!-- ✏️ القسم 2: اسم الأغنية والفنان -->
-    <section class="editor-section">
-      <div class="editor-section-title">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        معلومات الأغنية
-      </div>
-      <input type="text" id="songNameInput" class="editor-input" placeholder="اسم الأغنية" value="اسم الأغنية">
-      <input type="text" id="artistNameInput" class="editor-input" placeholder="اسم الفنان" value="اسم الفنان">
-    </section>
-
-    <!-- 🎵 القسم 3: الأغنية -->
-    <section class="editor-section">
-      <div class="editor-section-title">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        الأغنية
-      </div>
+    <!-- صوت -->
+    <div class="sheet-content" data-sheet="audio">
+      <h3 class="sheet-title">الأغنية</h3>
       <label for="audioInput" class="upload-btn" id="audioUploadBtn">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>اختر ملف صوتي</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>اختر أغنية أو فيديو</span>
       </label>
-      <input type="file" id="audioInput" accept="audio/*" hidden>
+      <input type="file" id="audioInput" accept="audio/*,video/*" hidden>
       <div class="upload-preview hidden" id="audioPreview">
-        <div class="upload-preview-info" style="text-align:center;">
+        <div class="upload-preview-info" style="text-align:center;flex:1;">
           <div class="upload-preview-name" id="audioPreviewName"></div>
           <div class="upload-preview-meta" id="audioPreviewMeta"></div>
         </div>
         <button class="upload-preview-remove" onclick="removeAudio()">×</button>
       </div>
       <audio id="audioPlayer" class="audio-player hidden" controls></audio>
-    </section>
+    </div>
 
-    <!-- 📝 القسم 4: الكلمات -->
-    <section class="editor-section">
-      <div class="editor-section-title">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
-        الكلمات
-      </div>
-      <div id="lyricsList"></div>
+    <!-- ك classلمات -->
+    <div class="sheet-content" data-sheet="lyrics="">
+      <h3 class="sheet-title">الكلمات</fonth3>
+      <p class="sheet-h-familyint">اكتب كل سطر، وبعدها عد-btnّل المدة من الخط الزمني</p>
+     " <div id="lyricsList"></div>
       <button class="add-lyric-btn" onclick="addLyricLine()">+ إضافة سطر جديد</button>
-    </section>
+    </div>
 
-  </main>
+    <!-- خط -->
+    <div class="sheet-content" data-sheet="font">
+      <h3 class="sheet-title">الخط والتنسيق</h3>
+
+      <div class="font-group">
+        <label class="font-label">نوع الخط</label>
+        <div class="font-family-grid" id="fontFamilyGrid">
+          <button class="font-family-btn active" data-font="Cairo" style="font-family:'Cairo',sans-serif;">Cairo</button>
+          <button data-font="Tajawal" style="font-family:'Tajawal',sans-serif;">Tajawal</button>
+          <button class="font-family-btn" data-font="Almarai" style="font-family:'Almarai',sans-serif;">Almarai</button>
+          <button class="font-family-btn" data-font="Reem Kufi" style="font-family:'Reem Kufi',sans-serif;">Reem Kufi</button>
+          <button class="font-family-btn" data-font="Inter" style="font-family:'Inter',sans-serif;">Inter</button>
+        </div>
+      </div>
+
+      <div class="font-group">
+        <label class="font-label">الحجم: <span id="fontSizeVal">24</span>px</label>
+        <input type="range" id="fontSizeRange" min="12" max="48" value="24" class="font-slider">
+      </div>
+
+      <div class="font-group">
+        <label class="font-label">السماكة</label>
+        <div class="font-weight-row">
+          <button class="font-weight-btn" data-weight="500">عادي</button>
+          <button class="font-weight-btn active" data-weight="800">عريض</button>
+          <button class="font-weight-btn" data-weight="900">عريض جداً</button>
+        </div>
+      </div>
+
+      <div class="font-group">
+        <label class="font-label">اللون</label>
+        <div class="color-grid" id="colorGrid">
+          <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;"></button>
+          <button class="color-btn" data-color="#0a84ff" style="background:#0a84ff;"></button>
+          <button class="color-btn" data-color="#ff453a" style="background:#ff453a;"></button>
+          <button class="color-btn" data-color="#ffd60a" style="background:#ffd60a;"></button>
+          <button class="color-btn" data-color="#32d74b" style="background:#32d74b;"></button>
+          <button class="color-btn" data-color="#bf5af2" style="background:#bf5af2;"></button>
+          <button class="color-btn" data-color="#ff9f0a" style="background:#ff9f0a;"></button>
+        </div>
+      </div>
+
+      <div class="font-group">
+        <label class="font-label">التأثير</label>
+        <div class="effect-row">
+          <button class="effect-btn" data-effect="none">بدون</button>
+          <button class="effect-btn active" data-effect="shadow">ظل</button>
+          <button class="effect-btn" data-effect="glow">توهج</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- معلومات -->
+    <div class="sheet-content" data-sheet="info">
+      <h3 class="sheet-title">معلومات الأغنية</h3>
+      <input type="text" id="songNameInput" class="editor-input" placeholder="اسم الأغنية" value="اسم الأغنية">
+      <input type="text" id="artistNameInput" class="editor-input" placeholder="اسم الفنان" value="اسم الفنان">
+    </div>
+
+  </div>
 
   <script src="script.js"></script>
 </body>
