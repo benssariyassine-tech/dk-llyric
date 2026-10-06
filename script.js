@@ -481,6 +481,21 @@ function showCapcutMenu(type) {
   menu.classList.add('open');
   document.body.classList.add('menu-open');
 
+  if (type === 'bg') {
+    // For background: hide glass + edit
+    menu.querySelectorAll('.cm-item').forEach(function(item) {
+      const svg = item.querySelector('svg');
+      if (!svg) return;
+      const svgData = svg.outerHTML;
+      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
+        item.style.display = 'none';
+      } else {
+        item.style.display = '';
+      }
+    });
+    return;
+  }
+
   if (type === 'audio') {
     menu.querySelectorAll('.cm-item').forEach(item => {
       const svg = item.querySelector('svg');
