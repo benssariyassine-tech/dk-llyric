@@ -534,6 +534,14 @@ function setupPlayheadDrag() {
 
   ph.addEventListener('mousedown', onDown);
   ph.addEventListener('touchstart', onDown, { passive: false });
+   // Tap على الفراغ → خفي القائمة
+  vp.addEventListener('touchstart', (e) => {
+    if (e.target === vp || e.target.classList.contains('timeline-content')) {
+      if (state.selectedType) {
+        clearSelection();
+      }
+    }
+  }, { passive: true });
 
   // Tap على الـ timeline (ماشي على السطور) = نقل المؤشر
   vp.addEventListener('click', (e) => {
