@@ -1406,11 +1406,10 @@ body {
 }
 
 .track {
-  display: flex;
-  gap: 2px;
+  display: block;
   min-height: 42px;
-  align-items: center;
   position: relative;
+  overflow: visible;
 }
 
 /* Track النص */
