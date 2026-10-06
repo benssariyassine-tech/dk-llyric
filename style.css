@@ -2486,47 +2486,25 @@ input, textarea { -webkit-user-select: text !important; user-select: text !impor
   border-radius: 4px;
 }
 
-/* ===== CapCut Menu (Bottom Icons Bar) ===== */
-.capcut-menu {
-  position: fixed;
-  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  left: 0; right: 0;
-  background: rgba(22,22,28,0.95);
-  backdrop-filter: blur(40px) saturate(180%);
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  overflow-x: auto;
-  gap: 4px;
-  padding: 12px 12px 14px;
-  transform: translateY(120%);
+
+/* ============================================
+   🎛️ Nav visibility states
+   ============================================ */
+
+/* كي تبان قائمة CapCut → تخبي القائمة الرئيسية */
+body.menu-open .editor-nav {
+  transform: translateX(-50%) translateY(120%);
   opacity: 0;
+  pointer-events: none;
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.25s;
-  z-index: 90;
-  scrollbar-width: none;
 }
-.capcut-menu::-webkit-scrollbar { display: none; }
-.capcut-menu.open {
-  transform: translateY(0);
-  opacity: 1;
+
+/* القائمة الرئيسية - حالتها العادية */
+.editor-nav {
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.25s;
 }
-.cm-item {
-  flex: 0 0 auto;
-  min-width: 68px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  border-radius: 12px;
+
+/* قائمة CapCut تكون فوق القائمة الرئيسية كي تبان */
+.capcut-menu {
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
 }
-.cm-item:active { background: rgba(255,255,255,0.06); }
-.cm-item svg { width: 22px; height: 22px; stroke: var(--text-color); }
-.cm-item.danger svg { stroke: var(--danger); }
-.cm-item.danger span { color: var(--danger); }
