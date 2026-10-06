@@ -1,5 +1,5 @@
 /* ============================================
-   dk.llyric Editor — Final v4.0
+   dk.llyric Editor — Final v6.0 (Clean)
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 1000;
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAudioSegmentListeners();
   initBgUpload();
   initIgInput();
+  initCardControls();
   renderAll();
   applyFont();
   setupPlayheadDrag();
@@ -62,19 +63,123 @@ function renderAll() {
   renderLyricsList();
 }
 
+/* ============================================
+   Card Entry Animation
+   ============================================ */
 function playCardAnimation() {
-  const banner = document.getElementById('cardBanner');
-  const info = document.getElementById('cardInfo');
+  const card = document.getElementById('mainCard');
+  const header = document.querySelector('.card-header');
   const lyrics = document.getElementById('previewLyrics');
   const footer = document.getElementById('previewFooter');
-  if (!banner) return;
+  if (!card) return;
 
-  setTimeout(() => banner.classList.add('expanded'), 300);
-  setTimeout(() => { if (info) info.classList.add('show'); }, 900);
-  setTimeout(() => { if (lyrics) lyrics.classList.add('show'); }, 1200);
-  setTimeout(() => { if (footer) footer.classList.add('show'); }, 1500);
+  if (header) {
+    header.style.opacity = '0';
+    header.style.transition = 'opacity 0.6s ease';
+    setTimeout(() => { header.style.opacity = '1'; }, 400);
+  }
+  if (lyrics) {
+    lyrics.style.opacity = '0';
+    lyrics.style.transition = 'opacity 0.6s ease';
+    setTimeout(() => { lyrics.style.opacity = '1'; }, 700);
+  }
+  if (footer) {
+    footer.style.opacity = '0';
+    footer.style.transition = 'opacity 0.6s ease';
+    setTimeout(() => { footer.style.opacity = '1'; }, 1000);
+  }
 }
 
+/* ============================================
+   Card Controls
+   ============================================ */
+function initCardControls() {
+  const scaleRange = document.getElementById('cardScaleRange');
+  const scaleVal = document.getElementById('cardScaleVal');
+  if (scaleRange) {
+    scaleRange.addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      document.documentElement.style.setProperty('--card-scale', v);
+      if (scaleVal) scaleVal.textContent = v.toFixed(2);
+    });
+  }
+
+  const opRange = document.getElementById('cardOpacityRange');
+  const opVal = document.getElementById('cardOpacityVal');
+  if (opRange) {
+    opRange.addEventListener('input', (e) => {
+      const v = parseInt(e.target.value);
+      document.documentElement.style.setProperty('--card-opacity', (v / 100).toFixed(2));
+      if (opVal) opVal.textContent = v;
+    });
+  }
+
+  const rRange = document.getElementById('cardRadiusRange');
+  const rVal = document.getElementById('cardRadiusVal');
+  if (rRange) {
+    rRange.addEventListener('input', (e) => {
+      const v = parseInt(e.target.value);
+      document.documentElement.style.setProperty('--card-radius', v + 'px');
+      if (rVal) rVal.textContent = v;
+    });
+  }
+
+  const cRange = document.getElementById('coverSizeRange');
+  const cVal = document.getElementById('coverSizeVal');
+  if (cRange) {
+    cRange.addEventListener('input', (e) => {
+      const v = parseInt(e.target.value);
+      document.documentElement.style.setProperty('--cover-size', v + 'px');
+      if (cVal) cVal.textContent = v;
+    });
+  }
+
+  initCardPinch();
+}
+
+function initCardPinch() {
+  const card = document.getElementById('mainCard');
+  if (!card) return;
+
+  let startDist = 0;
+  let startScale = 1;
+
+  const getDist = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  };
+
+  card.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      startDist = getDist(e.touches);
+      startScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 1;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  card.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && startDist > 0) {
+      const dist = getDist(e.touches);
+      const ratio = dist / startDist;
+      let newScale = Math.max(0.5, Math.min(1.5, startScale * ratio));
+      document.documentElement.style.setProperty('--card-scale', newScale.toFixed(2));
+      const range = document.getElementById('cardScaleRange');
+      const val = document.getElementById('cardScaleVal');
+      if (range) range.value = newScale.toFixed(2);
+      if (val) val.textContent = newScale.toFixed(2);
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  card.addEventListener('touchend', () => {
+    startDist = 0;
+  });
+}
+
+/* ============================================
+   Helpers
+   ============================================ */
 function hasAudio() {
   return state.audioUrl && state.audioDuration > 0;
 }
@@ -87,6 +192,9 @@ function fileToTimeline(fileSec) {
   return state.audioStart + (fileSec - state.audioTrimIn);
 }
 
+/* ============================================
+   Tabs
+   ============================================ */
 function openTab(tabName, btnEl) {
   if (currentTab === tabName) { closeSheet(); return; }
   currentTab = tabName;
@@ -109,6 +217,9 @@ function closeSheet() {
   if (sb) sb.classList.remove('open');
 }
 
+/* ============================================
+   Audio Upload
+   ============================================ */
 function initAudioUpload() {
   const input = document.getElementById('audioInput');
   if (!input) return;
@@ -198,6 +309,9 @@ function initAudioSegmentListeners() {
   audioSeg.addEventListener('touchstart', lp, { passive: true });
 }
 
+/* ============================================
+   Lyrics
+   ============================================ */
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
   state.lyrics.push({ text: '', start: startAt, duration: 3, glass: false });
@@ -239,6 +353,9 @@ function renderLyricsList() {
   });
 }
 
+/* ============================================
+   Timeline Duration
+   ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
   if (hasAudio()) {
@@ -247,6 +364,9 @@ function getTimelineDuration() {
   return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
+/* ============================================
+   Ruler
+   ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
   if (!ruler) return;
@@ -262,6 +382,9 @@ function renderRuler() {
   }
 }
 
+/* ============================================
+   Timeline
+   ============================================ */
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
   if (!trackText) return;
@@ -311,6 +434,9 @@ function renderTimeline() {
   setTimeout(checkAllTextOverlaps, 10);
 }
 
+/* ============================================
+   Selection
+   ============================================ */
 function selectText(index) {
   state.selectedType = 'text';
   state.selectedIndex = index;
@@ -325,7 +451,7 @@ function selectAudio() {
   renderTimeline();
   renderAudioSelection();
   showCapcutMenu('audio');
-  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+  if (navigator.v')ibrate) try { navigator.vibrate(10); } catch (e) {}
 }
 
 function renderAudioSelection() {
@@ -353,7 +479,7 @@ function showCapcutMenu(type) {
       const svg = item.querySelector('svg');
       if (!svg) return;
       const svgData = svg.outerHTML;
-      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
+      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4" !== -1) {
         item.style.display = 'none';
       } else {
         item.style.display = '';
@@ -430,6 +556,9 @@ function cmAction(action) {
   }
 }
 
+/* ============================================
+   Resize
+   ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
@@ -537,6 +666,9 @@ function onResizeEnd() {
   }
 }
 
+/* ============================================
+   Text Overlap
+   ============================================ */
 function checkTextOverlap() {
   const segs = document.querySelectorAll('.text-segment');
   segs.forEach(s => s.classList.remove('overlap'));
@@ -561,6 +693,9 @@ function checkAllTextOverlaps() {
   checkTextOverlap();
 }
 
+/* ============================================
+   Long Press → Text
+   ============================================ */
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -630,6 +765,9 @@ function startLongPressText(e, index, segEl) {
   }, LONG_PRESS_MS);
 }
 
+/* ============================================
+   Long Press → Audio
+   ============================================ */
 function startLongPressAudio(e, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -701,6 +839,9 @@ function startLongPressAudio(e, segEl) {
   }, LONG_PRESS_MS);
 }
 
+/* ============================================
+   Playhead Position
+   ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
@@ -712,6 +853,9 @@ function setPlayheadPosition(sec) {
   updateTimeDisplay();
 }
 
+/* ============================================
+   Playhead Drag
+   ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
   const vp = document.getElementById('timelineViewport');
@@ -794,6 +938,9 @@ function setupPlayheadDrag() {
   });
 }
 
+/* ============================================
+   Playhead Loop
+   ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
   _lastRAFTime = performance.now();
@@ -875,6 +1022,9 @@ function autoScrollPlayhead() {
   }
 }
 
+/* ============================================
+   Sync Playhead → Lyric (3 lines)
+   ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
   let idx = -1;
@@ -915,6 +1065,9 @@ function renderLyricFromPlayhead(idx) {
   currEl.classList.add('animate-in');
 }
 
+/* ============================================
+   Play / Pause
+   ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const isAudioActive = hasAudio();
@@ -967,6 +1120,9 @@ function fmt(s) {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 
+/* ============================================
+   Font Controls
+   ============================================ */
 function setupFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1018,15 +1174,9 @@ function setFontFilter(filter, btnEl) {
   });
 }
 
-function setAspectRatio(ratio, btnEl) {
-  const frame = document.getElementById('previewFrame');
-  if (!frame) return;
-  frame.setAttribute('data-ratio', ratio);
-  document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
-  if (btnEl) btnEl.classList.add('active');
-  if (navigator.vibrate) try { navigator.vibrate(8); } catch (err) {}
-}
-
+/* ============================================
+   Background Upload
+   ============================================ */
 function initBgUpload() {
   const bgInput = document.getElementById('bgInput');
   if (!bgInput) return;
@@ -1054,6 +1204,9 @@ function removeBackground() {
   document.getElementById('bgInput').value = '';
 }
 
+/* ============================================
+   Instagram
+   ============================================ */
 function initIgInput() {
   const igInput = document.getElementById('igNameInput');
   if (!igInput) return;
@@ -1070,6 +1223,9 @@ function openInstagram() {
   window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
 }
 
+/* ============================================
+   Tap → Hide Menu
+   ============================================ */
 document.addEventListener('click', (e) => {
   if (state.selectedType) {
     if (e.target.closest('.capcut-menu')) return;
@@ -1084,6 +1240,9 @@ document.addEventListener('click', (e) => {
   }
 }, true);
 
+/* ============================================
+   Misc
+   ============================================ */
 function closeEditor() {
   if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
 }
