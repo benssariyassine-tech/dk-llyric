@@ -1,5 +1,6 @@
 /* ============================================
-   dk.llyric Editor — Final v1.0
+   dk.llyric Editor — Final v2.0
+   (Smooth crop + Audio trim + Overlap detection)
    ============================================ */
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 2000;
@@ -42,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setupPlayheadDrag();
   setupFontControls();
 
-  // ⏱️ ضع المؤشر في 0s بعد الرندر
   requestAnimationFrame(() => {
     state.currentTime = 0;
     setPlayheadPosition(0);
@@ -276,10 +276,11 @@ function renderTimeline() {
 
     trackText.appendChild(seg);
   });
-}
-// ✅ تحقق من التداخلات بعد الرندر
+
+  // ✅ تحقق من التداخلات بعد الرندر
   setTimeout(checkAllTextOverlaps, 10);
 }
+
 /* ============================================
    Selection + Menu
    ============================================ */
@@ -384,7 +385,7 @@ function cmAction(action) {
 }
 
 /* ============================================
-   Resize Handles
+   Resize Handles — SMOOTH (bلا re-render)
    ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
@@ -407,6 +408,7 @@ function startResize(e, index, side) {
     document.addEventListener('mouseup', onResizeEnd);
   }
 }
+
 function onResizeMove(e) {
   if (!_resize || !_resize.active) return;
   e.preventDefault();
@@ -423,7 +425,7 @@ function onResizeMove(e) {
       const ns = Math.max(0, Math.min(state.audioEnd - 0.5, _resize.startStart + deltaSec));
       state.audioStart = Math.round(ns * 10) / 10;
     }
-    // تحديث DOM مباشرة (سلس)
+    // ✅ تحديث DOM مباشرة (سلس)
     const seg = document.getElementById('audioSegment');
     if (seg) {
       seg.style.left = (state.audioStart * PX_PER_SEC) + 'px';
@@ -445,7 +447,7 @@ function onResizeMove(e) {
     state.lyrics[idx].start = Math.round(newStart * 10) / 10;
     state.lyrics[idx].duration = Math.round(newDuration * 10) / 10;
 
-    // تحديث DOM مباشرة (سلس) — بلا re-render
+    // ✅ تحديث DOM مباشرة (سلس — بلا re-render)
     const segs = document.querySelectorAll('.text-segment');
     const seg = segs[idx];
     if (seg) {
@@ -453,10 +455,11 @@ function onResizeMove(e) {
       seg.style.width = (state.lyrics[idx].duration * PX_PER_SEC) + 'px';
     }
 
-    // ✅ تحقق التداخل + حدّد أحمر
-    checkTextOverlap(idx);
+    // ✅ تحقق التداخل + إطار أحمر
+    checkTextOverlap();
   }
 }
+
 function onResizeEnd() {
   if (!_resize) return;
   const wasText = !_resize.isAudio;
@@ -467,29 +470,26 @@ function onResizeEnd() {
   document.removeEventListener('touchmove', onResizeMove);
   document.removeEventListener('touchend', onResizeEnd);
 
-  // بعد القص، نحدّثو الـ ruler + نتحققو من التداخلات الكل
+  // ✅ بعد القص، نحدّثو الـ ruler + نتحققو من التداخلات
   if (wasText) {
     renderRuler();
     setTimeout(checkAllTextOverlaps, 20);
   }
 }
-/* ============================================
-   🎯 Text Overlap Check
-   ============================================ */
-function checkTextOverlap(currentIdx) {
-  const segs = document.querySelectorAll('.text-segment');
 
-  // امسح الـ overlap من الكل
+/* ============================================
+   Text Overlap Detection
+   ============================================ */
+function checkTextOverlap() {
+  const segs = document.querySelectorAll('.text-segment');
   segs.forEach(s => s.classList.remove('overlap'));
 
-  // تحقق من التداخل لكل زوج
   for (let i = 0; i < state.lyrics.length; i++) {
     const a = state.lyrics[i];
     const aS = a.start, aE = a.start + a.duration;
     for (let j = i + 1; j < state.lyrics.length; j++) {
       const b = state.lyrics[j];
       const bS = b.start, bE = b.start + b.duration;
-      // إذا فيهم تداخل
       if (aS < bE && aE > bS) {
         if (segs[i]) segs[i].classList.add('overlap');
         if (segs[j]) segs[j].classList.add('overlap');
@@ -499,8 +499,9 @@ function checkTextOverlap(currentIdx) {
 }
 
 function checkAllTextOverlaps() {
-  checkTextOverlap(-1);
+  checkTextOverlap();
 }
+
 /* ============================================
    Long Press = Move Block
    ============================================ */
@@ -548,6 +549,7 @@ function startLongPress(e, index, segEl) {
       const ns = Math.max(0, _move.startStart + deltaSec);
       state.lyrics[_move.index].start = Math.round(ns * 10) / 10;
       _move.segEl.style.left = (state.lyrics[_move.index].start * PX_PER_SEC) + 'px';
+      checkTextOverlap();
     };
     const onEndFn = () => {
       if (_move && _move.segEl) _move.segEl.classList.remove('moving');
@@ -557,6 +559,7 @@ function startLongPress(e, index, segEl) {
       document.removeEventListener('touchmove', onMoveFn);
       document.removeEventListener('touchend', onEndFn);
       renderRuler();
+      setTimeout(checkAllTextOverlaps, 20);
     };
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
@@ -576,8 +579,7 @@ function setPlayheadPosition(sec) {
   if (!ph) return;
   const hasAudio = state.audioUrl && state.audioDuration > 0;
   const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
-  const minStart = 0;
-  const clampedSec = Math.max(minStart, Math.min(sec, maxEnd));
+  const clampedSec = Math.max(0, Math.min(sec, maxEnd));
   const x = clampedSec * PX_PER_SEC;
   ph.style.transform = `translateX(${x}px)`;
   state.currentTime = clampedSec;
@@ -585,9 +587,23 @@ function setPlayheadPosition(sec) {
 }
 
 /* ============================================
-   Playhead Drag
+   Playhead Drag (Cap)
    ============================================ */
-const seekTo = (sec) => {
+function setupPlayheadDrag() {
+  const ph = document.getElementById('playhead');
+  const vp = document.getElementById('timelineViewport');
+  const content = document.getElementById('timelineContent');
+  if (!ph || !vp || !content) return;
+
+  let dragging = false;
+
+  const pxToTime = (clientX) => {
+    const rect = content.getBoundingClientRect();
+    const x = clientX - rect.left;
+    return Math.max(0, x / PX_PER_SEC);
+  };
+
+  const seekTo = (sec) => {
     const hasAudio = state.audioUrl && state.audioDuration > 0;
     const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
     sec = Math.max(0, Math.min(sec, maxEnd));
@@ -656,7 +672,7 @@ const seekTo = (sec) => {
 }
 
 /* ============================================
-   Playhead Loop
+   Playhead Loop — Clock + Audio Sync + Trim
    ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
@@ -671,10 +687,10 @@ function startPlayheadLoop() {
     const hasAudio = state.audioUrl && state.audioDuration > 0;
 
     if (hasAudio && player && !player.paused && !player.ended) {
-      // ✅ الوقت الحقيقي من الصوت
+      // ✅ الوقت من الصوت
       state.currentTime = player.currentTime;
 
-      // ✅ القص الفعلي: إذا وصلنا لآخر القص، وقف
+      // ✅ القص الفعلي: إذا وصلنا لنهاية القص، وقف
       if (state.currentTime >= state.audioEnd) {
         player.pause();
         state.currentTime = state.audioEnd;
@@ -687,7 +703,7 @@ function startPlayheadLoop() {
         return;
       }
     } else {
-      // بلا أغنية: الساعة اليدوية
+      // ساعة يدوية (بلا أغنية)
       state.currentTime += dt;
     }
 
@@ -776,7 +792,7 @@ function renderLyricFromPlayhead(idx) {
 }
 
 /* ============================================
-   Play / Pause
+   Play / Pause — Trim Aware
    ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
@@ -807,9 +823,7 @@ function togglePlay() {
     setPlayheadPosition(startAt);
 
     if (player && hasAudio) {
-      try {
-        player.currentTime = startAt;
-      } catch (e) {}
+      try { player.currentTime = startAt; } catch (e) {}
       player.play().catch(e => console.warn('play err:', e));
     }
     state.isPlaying = true;
@@ -829,9 +843,8 @@ function updatePlayIcon() {
 function updateTimeDisplay() {
   const el = document.getElementById('timeDisplay');
   if (!el) return;
-  const maxEnd = (state.audioUrl && state.audioDuration > 0)
-    ? state.audioEnd
-    : getTimelineDuration();
+  const hasAudio = state.audioUrl && state.audioDuration > 0;
+  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
   const cur = Math.max(0, Math.min(state.currentTime, maxEnd));
   el.textContent = fmt(cur) + ' / ' + fmt(maxEnd);
 }
