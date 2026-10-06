@@ -1667,3 +1667,164 @@ body {
 .tt-title { display: block; font-size: 10px; font-weight: 900; color: #fff; }
 .tt-artist { display: block; font-size: 8px; color: rgba(255,255,255,0.6); }
 .tt-label { font-size: 10px; font-weight: 800; color: var(--accent); }
+/* ============================================
+   🔧 FIXES — v2 (User Select + Timeline LTR)
+   ============================================ */
+
+/* 1️⃣ منع تحديد النص */
+* {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+input, textarea {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+/* 2️⃣ الخط الزمني LTR (كيما CapCut) */
+.timeline-ruler,
+.timeline-scroll,
+.timeline-tracks,
+.track {
+  direction: ltr !important;
+}
+/* النص داخل السطر يبقى RTL للعربية */
+.text-segment,
+.audio-label {
+  direction: rtl;
+}
+
+/* 3️⃣ المقابض أكبر وأسهل للسحب */
+.text-segment .seg-handle {
+  width: 16px !important;
+  top: -4px !important;
+  bottom: -4px !important;
+  background: transparent;
+}
+.text-segment .seg-handle.left { left: -6px !important; }
+.text-segment .seg-handle.right { right: -6px !important; }
+.text-segment.active .seg-handle::after {
+  width: 3px !important;
+  height: 22px !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 4️⃣ cursor عند السحب */
+.text-segment {
+  cursor: grab !important;
+  touch-action: none;
+}
+.text-segment.dragging {
+  cursor: grabbing !important;
+  opacity: 0.9;
+  z-index: 10;
+}
+
+/* 5️⃣ مؤشر الـ Long Press */
+.text-segment.long-pressing {
+  box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.5) !important;
+}
+
+/* 6️⃣ قسم التأثيرات الصوتية */
+.audio-effects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.audio-effect-card {
+  padding: 14px 10px;
+  background: rgba(11, 11, 15, 0.6);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.audio-effect-card.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: var(--accent);
+}
+.audio-effect-card:active { transform: scale(0.96); }
+.audio-effect-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(10, 132, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+.audio-effect-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 2.2;
+}
+.audio-effect-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+.audio-effect-desc {
+  font-size: 10px;
+  color: var(--subtext-color);
+  font-weight: 500;
+}
+
+/* 7️⃣ Toggle للـ Fade */
+.fade-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.fade-item {
+  flex: 1;
+  padding: 12px;
+  background: rgba(11, 11, 15, 0.6);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fade-item.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: var(--accent);
+}
+.fade-item-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-color);
+  margin-bottom: 6px;
+}
+.fade-slider {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.fade-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.fade-value {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
