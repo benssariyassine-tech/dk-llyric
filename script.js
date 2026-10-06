@@ -574,10 +574,10 @@ function startLongPress(e, index, segEl) {
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
-  const maxEnd = (state.audioUrl && state.audioDuration > 0)
-    ? state.audioEnd
-    : getTimelineDuration();
-  const clampedSec = Math.max(0, Math.min(sec, maxEnd));
+  const hasAudio = state.audioUrl && state.audioDuration > 0;
+  const maxEnd = hasAudio ? state.audioEnd : getTimelineDuration();
+  const minStart = 0;
+  const clampedSec = Math.max(minStart, Math.min(sec, maxEnd));
   const x = clampedSec * PX_PER_SEC;
   ph.style.transform = `translateX(${x}px)`;
   state.currentTime = clampedSec;
