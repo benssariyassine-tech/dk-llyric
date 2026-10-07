@@ -275,14 +275,31 @@
     </div>
 
     <!-- 🃏 CARD -->
-    <div class="sheet-content" data-sheet="card">
+
+<div class="sheet-content" data-sheet="card">
       <h3 class="sheet-title">البطاقة</h3>
+
+      <div class="font-group">
+        <label class="font-label">صورة الغلاف</label>
+        <label for="coverInput" class="upload-btn" id="coverUploadBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>اختر صورة الغلاف</span>
+        </label>
+        <input type="file" id="coverInput" accept="image/*" hidden>
+        <div class="upload-preview hidden" id="coverPreview">
+          <img id="coverPreviewImg" alt="" style="width:50px;height:50px;border-radius:10px;object-fit:cover;">
+          <div class="upload-preview-info">
+            <div class="upload-preview-name" id="coverPreviewName"></div>
+            <div class="upload-preview-meta">تم الرفع ✓</div>
+          </div>
+          <button class="upload-preview-remove" onclick="removeCover()">×</button>
+        </div>
+      </div>
 
       <div class="font-group">
         <label class="font-label">حجم البطاقة: <span id="cardScaleVal">1.00</span>x</label>
         <input type="range" id="cardScaleRange" min="0.5" max="1.5" step="0.05" value="1" class="font-slider">
       </div>
-
       <div class="font-group">
         <label class="font-label">شفافية البطاقة: <span id="cardOpacityVal">65</span>%</label>
         <input type="range" id="cardOpacityRange" min="10" max="100" step="5" value="65" class="font-slider">
