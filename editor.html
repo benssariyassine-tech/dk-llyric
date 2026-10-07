@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <!-- html2canvas: لالتقاط صورة مطابقة للمعاينة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- mp4-muxer: لتحويل الفيديو إلى MP4 -->
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.1/build/mp4-muxer.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>المحرر — dk.llyric</title>
@@ -44,10 +49,9 @@
         <div class="divider"></div>
 
         <!-- 🎯 LYRICS -->
-        <div class="card-lyrics">
+<div class="card-lyrics">
           <div class="lyric-prev" id="lyricPrev"></div>
-          <div class="lyric-current" 
-            <div class="lyric-current" id="lyricCurrent"></div>
+          <div class="lyric-current" id="lyricCurrent"></div>
           <div class="lyric-next" id="lyricNext"></div>
         </div>
 
