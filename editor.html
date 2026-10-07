@@ -8,10 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Cairo:wght@400;700;900&family=Tajawal:wght@400;700&family=Almarai:wght@400;700;800&family=Reem+Kufi:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg-color:#07070d;--card-bg:rgba(255,255,255,0.055);--text-color:#fff;--subtext-color:#8e8e93;
-  --accent:#0a84ff;--accent2:#0062d2;--danger:#ff453a;--border-color:rgba(255,255,255,0.1);
-}
+:root{--bg-color:#07070d;--text-color:#fff;--subtext-color:#8e8e93;--accent:#0a84ff;--accent2:#0062d2;--danger:#ff453a;--border-color:rgba(255,255,255,0.1)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 input,textarea{-webkit-user-select:text;user-select:text}
 html,body{background:var(--bg-color);color:var(--text-color);font-family:Cairo,Inter,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -21,28 +18,22 @@ button{font-family:inherit;cursor:pointer}
 .blob-1{width:280px;height:280px;background:#0a84ff;top:-60px;right:-60px}
 .blob-2{width:260px;height:260px;background:#bf5af2;bottom:-40px;left:-40px;animation-delay:-8s}
 @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
-
 .editor-body{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-.glass{background:rgba(255,255,255,0.055);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)}
-
 .editor-topbar{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:rgba(7,7,13,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-color);flex-shrink:0;z-index:10}
 .etb-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border-color);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
 .etb-btn svg{width:16px;height:16px}
 .etb-title-wrap{flex:1;text-align:center;min-width:0}
 .etb-title{font-size:14px;font-weight:800;color:#fff}
-.etb-badge{font-size:10px;font-weight:900;color:var(--accent);background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.35);padding:4px 10px;border-radius:8px;flex-shrink:0;backdrop-filter:blur(10px)}
-.etb-export{padding:8px 16px;background:linear-gradient(135deg,rgba(10,132,255,0.9),rgba(0,98,210,0.9));color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;font-size:12px;font-weight:800;flex-shrink:0;backdrop-filter:blur(20px);box-shadow:0 6px 20px rgba(10,132,255,0.35)}
-
+.etb-badge{font-size:10px;font-weight:900;color:var(--accent);background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.35);padding:4px 10px;border-radius:8px;flex-shrink:0}
+.etb-export{padding:8px 16px;background:linear-gradient(135deg,rgba(10,132,255,0.9),rgba(0,98,210,0.9));color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;font-size:12px;font-weight:800;flex-shrink:0;box-shadow:0 6px 20px rgba(10,132,255,0.35)}
 .preview-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 12px;min-height:0;overflow:hidden}
 .preview-frame{position:relative;width:100%;max-width:240px;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.08)}
 .preview-frame canvas{display:block;width:100%;height:100%}
-
 .playback-controls{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;flex-shrink:0;gap:8px;min-height:46px;position:relative;z-index:5}
-.pc-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border-color);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;backdrop-filter:blur(10px)}
+.pc-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border-color);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
 .pc-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2}
 .pc-btn svg polygon{fill:currentColor;stroke:none}
 .pc-time{flex:1;text-align:center;font-size:11px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
-
 .timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border-color);padding-bottom:76px}
 .timeline-viewport{position:relative;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0 6px;touch-action:pan-x}
 .timeline-viewport::-webkit-scrollbar{display:none}
@@ -52,32 +43,28 @@ button{font-family:inherit;cursor:pointer}
 .ruler-tick span{font-size:9px;font-weight:700;color:var(--subtext-color)}
 .ruler-tick i{display:block;width:1px;height:5px;background:var(--subtext-color);opacity:0.5}
 .track{position:relative;min-height:42px;margin-bottom:4px}
-
-.text-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(191,90,242,0.85),rgba(142,68,173,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;padding:0 16px;display:flex;align-items:center;font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:box-shadow 0.15s}
+.text-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(191,90,242,0.85),rgba(142,68,173,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;padding:0 22px;display:flex;align-items:center;font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:box-shadow 0.15s}
 .text-segment.selected{border-color:#ffd60a;box-shadow:0 0 0 2px #ffd60a,0 0 24px rgba(255,214,10,0.5);z-index:10}
-.seg-handle{position:absolute;top:50%;transform:translateY(-50%);width:12px;height:60%;background:#ffd60a;border-radius:3px;display:none;z-index:5;cursor:ew-resize}
-.text-segment.selected .seg-handle,.audio-segment.selected .seg-handle{display:block}
-.seg-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:40%;background:#000;border-radius:2px;opacity:0.8}
-.handle-left{left:2px}
-.handle-right{right:2px}
-
-.audio-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,45,146,0.85),rgba(214,51,132,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;display:flex;align-items:center;padding:0 20px;color:#fff;font-size:11px;font-weight:800;overflow:hidden;cursor:grab;touch-action:none;transition:box-shadow 0.15s}
+.audio-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,45,146,0.85),rgba(214,51,132,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;display:flex;align-items:center;padding:0 22px;color:#fff;font-size:11px;font-weight:800;overflow:hidden;cursor:grab;touch-action:none;user-select:none;transition:box-shadow 0.15s}
 .audio-segment:active{cursor:grabbing}
+.audio-segment.dragging{opacity:0.85;box-shadow:0 0 0 3px #ffd60a,0 0 30px rgba(255,214,10,0.6);z-index:20}
 .audio-segment.selected{border-color:#ffd60a;box-shadow:0 0 0 2px #ffd60a,0 0 24px rgba(255,214,10,0.5);z-index:10}
 .audio-wave{flex:1;height:60%;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.6) 0 2px,transparent 2px 5px);margin-left:8px}
 .audio-label{flex-shrink:0;font-size:11px;font-weight:800;white-space:nowrap}
-.audio-add-btn{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.05);border:1.5px dashed rgba(255,255,255,0.25);color:var(--accent);display:flex;align-items:center;justify-content:center;padding:0;backdrop-filter:blur(10px)}
+.audio-add-btn{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.05);border:1.5px dashed rgba(255,255,255,0.25);color:var(--accent);display:flex;align-items:center;justify-content:center;padding:0}
 .audio-add-btn svg{width:20px;height:20px}
-
+.seg-handle{position:absolute;top:0;bottom:0;width:22px;background:linear-gradient(180deg,#ffd60a,#ffb800);border-radius:8px;display:none;z-index:6;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.4);align-items:center;justify-content:center;touch-action:none}
+.seg-handle::before{content:'';width:2px;height:50%;background:rgba(0,0,0,0.55);border-radius:2px;box-shadow:-4px 0 0 rgba(0,0,0,0.55),4px 0 0 rgba(0,0,0,0.55)}
+.text-segment.selected .seg-handle,.audio-segment.selected .seg-handle{display:flex}
+.handle-left{left:-2px;border-top-left-radius:10px;border-bottom-left-radius:10px}
+.handle-right{right:-2px;border-top-right-radius:10px;border-bottom-right-radius:10px}
 .playhead{position:absolute;top:0;bottom:0;left:0;width:2px;background:#ff453a;z-index:30;pointer-events:none;box-shadow:0 0 10px rgba(255,69,58,0.8);transform:translateX(0);will-change:transform}
 .playhead-cap{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:20px;height:8px;background:#ff453a;border-radius:4px;pointer-events:auto;cursor:ew-resize}
-
 .editor-nav{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;gap:4px;padding:8px 10px;background:rgba(28,28,34,0.75);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:32px;box-shadow:0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);z-index:100;width:calc(100% - 32px);max-width:420px;transition:transform 0.3s,opacity 0.25s}
 body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0;pointer-events:none}
 .editor-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;min-width:60px;height:52px;background:none;border:none;border-radius:22px;color:rgba(255,255,255,0.55);font-size:10px;font-weight:800;transition:all 0.25s}
 .editor-nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
 .editor-nav-item.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 6px 18px rgba(10,132,255,0.5)}
-
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s}
 .sheet-backdrop.open{opacity:1;visibility:visible}
 .bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:rgba(20,20,28,0.85);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.1);padding:12px 20px calc(90px + env(safe-area-inset-bottom,0px));max-height:70vh;overflow-y:auto;z-index:300;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);box-shadow:0 -20px 60px rgba(0,0,0,0.5)}
@@ -87,46 +74,41 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 .sheet-content.active{display:block}
 .sheet-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:14px}
 .sheet-hint{font-size:11.5px;color:var(--subtext-color);margin-bottom:14px;line-height:1.5}
-
-.upload-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:rgba(10,132,255,0.08);border:1.5px dashed rgba(10,132,255,0.4);border-radius:14px;color:var(--accent);font-size:13px;font-weight:700;backdrop-filter:blur(10px)}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:rgba(10,132,255,0.08);border:1.5px dashed rgba(10,132,255,0.4);border-radius:14px;color:var(--accent);font-size:13px;font-weight:700}
 .upload-btn svg{width:18px;height:18px;stroke:currentColor;fill:none}
-.upload-preview{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border-color);border-radius:12px;margin-top:10px;backdrop-filter:blur(10px)}
+.upload-preview{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.05);border:1px solid var(--border-color);border-radius:12px;margin-top:10px}
 .upload-preview img{width:50px;height:50px;border-radius:10px;object-fit:cover}
 .upload-preview-info{flex:1;min-width:0}
 .upload-preview-name{font-size:12px;font-weight:700;color:var(--text-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upload-preview-meta{font-size:10px;color:var(--subtext-color);margin-top:2px}
 .upload-preview-remove{width:30px;height:30px;border-radius:50%;background:rgba(255,69,58,0.15);border:1px solid rgba(255,69,58,0.3);color:#ff453a;font-size:16px;font-weight:bold;padding:0;flex-shrink:0}
-
 .lyric-row{display:grid;grid-template-columns:1fr 32px;gap:8px;margin-bottom:8px;align-items:center}
-.lyric-text-input{padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;outline:none;width:100%;font-family:inherit;backdrop-filter:blur(10px)}
+.lyric-text-input{padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;outline:none;width:100%;font-family:inherit}
 .lyric-text-input:focus,.input-field:focus{border-color:var(--accent)}
-.input-field{padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;outline:none;width:100%;font-family:inherit;backdrop-filter:blur(10px)}
+.input-field{padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;outline:none;width:100%;font-family:inherit}
 .lyric-remove-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,69,58,0.12);border:1px solid rgba(255,69,58,0.25);color:#ff453a;font-size:18px;font-weight:900;padding:0;line-height:1}
-.add-lyric-btn{width:100%;padding:12px;margin-top:6px;background:rgba(255,255,255,0.04);border:1.5px dashed var(--border-color);border-radius:12px;color:var(--accent);font-size:13px;font-weight:700;backdrop-filter:blur(10px)}
-
+.add-lyric-btn{width:100%;padding:12px;margin-top:6px;background:rgba(255,255,255,0.04);border:1.5px dashed var(--border-color);border-radius:12px;color:var(--accent);font-size:13px;font-weight:700}
 .font-group{margin-bottom:18px}
 .font-label{display:block;font-size:11px;font-weight:800;color:var(--subtext-color);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .font-label span{color:var(--accent)}
 .font-family-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.font-family-btn{padding:12px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;font-weight:700;backdrop-filter:blur(10px)}
+.font-family-btn{padding:12px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:14px;font-weight:700}
 .font-family-btn.active{background:rgba(10,132,255,0.18);border-color:var(--accent);color:var(--accent)}
 .font-family-btn.hidden{display:none}
 .filter-row{display:flex;gap:8px}
-.filter-btn{flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:12px;font-weight:700;backdrop-filter:blur(10px)}
+.filter-btn{flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:var(--text-color);font-size:12px;font-weight:700}
 .filter-btn.active{background:rgba(10,132,255,0.18);border-color:var(--accent);color:var(--accent)}
 .slider{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;outline:none;-webkit-appearance:none}
 .slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 4px 12px rgba(10,132,255,0.5)}
 .color-grid{display:flex;gap:10px;flex-wrap:wrap}
 .color-btn{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);padding:0}
 .color-btn.active{border-color:#fff;transform:scale(1.15);box-shadow:0 0 15px rgba(255,255,255,0.4)}
-
 .capcut-menu{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:12px;right:12px;max-width:420px;margin:0 auto;background:rgba(28,28,34,0.8);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:24px;display:flex;overflow-x:auto;gap:4px;padding:10px 12px;transform:translateY(150%);opacity:0;transition:transform 0.3s,opacity 0.25s;z-index:90;box-shadow:0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08)}
 .capcut-menu.open{transform:translateY(0);opacity:1}
 .cm-item{flex:0 0 auto;min-width:62px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;background:none;border:none;color:var(--text-color);font-size:10px;font-weight:700;border-radius:10px}
 .cm-item svg{width:20px;height:20px;stroke:var(--text-color);fill:none}
 .cm-item.danger svg{stroke:var(--danger)}
 .cm-item.danger span{color:var(--danger)}
-
 .export-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
 .export-modal.open{display:flex}
 .export-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -139,7 +121,7 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 .export-group{margin-bottom:20px}
 .export-label{display:block;font-size:11px;font-weight:800;color:var(--subtext-color);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .export-options{display:flex;gap:8px}
-.export-opt{flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:#fff;font-size:13px;font-weight:700;backdrop-filter:blur(10px)}
+.export-opt{flex:1;padding:12px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border-color);border-radius:12px;color:#fff;font-size:13px;font-weight:700}
 .export-opt.active{background:rgba(10,132,255,0.18);border-color:var(--accent);color:var(--accent)}
 .export-progress{margin-bottom:20px}
 .export-progress-bar{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:8px}
@@ -259,7 +241,7 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
     </div>
     <div class="font-group" style="margin-top:20px;">
       <label class="font-label">الكلمات</label>
-      <p class="sheet-hint">كل سطر يظهر حسب توقيته</p>
+      <p class="sheet-hint">كل سطر يظهر كلمة بكلمة بتزامن مع الصوت</p>
       <div id="lyricsList"></div>
       <button class="add-lyric-btn" onclick="addLyric()">+ إضافة سطر</button>
     </div>
@@ -409,12 +391,14 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 
 <script>
 /* ============================================================
-   dk.llyric Editor — Final Glass Edition with iPhone Filters
+   dk.llyric Editor — Dynamic Karaoke Lyrics Edition
    ============================================================ */
 const DESIGN_W = 360;
 const DESIGN_H = 640;
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 600;
+const WORD_SPACING = 10;    // ✅ 10px بين كل كلمة
+const WORD_ANIM_MS = 350;   // ✅ مدة انتقال كل كلمة
 
 const state = {
   audioUrl: null, duration: 0,
@@ -427,8 +411,8 @@ const state = {
   card: { scale: 1, opacity: 0.65, radius: 26, coverSize: 68 },
   font: { family: 'Cairo', size: 28, color: '#ffffff' },
   lyrics: [
-    { text: 'كلمات الأغنية هنا', start: 0, duration: 4 },
-    { text: 'السطر الثاني', start: 4, duration: 4 }
+    { text: 'كلمات الأغنية هنا تجرب', start: 0, duration: 4 },
+    { text: 'السطر الثاني من الأغنية', start: 4, duration: 4 }
   ],
   selected: { type: null, index: -1 }
 };
@@ -439,9 +423,10 @@ let previewCtx = null;
 let renderRAF = null;
 let _resize = null;
 let _lpTimer = null;
-
-// ✅ Cache for filtered bg (fixes iPhone perf)
 let _bgCache = { key: '', imgVersion: -1, canvas: null };
+
+// ✅ حالة تأثير الكلمات
+let _wordAnim = { lastLineIdx: -1, lastWordIdx: -1, startTime: 0 };
 
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -454,12 +439,10 @@ const fmtTime = s => {
 /* ===== LOAD ===== */
 window.addEventListener('load', function() {
   const fontsToLoad = [
-    '700 28px Cairo', '500 28px Cairo',
-    '700 28px Tajawal', '500 28px Tajawal',
-    '700 28px Almarai', '500 28px Almarai',
-    '700 28px "Reem Kufi"', '500 28px "Reem Kufi"',
-    '700 28px "IBM Plex Sans Arabic"', '500 28px "IBM Plex Sans Arabic"',
-    '700 28px Inter', '500 28px Inter'
+    '700 28px Cairo','500 28px Cairo','700 28px Tajawal','500 28px Tajawal',
+    '700 28px Almarai','500 28px Almarai','700 28px "Reem Kufi"','500 28px "Reem Kufi"',
+    '700 28px "IBM Plex Sans Arabic"','500 28px "IBM Plex Sans Arabic"',
+    '700 28px Inter','500 28px Inter'
   ];
 
   function init() {
@@ -481,9 +464,7 @@ window.addEventListener('load', function() {
       .then(() => { console.log('✅ Fonts loaded'); init(); })
       .catch(() => init());
     setTimeout(() => { if (!previewCtx) init(); }, 3000);
-  } else {
-    init();
-  }
+  } else { init(); }
 });
 
 /* ===== CANVAS ===== */
@@ -505,116 +486,225 @@ function startRenderLoop() {
   loop();
 }
 
-/* ===== FILTERED BG (iPhone compatible) ===== */
+/* ===== BOX BLUR (iPhone compatible) ===== */
+function boxBlurCanvas(canvas, radius) {
+  const w = canvas.width, h = canvas.height;
+  if (w < 2 || h < 2) return;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const tmp = new Uint8ClampedArray(data.length);
+  const r = Math.max(1, Math.min(Math.round(radius), Math.floor(w / 4), Math.floor(h / 4)));
+  const count = 2 * r + 1;
+
+  // Horizontal
+  for (let y = 0; y < h; y++) {
+    let rs = 0, gs = 0, bs = 0, as = 0;
+    for (let dx = -r; dx <= r; dx++) {
+      const xx = Math.min(w - 1, Math.max(0, dx));
+      const idx = (y * w + xx) * 4;
+      rs += data[idx]; gs += data[idx+1]; bs += data[idx+2]; as += data[idx+3];
+    }
+    for (let x = 0; x < w; x++) {
+      const idx = (y * w + x) * 4;
+      tmp[idx] = rs / count; tmp[idx+1] = gs / count;
+      tmp[idx+2] = bs / count; tmp[idx+3] = as / count;
+      const xOut = Math.max(0, x - r);
+      const xIn = Math.min(w - 1, x + r + 1);
+      const iO = (y * w + xOut) * 4;
+      const iI = (y * w + xIn) * 4;
+      rs += data[iI] - data[iO];
+      gs += data[iI+1] - data[iO+1];
+      bs += data[iI+2] - data[iO+2];
+      as += data[iI+3] - data[iO+3];
+    }
+  }
+  // Vertical
+  for (let x = 0; x < w; x++) {
+    let rs = 0, gs = 0, bs = 0, as = 0;
+    for (let dy = -r; dy <= r; dy++) {
+      const yy = Math.min(h - 1, Math.max(0, dy));
+      const idx = (yy * w + x) * 4;
+      rs += tmp[idx]; gs += tmp[idx+1]; bs += tmp[idx+2]; as += tmp[idx+3];
+    }
+    for (let y = 0; y < h; y++) {
+      const idx = (y * w + x) * 4;
+      data[idx] = rs / count; data[idx+1] = gs / count;
+      data[idx+2] = bs / count; data[idx+3] = as / count;
+      const yOut = Math.max(0, y - r);
+      const yIn = Math.min(h - 1, y + r + 1);
+      const iO = (yOut * w + x) * 4;
+      const iI = (yIn * w + x) * 4;
+      rs += tmp[iI] - tmp[iO];
+      gs += tmp[iI+1] - tmp[iO+1];
+      bs += tmp[iI+2] - tmp[iO+2];
+      as += tmp[iI+3] - tmp[iO+3];
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
 function generateFilteredBg(W, H) {
   if (!state.bgImg || !state.bgImg.complete) return null;
-
   const f = state.bgFilters;
-  // Downscale for performance
   const scale = 1 / 3;
   const tw = Math.max(8, Math.round(W * scale));
   const th = Math.max(8, Math.round(H * scale));
-
   const tmp = document.createElement('canvas');
-  tmp.width = tw;
-  tmp.height = th;
+  tmp.width = tw; tmp.height = th;
   const tctx = tmp.getContext('2d');
+  drawCover(tctx, state.bgImg, 0, 0, tw, th);
 
-  // Try ctx.filter first (Chrome/Android)
   let usedCtxFilter = false;
   if (typeof tctx.filter !== 'undefined') {
     try {
+      tctx.clearRect(0, 0, tw, th);
       tctx.filter = 'brightness(' + f.bright + '%) saturate(' + f.sat + '%) contrast(' + f.con + '%)';
-      // Check if filter actually applied
-      tctx.fillStyle = 'red';
-      tctx.fillRect(0, 0, 1, 1);
-      const testData = tctx.getImageData(0, 0, 1, 1).data;
-      // Reset and draw
-      tctx.clearRect(0, 0, 1, 1);
-      // Filter is likely working if setting didn't throw
       drawCover(tctx, state.bgImg, 0, 0, tw, th);
       tctx.filter = 'none';
       usedCtxFilter = true;
-    } catch (e) {
-      tctx.filter = 'none';
-      usedCtxFilter = false;
-    }
+    } catch (e) { tctx.filter = 'none'; }
   }
 
-  // Manual pixel filters for iOS
   if (!usedCtxFilter) {
-    drawCover(tctx, state.bgImg, 0, 0, tw, th);
     try {
       const imgData = tctx.getImageData(0, 0, tw, th);
       const data = imgData.data;
-      const b = f.bright / 100;
-      const c = f.con / 100;
-      const s = f.sat / 100;
+      const b = f.bright / 100, c = f.con / 100, s = f.sat / 100;
       for (let i = 0; i < data.length; i += 4) {
-        let r = data[i] * b;
-        let g = data[i + 1] * b;
-        let bl = data[i + 2] * b;
-        // Contrast around 128
-        r = (r - 128) * c + 128;
-        g = (g - 128) * c + 128;
-        bl = (bl - 128) * c + 128;
-        // Saturation
+        let r = data[i] * b, g = data[i+1] * b, bl = data[i+2] * b;
+        r = (r - 128) * c + 128; g = (g - 128) * c + 128; bl = (bl - 128) * c + 128;
         const gray = r * 0.299 + g * 0.587 + bl * 0.114;
-        r = gray + (r - gray) * s;
-        g = gray + (g - gray) * s;
-        bl = gray + (bl - gray) * s;
+        r = gray + (r - gray) * s; g = gray + (g - gray) * s; bl = gray + (bl - gray) * s;
         data[i] = r < 0 ? 0 : (r > 255 ? 255 : r);
-        data[i + 1] = g < 0 ? 0 : (g > 255 ? 255 : g);
-        data[i + 2] = bl < 0 ? 0 : (bl > 255 ? 255 : bl);
+        data[i+1] = g < 0 ? 0 : (g > 255 ? 255 : g);
+        data[i+2] = bl < 0 ? 0 : (bl > 255 ? 255 : bl);
       }
       tctx.putImageData(imgData, 0, 0);
-    } catch (e) {
-      console.warn('Pixel filter error:', e);
-    }
+    } catch (e) {}
   }
 
-  // Output with blur
+  if (f.blur > 0) {
+    const blurR = Math.max(1, Math.round(f.blur / 3));
+    boxBlurCanvas(tmp, blurR);
+  }
+
   const out = document.createElement('canvas');
-  out.width = W;
-  out.height = H;
+  out.width = W; out.height = H;
   const octx = out.getContext('2d');
   octx.imageSmoothingEnabled = true;
   octx.imageSmoothingQuality = 'high';
   octx.globalAlpha = f.op / 100;
-
-  if (f.blur > 0) {
-    // Progressive blur via smaller downscale
-    const blurScale = Math.max(1 / 40, 1 / (4 + f.blur * 1.2));
-    const bw = Math.max(4, Math.round(W * blurScale));
-    const bh = Math.max(4, Math.round(H * blurScale));
-    const bc = document.createElement('canvas');
-    bc.width = bw;
-    bc.height = bh;
-    const bctx = bc.getContext('2d');
-    bctx.imageSmoothingEnabled = true;
-    bctx.imageSmoothingQuality = 'high';
-    bctx.drawImage(tmp, 0, 0, tw, th, 0, 0, bw, bh);
-    octx.drawImage(bc, 0, 0, bw, bh, 0, 0, W, H);
-  } else {
-    octx.drawImage(tmp, 0, 0, tw, th, 0, 0, W, H);
-  }
-
+  octx.drawImage(tmp, 0, 0, tw, th, 0, 0, W, H);
   return out;
 }
 
 function getFilteredBg(W, H) {
   const f = state.bgFilters;
   const key = W + 'x' + H + '|' + f.blur + ',' + f.bright + ',' + f.sat + ',' + f.con + ',' + f.op;
-  if (_bgCache.canvas && _bgCache.key === key && _bgCache.imgVersion === state.bgImgVersion) {
-    return _bgCache.canvas;
-  }
+  if (_bgCache.canvas && _bgCache.key === key && _bgCache.imgVersion === state.bgImgVersion) return _bgCache.canvas;
   const canvas = generateFilteredBg(W, H);
-  _bgCache = { key: key, imgVersion: state.bgImgVersion, canvas: canvas };
+  _bgCache = { key, imgVersion: state.bgImgVersion, canvas };
   return canvas;
 }
 
-function invalidateBgCache() {
-  _bgCache = { key: '', imgVersion: -1, canvas: null };
+function invalidateBgCache() { _bgCache = { key: '', imgVersion: -1, canvas: null }; }
+
+/* ============================================================
+   ⭐ DYNAMIC KARAOKE LYRICS RENDERER
+   ============================================================ */
+function renderKaraoke(ctx, line, currentTime, cardX, cardY, cardW, cardH, padX, padY, gap, s) {
+  const words = line.text.split(/\s+/).filter(w => w.length > 0);
+  if (words.length === 0) return;
+
+  const elapsed = currentTime - line.start;
+  const wordDur = line.duration / words.length;
+  let activeWordIdx = Math.floor(elapsed / wordDur);
+  activeWordIdx = Math.max(0, Math.min(words.length - 1, activeWordIdx));
+  const wordProgress = Math.max(0, Math.min(1, (elapsed - activeWordIdx * wordDur) / wordDur));
+
+  // ✅ كشف تغيير الكلمة لبدء الأنيميشن
+  if (activeWordIdx !== _wordAnim.lastWordIdx) {
+    _wordAnim.lastWordIdx = activeWordIdx;
+    _wordAnim.startTime = performance.now();
+  }
+
+  const fontSize = state.font.size * s * state.card.scale;
+  const font = '"' + state.font.family + '", "Cairo", "Inter", sans-serif';
+  const spaceW = WORD_SPACING * s;
+
+  ctx.save();
+  ctx.font = '700 ' + fontSize + 'px ' + font;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+
+  // قياس عرض كل كلمة
+  const widths = words.map(w => ctx.measureText(w).width);
+  const totalW = widths.reduce((a, b) => a + b, 0) + spaceW * (words.length - 1);
+
+  // ✅ محاذاة يسارية: النص يبدأ من cardX + padX
+  const startX = cardX + padX;
+  const centerY = (cardY + cardY + cardH) / 2; // منتصف البطاقة تقريباً
+
+  // ✅ حساب Y: النص يكون في وسط منطقة الكلمات
+  const footerH = 20 * s;
+  const div1Y = cardY + padY + 68 * s * state.card.scale + gap;
+  const div2Y = cardY + cardH - padY - footerH - gap;
+  const lyricsCenterY = (div1Y + div2Y) / 2;
+
+  let x = startX;
+  const animElapsed = performance.now() - _wordAnim.startTime;
+  const wordAnimP = Math.min(1, animElapsed / WORD_ANIM_MS);
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const wW = widths[i];
+
+    let opacity, scale = 1, glowBlur = 0, glowColor = null;
+
+    if (i < activeWordIdx) {
+      // ✅ كلمة سابقة — ظاهرة بوضوح كامل
+      opacity = 1;
+    } else if (i === activeWordIdx) {
+      // ✅ كلمة نشطة — مع تأثير انتقال
+      const animP = (i === _wordAnim.lastWordIdx) ? wordAnimP : 1;
+      const easeOut = 1 - Math.pow(1 - animP, 3);
+      opacity = 1;
+      scale = 0.85 + easeOut * 0.15;
+      glowBlur = 25 * s * (0.5 + 0.5 * Math.sin(performance.now() / 200));
+      glowColor = state.font.color;
+    } else {
+      // ✅ كلمة قادمة — شفافة
+      opacity = 0.2;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = opacity;
+
+    // تطبيق transform للكلمة النشطة
+    if (scale !== 1) {
+      const cx = x + wW / 2;
+      ctx.translate(cx, lyricsCenterY);
+      ctx.scale(scale, scale);
+      ctx.translate(-cx, -lyricsCenterY);
+    }
+
+    // Shadow/Glow
+    if (glowColor) {
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = glowBlur;
+    } else {
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur = 12 * s;
+    }
+
+    ctx.fillStyle = state.font.color;
+    ctx.fillText(word, x, lyricsCenterY);
+    ctx.restore();
+
+    x += wW + spaceW;
+  }
+  ctx.restore();
 }
 
 /* ===== DRAW FRAME ===== */
@@ -623,42 +713,35 @@ function drawFrame(ctx, W, H, t) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
 
-  // Background
   if (state.bgImg) {
     const filtered = getFilteredBg(W, H);
-    if (filtered) {
-      ctx.drawImage(filtered, 0, 0, W, H);
-    }
+    if (filtered) ctx.drawImage(filtered, 0, 0, W, H);
   }
 
-  // Card
   const cardW = 320 * s * state.card.scale;
   const cardH = cardW;
   const cardX = (W - cardW) / 2;
   const cardY = (H - cardH) / 2;
   const radius = state.card.radius * s;
 
-  // Glass inside card
   if (state.bgImg) {
     const filtered = getFilteredBg(W, H);
     if (filtered) {
       ctx.save();
-      roundRect(ctx, cardX, cardY, cardW, cardH, radius);
-      ctx.clip();
-      ctx.globalAlpha = 0.6;
+      roundRect(ctx, cardX, cardY, " cardW, cardInterH, radius);
+     ", ctx.clip();
+ sans      ctx.globalAlpha-serif = 0.6;
       ctx.drawImage(filtered, 0, 0, W, H);
       ctx.restore();
     }
   }
 
-  // Tint
   ctx.save();
   ctx.fillStyle = 'rgba(15,15,15,' + state.card.opacity + ')';
   roundRect(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.fill();
   ctx.restore();
 
-  // Border
   ctx.save();
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
   ctx.lineWidth = 1 * s;
@@ -701,7 +784,7 @@ function drawFrame(ctx, W, H, t) {
   }
   if (state.artistName) {
     ctx.fillStyle = '#b3b3b3';
-    ctx.font = '500 ' + (14 * s) + 'px "Cairo", "Inter", sans-serif';
+    ctx.font = '500 ' + (14 * s) + 'px "Cairo",';
     ctx.fillText(state.artistName, textRight, artY + artSize * 0.7);
   }
   ctx.restore();
@@ -712,53 +795,53 @@ function drawFrame(ctx, W, H, t) {
 
   const footerH = 20 * s;
   const div2Y = cardY + cardH - padY - footerH - gap;
-  const lyricsCenter = (div1Y + div2Y) / 2;
 
+  // ✅ الكلمات
   const idx = findActiveLyric(t);
-  let prev = '', curr = '...', next = '';
+  let prev = '', next = '';
   if (idx >= 0) {
     prev = idx > 0 ? (state.lyrics[idx - 1].text || '') : '';
-    curr = state.lyrics[idx].text || '...';
     next = idx < state.lyrics.length - 1 ? (state.lyrics[idx + 1].text || '') : '';
-  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
-    curr = state.lyrics[0].text;
-    next = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
   }
 
   const fontSize = state.font.size * s * state.card.scale;
   const smallSize = 15 * s * state.card.scale;
   const font = '"' + state.font.family + '", "Cairo", "Inter", sans-serif';
   const cx = cardX + cardW / 2;
+  const lyricsCenterY = (div1Y + div2Y) / 2;
 
+  // ✅ السطر السابق
   if (prev) {
     ctx.save();
-    ctx.globalAlpha = 0.4;
+    ctx.globalAlpha = 0.35;
     ctx.fillStyle = '#fff';
     ctx.font = '500 ' + smallSize + 'px ' + font;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(prev, cx, lyricsCenter - fontSize * 1.4);
+    ctx.fillText(prev, cx, lyricsCenterY - fontSize * 1.5);
     ctx.restore();
   }
 
-  ctx.save();
-  ctx.fillStyle = state.font.color;
-  ctx.font = '700 ' + fontSize + 'px ' + font;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 20 * s;
-  ctx.fillText(curr, cx, lyricsCenter);
-  ctx.restore();
+  // ✅ السطر الحالي — تأثير الكاريوكي
+  if (idx >= 0 && state.lyrics[idx]) {
+    const lineElapsed = t - state.lyrics[idx].start;
+    if (lineElapsed >= 0) {
+      renderKaraoke(ctx, state.lyrics[idx], t, cardX, cardY, cardW, cardH, padX, padY, gap, s);
+    }
+  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
+    // لا يوجد سطر نشط — اعرض أول سطر بتأثير الكاريوكي
+    renderKaraoke(ctx, state.lyrics[0], t, cardX, cardY, cardW, cardH, padX, padY, gap, s);
+  }
 
+  // ✅ السطر القادم
   if (next) {
     ctx.save();
-    ctx.globalAlpha = 0.4;
+    ctx.globalAlpha = 0.35;
     ctx.fillStyle = '#fff';
     ctx.font = '500 ' + smallSize + 'px ' + font;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(next, cx, lyricsCenter + fontSize * 1.4);
+    ctx.fillText(next, cx, lyricsCenterY + fontSize * 1.5);
     ctx.restore();
   }
 
@@ -1222,12 +1305,13 @@ function bindAudioSegment() {
 }
 
 function startAudioDrag(e) {
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   const startX = e.touches ? e.touches[0].clientX : e.clientX;
   const snapStart = state.audioStart;
   const width = state.audioEnd - state.audioStart;
   let moved = false;
+  const seg = $('audioSegment');
+  seg.classList.add('dragging');
 
   function move(ev) {
     const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
@@ -1244,8 +1328,8 @@ function startAudioDrag(e) {
     document.removeEventListener('mouseup', end);
     document.removeEventListener('touchmove', move);
     document.removeEventListener('touchend', end);
-    renderRuler();
-    updateTimeDisplay();
+    seg.classList.remove('dragging');
+    renderRuler(); updateTimeDisplay();
     if (!moved) {
       state.selected = { type: 'audio', index: -1 };
       renderTimeline();
@@ -1496,13 +1580,11 @@ function bindFontButtons() {
       document.querySelectorAll('.font-family-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.font.family = btn.dataset.font;
-
       const family = state.font.family;
       if (document.fonts && document.fonts.load) {
         Promise.all([
           document.fonts.load('700 28px "' + family + '"').catch(() => {}),
-          document.fonts.load('500 28px "' + family + '"').catch(() => {}),
-          document.fonts.load('400 28px "' + family + '"').catch(() => {})
+          document.fonts.load('500 28px "' + family + '"').catch(() => {})
         ]).then(() => {
           if (previewCtx) drawFrame(previewCtx, DESIGN_W, DESIGN_H, state.currentTime);
         });
@@ -1619,6 +1701,7 @@ async function startExport() {
     const stopped = new Promise(r => recorder.onstop = r);
     recorder.start(200);
 
+    // ✅ ترجع للأغنية الأصلية وتقص بدقة من trimIn
     player.currentTime = state.trimIn;
     await new Promise(r => {
       const h = () => { player.removeEventListener('seeked', h); r(); };
@@ -1630,25 +1713,26 @@ async function startExport() {
       const p = player.play();
       if (p && p.catch) await p;
     } catch (playErr) {
-      try { recorder.stop(); } catch(e) {}
+      try { recorder.stop(); } catch (e) {}
       throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
     }
 
-    // ✅ HEARTBEAT — iPhone audio keep-alive
+    // ✅ HEARTBEAT for iPhone
     heartbeat = setInterval(() => {
       if (player.paused && !player.ended) player.play().catch(() => {});
       if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
-      if (recorder && recorder.state === 'paused') { try { recorder.resume(); } catch(e) {} }
+      if (recorder && recorder.state === 'paused') { try { recorder.resume(); } catch (e) {} }
     }, 300);
 
+    // ✅ الكاريوكي ياخذ `currentTime` الحقيقي من الصوت
     await new Promise(resolve => {
       function render() {
         const audioT = player.currentTime;
 
-        // ✅ Stop at trimOut
+        // ✅ توقف عند trimOut (قص فعلي)
         if (audioT >= state.trimOut - 0.02 || player.ended) {
           if (recorder && recorder.state !== 'inactive') {
-            try { recorder.stop(); } catch(e) {}
+            try { recorder.stop(); } catch (e) {}
           }
           resolve();
           return;
