@@ -971,10 +971,10 @@ function setupPlayheadDrag() {
     ruler.addEventListener('mousedown', onRulerTouch);
     ruler.addEventListener('touchstart', onRulerTouch, { passive: true });
   }
-
-  vp.addEventListener('click', (e) => {
+vp.addEventListener('click', (e) => {
     if (e.target.closest('.text-segment')) return;
     if (e.target.closest('.audio-segment')) return;
+    if (e.target.closest('.bg-segment')) return;
     if (e.target.closest('.seg-handle')) return;
     if (e.target.closest('.playhead-cap')) return;
     if (e.target.closest('.ruler-tick')) return;
@@ -982,7 +982,33 @@ function setupPlayheadDrag() {
     const sec = pxToTime(e.clientX);
     seekTo(sec);
   });
+
+  // ✅ كي المستخدم يلمس الـ Timeline → وقف Auto-scroll
+  const pauseAutoScroll = () => {
+    _userTouchingTimeline = true;
+  };
+  const resumeAutoScroll = () => {
+    _userTouchingTimeline = false;
+    _autoScrollPausedUntil = Date.now() + 3000; // 3 ثواني سماح
+  };
+
+  vp.addEventListener('touchstart', pauseAutoScroll, { passive: true });
+  vp.addEventListener('touchend', resumeAutoScroll, { passive: true });
+  vp.addEventListener('touchcancel', resumeAutoScroll, { passive: true });
+  vp.addEventListener('mousedown', pauseAutoScroll);
+  vp.addEventListener('mouseup', resumeAutoScroll);
+  vp.addEventListener('mouseleave', resumeAutoScroll);
+
+  // ✅ سكرول بالسحب (Swipe) → وقف Auto-scroll مؤقتاً
+  let scrollTimeout = null;
+  vp.addEventListener('scroll', () => {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      _autoScrollPausedUntil = Date.now() + 2000;
+    }, 150);
+  }, { passive: true });
 }
+
 
 /* ============================================
    Playhead Loop
