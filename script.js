@@ -1054,6 +1054,10 @@ function stopPlayheadLoop() {
 }
 
 function autoScrollPlayhead() {
+  // ✅ إذا المستخدم لمس الـ Timeline → ما نتحركوش
+  if (_userTouchingTimeline) return;
+  if (Date.now() < _autoScrollPausedUntil) return;
+
   const vp = document.getElementById('timelineViewport');
   if (!vp) return;
   const phX = state.currentTime * PX_PER_SEC;
