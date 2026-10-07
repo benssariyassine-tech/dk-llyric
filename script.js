@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBgUpload();
   initBgFilters();
   initBgSegmentListeners();
+  initCoverUpload();
   initIgInput();
   initSongInputs();
   initCardControls();
@@ -1551,4 +1552,49 @@ function initSongInputs() {
       if (preview) preview.textContent = e.target.value;
     });
   }
+}
+/* ============================================
+   🖼️ Cover Image Upload
+   ============================================ */
+function initCoverUpload() {
+  const coverInput = document.getElementById('coverInput');
+  if (!coverInput) return;
+
+  coverInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // تحقق من الحجم (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('الصورة كبيرة بزاف (الأقصى 5MB)');
+      return;
+    }
+
+    if (state.coverUrl) URL.revokeObjectURL(state.coverUrl);
+    state.coverUrl = URL.createObjectURL(file);
+
+    const preview = document.getElementById('previewCover');
+    if (preview) preview.src = state.coverUrl;
+
+    document.getElementById('coverUploadBtn').classList.add('hidden');
+    document.getElementById('coverPreview').classList.remove('hidden');
+    document.getElementById('coverPreviewImg').src = state.coverUrl;
+    document.getElementById('coverPreviewName').textContent = file.name;
+
+    if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+  });
+}
+
+function removeCover() {
+  if (state.coverUrl) URL.revokeObjectURL(state.coverUrl);
+  state.coverUrl = null;
+
+  const preview = document.getElementById('previewCover');
+  if (preview) preview.src = 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80';
+
+  document.getElementById('coverUploadBtn').classList.remove('hidden');
+  document.getElementById('coverPreview').classList.add('hidden');
+  document.getElementById('coverInput').value = '';
+
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
