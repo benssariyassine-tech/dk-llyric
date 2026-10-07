@@ -1645,95 +1645,238 @@ function closeExportModal() {
   if (modal) modal.classList.remove('open');
 }
 
-/* ============================================
-   🎬 الرسم على Canvas
-   ============================================ */
-function drawFrameToCanvas(ctx, canvasW, canvasH, currentTime) {
-  // خلفية سوداء
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, canvasW, canvasH);
 
-  // ===== الخلفية =====
+/* ============================================
+   🎨 رسم الإطار (Canvas Render — iOS Compatible)
+   ============================================ */
+function drawPreviewToCanvas(ctx, W, H, currentTime) {
+  // ===== 1. الخلفية =====
   const bgImg = document.getElementById('bgImage');
-  if (bgImg && bgImg.src && bgImg.complete && bgImg.naturalWidth > 0) {
+  const hasBg = bgImg && bgImg.src && bgImg.naturalWidth > 0;
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  if (hasBg) {
     const f = state.bgFilters;
-    ctx.save();
-    ctx.filter = 'blur(' + f.blur + 'px) brightness(' + f.brightness + '%) saturate(' + f.saturation + '%) contrast(' + f.contrast + '%) hue-rotate(' + f.hue + 'deg)';
-    ctx.globalAlpha = f.opacity / 100;
-    // Cover: fill
-    const imgRatio = bgImg.naturalWidth / bgImg.naturalHeight;
-    const canvasRatio = canvasW / canvasH;
-    let dw, dh, dx, dy;
-    if (imgRatio > canvasRatio) {
-      dh = canvasH;
-      dw = canvasH * imgRatio;
-      dx = (canvasW - dw) / 2;
-      dy = 0;
+
+    // ✅ Blur يدوي عبر Downscale
+    if (f.blur > 0) {
+      drawBlurredImage(ctx, bgImg, 0, 0, W, H, f.blur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
     } else {
-      dw = canvasW;
-      dh = canvasW / imgRatio;
-      dx = 0;
-      dy = (canvasH - dh) / 2;
+      drawImageWithFilters(ctx, bgImg, 0, 0, W, H, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
     }
-    ctx.drawImage(bgImg, dx, dy, dw, dh);
+  }
+
+  // ===== 2. قياسات البطاقة =====
+  const previewFrame = document.getElementById('previewFrame');
+  const previewRect = previewFrame.getBoundingClientRect();
+  const pxScale = W / previewRect.width;
+
+  const cardScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 1;
+  const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
+  const cardRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-radius')) || 26;
+  const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
+
+  const frameW = previewRect.width;
+  let baseW = frameW * 0.92;
+  if (baseW > 440) baseW = 440;
+  const cardBaseW = baseW * cardScale;
+  const cardBaseH = cardBaseW;
+
+  const cardW = cardBaseW * pxScale;
+  const cardH = cardBaseH * pxScale;
+  const cardX = (W - cardW) / 2;
+  const cardY = (H - cardH) / 2;
+  const radius = cardRadius * pxScale;
+
+  // ===== 3. Glass Effect (بديل بدون backdrop-filter) =====
+  // ✅ نرسم نسخة مبلورة من الخلفية داخل البطاقة (لو كاينة)
+  if (hasBg) {
+    ctx.save();
+    roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
+    ctx.clip();
+
+    // نرسم صورة الخلفية مبلورة بشدة داخل البطاقة
+    const f = state.bgFilters;
+    const glassBlur = Math.max(f.blur, 20);
+    drawBlurredImage(ctx, bgImg, 0, 0, W, H, glassBlur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
     ctx.restore();
   }
 
-  // ===== البطاقة =====
-  const cardW = canvasW * 0.92;
-  const cardX = (canvasW - cardW) / 2;
-  const cardY = canvasH * 0.18;
-  const cardH = canvasH * 0.6;
-  const cardRadius = 26;
-  const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
-
-  // Card background
+  // ✅ طبقة داكنة شفافة فوق الـ glass (تحاكي الـ tint)
   ctx.save();
   ctx.fillStyle = 'rgba(15, 15, 15, ' + cardOpacity + ')';
-  ctx.beginPath();
-  ctx.moveTo(cardX + cardRadius, cardY);
-  ctx.lineTo(cardX + cardW - cardRadius, cardY);
-  ctx.quadraticCurveTo(cardX + cardW, cardY, cardX + cardW, cardY + cardRadius);
-  ctx.lineTo(cardX + cardW, cardY + cardH - cardRadius);
-  ctx.quadraticCurveTo(cardX + cardW, cardY + cardH, cardX + cardW - cardRadius, cardY + cardH);
-  ctx.lineTo(cardX + cardRadius, cardY + cardH);
-  ctx.quadraticCurveTo(cardX, cardY + cardH, cardX, cardY + cardH - cardRadius);
-  ctx.lineTo(cardX, cardY + cardRadius);
-  ctx.quadraticCurveTo(cardX, cardY, cardX + cardRadius, cardY);
-  ctx.closePath();
+  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.fill();
+  ctx.restore();
+
+  // ✅ حدود خفيفة
+  ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1 * pxScale;
+  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.stroke();
   ctx.restore();
 
-  // ===== صورة الغلاف =====
-  const coverEl = document.getElementById('previewCover');
-  const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
-  const scaleFactor = cardW / 380; // النسبة للـ canvas
-  const coverSizeScaled = coverSize * scaleFactor;
-  const paddingScaled = 20 * scaleFactor;
-  const coverX = cardX + cardW - paddingScaled - coverSizeScaled;
-  const coverY = cardY + paddingScaled;
+  // ===== 4. الحشوة =====
+  const padX = 22 * pxScale;
+  const padY = 20 * pxScale;
+  const innerX = cardX + padX;
+  const innerY = cardY + padY;
+  const innerW = cardW - padX * 2;
 
-  if (coverEl && coverEl.complete && coverEl.naturalWidth > 0) {
+  // ===== 5. Album Art =====
+  const artW = coverSize * pxScale;
+  const artH = artW;
+  const artRadius = 10 * pxScale;
+  const artX = cardX + cardW - padX - artW;
+  const artY = innerY;
+
+  const coverImg = document.getElementById('previewCover');
+  if (coverImg && coverImg.complete && coverImg.naturalWidth > 0) {
     ctx.save();
-    ctx.beginPath();
-    const r = 10 * scaleFactor;
-    ctx.moveTo(coverX + r, coverY);
-    ctx.lineTo(coverX + coverSizeScaled - r, coverY);
-    ctx.quadraticCurveTo(coverX + coverSizeScaled, coverY, coverX + coverSizeScaled, coverY + r);
-    ctx.lineTo(coverX + coverSizeScaled, coverY + coverSizeScaled - r);
-    ctx.quadraticCurveTo(coverX + coverSizeScaled, coverY + coverSizeScaled, coverX + coverSizeScaled - r, coverY + coverSizeScaled);
-    ctx.lineTo(coverX + r, coverY + coverSizeScaled);
-    ctx.quadraticCurveTo(coverX, coverY + coverSizeScaled, coverX, coverY + coverSizeScaled - r);
-    ctx.lineTo(coverX, coverY + r);
-    ctx.quadraticCurveTo(coverX, coverY, coverX + r, coverY);
-    ctx.closePath();
+    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
     ctx.clip();
-    ctx.drawImage(coverEl, coverX, coverY, coverSizeScaled, coverSizeScaled);
+    drawCoverFit(ctx, coverImg, artX, artY, artW, artH);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = '#1a1a24';
+    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
+    ctx.fill();
+  }
+
+  // ===== 6. Song + Artist =====
+  const songText = state.songName || '';
+  const artistText = state.artistName || '';
+  const textRightX = artX - 14 * pxScale;
+
+  ctx.save();
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+
+  if (songText) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 ' + (18 * pxScale) + 'px Cairo, Inter, sans-serif';
+    ctx.fillText(songText, textRightX, artY + artH * 0.35);
+  }
+  if (artistText) {
+    ctx.fillStyle = '#b3b3b3';
+    ctx.font = '500 ' + (14 * pxScale) + 'px Cairo, Inter, sans-serif';
+    ctx.fillText(artistText, textRightX, artY + artH * 0.7);
+  }
+  ctx.restore();
+
+  // ===== 7. Divider 1 =====
+  const gap = 16 * pxScale;
+  const div1Y = artY + artH + gap;
+  drawGradientDivider(ctx, innerX, div1Y, innerW, pxScale);
+
+  // ===== 8. Lyrics =====
+  const footerH = 20 * pxScale;
+  const div2Y = cardY + cardH - padY - footerH - gap;
+  const lyricsTop = div1Y + 1 + gap;
+  const lyricsBottom = div2Y - gap;
+  const lyricsCenterY = (lyricsTop + lyricsBottom) / 2;
+
+  let activeIdx = -1;
+  for (let i = 0; i < state.lyrics.length; i++) {
+    const l = state.lyrics[i];
+    if (currentTime >= l.start && currentTime < l.start + l.duration) {
+      activeIdx = i;
+      break;
+    }
+  }
+
+  let prevText = '';
+  let currText = '...';
+  let nextText = '';
+
+  if (activeIdx >= 0) {
+    prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
+    currText = state.lyrics[activeIdx].text || '...';
+    nextText = activeIdx < state.lyrics.length - 1 ? (state.lyrics[activeIdx + 1].text || '') : '';
+  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
+    currText = state.lyrics[0].text;
+    nextText = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
+  }
+
+  const fontFamily = (state.font.family || 'Cairo') + ', Inter, sans-serif';
+  const lyricSize = (state.font.size || 20) * pxScale;
+  const smallSize = 15 * pxScale;
+
+  // Prev
+  if (prevText) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
+    ctx.fillText(prevText, cardX + cardW / 2, lyricsCenterY - lyricSize * 1.4);
     ctx.restore();
   }
+
+  // Current (مع ظل)
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = state.font.color || '#ffffff';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 20 * pxScale;
+  ctx.font = '700 ' + lyricSize + 'px ' + fontFamily;
+  ctx.fillText(currText, cardX + cardW / 2, lyricsCenterY);
+  ctx.restore();
+
+  // Next
+  if (nextText) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
+    ctx.fillText(nextText, cardX + cardW / 2, lyricsCenterY + lyricSize * 1.4);
+    ctx.restore();
+  }
+
+  // ===== 9. Divider 2 =====
+  drawGradientDivider(ctx, innerX, div2Y, innerW, pxScale);
+
+  // ===== 10. Footer =====
+  const footerY = cardY + cardH - padY - footerH / 2;
+  const iconSize = 18 * pxScale;
+  const footerX = cardX + padX;
+
+  ctx.save();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5 * pxScale;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const igX = footerX;
+  const igY = footerY - iconSize / 2;
+  roundRectPath(ctx, igX, igY, iconSize, iconSize, iconSize * 0.28);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(igX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(igX + iconSize * 0.72, footerY - iconSize * 0.22, iconSize * 0.06, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '500 ' + (14 * pxScale) + 'px Inter, Cairo, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(state.igName || 'dk.llyric', igX + iconSize + 6 * pxScale, footerY);
+  ctx.restore();
+}
 
   // ===== اسم الأغنية + الفنان =====
   const songText = state.songName || '';
@@ -1846,9 +1989,6 @@ function drawFrameToCanvas(ctx, canvasW, canvasH, currentTime) {
   ctx.restore();
 }
 
-/* ============================================
-   🎬 VIDEO EXPORT (WYSIWYG with html2canvas + mp4-muxer)
-   ============================================ */
 async function startVideoExport() {
   if (!state.audioUrl) {
     alert('ارفع أغنية أول');
@@ -1863,104 +2003,117 @@ async function startVideoExport() {
   startBtn.disabled = true;
   progress.style.display = 'block';
   progressFill.style.width = '0%';
-  progressText.textContent = '0%';
+  progressText.textContent = 'جاري التجهيز...';
 
   try {
+    await ensureImagesLoaded();
+
     const quality = _exportSettings.quality;
     const fps = _exportSettings.fps;
-    
-    // 1. التقاط العنصر المستهدف (البطاقة)
-    const targetElement = document.getElementById('previewFrame');
-    const canvas = document.createElement('canvas');
-    
-    // ضبط أبعاد الكانفاس بناءً على أبعاد العنصر في المعاينة (مع ضرب الجودة)
-    const rect = targetElement.getBoundingClientRect();
-    const scale = quality / rect.width;
-    canvas.width = rect.width * scale;
-    canvas.height = rect.height * scale;
-    
-    // 2. إعداد تدفق الفيديو والصوت
-    const stream = canvas.captureStream(fps);
-    const player = document.getElementById('audioPlayer');
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaElementSource(player);
-    const dest = audioCtx.createMediaStreamDestination();
-    source.connect(dest);
-    source.connect(audioCtx.destination);
-    dest.stream.getAudioTracks().forEach(track => stream.addTrack(track));
 
-    // 3. إعداد مسجل الوسائط (MediaRecorder)
-    const recorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9,opus',
-      videoBitsPerSecond: 5000000 // 5 Mbps
+    const frame = document.getElementById('previewFrame');
+    const rect = frame.getBoundingClientRect();
+    const ratio = rect.width / rect.height;
+
+    let canvasW, canvasH;
+    if (quality === 1080) {
+      canvasW = 1080;
+      canvasH = Math.round(1080 / ratio);
+    } else {
+      canvasW = 720;
+      canvasH = Math.round(720 / ratio);
+    }
+    canvasW = Math.round(canvasW / 2) * 2;
+    canvasH = Math.round(canvasH / 2) * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    const videoStream = canvas.captureStream(fps);
+
+    const player = document.getElementById('audioPlayer');
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(player);
+      const dest = audioCtx.createMediaStreamDestination();
+      source.connect(dest);
+      dest.stream.getAudioTracks().forEach(track => videoStream.addTrack(track));
+    } catch (audioErr) {
+      console.warn('Audio setup failed:', audioErr);
+    }
+
+    let mimeType = 'video/webm';
+    const supported = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm'
+    ];
+    for (const m of supported) {
+      if (MediaRecorder.isTypeSupported(m)) {
+        mimeType = m;
+        break;
+      }
+    }
+
+    const recorder = new MediaRecorder(videoStream, {
+      mimeType: mimeType,
+      videoBitsPerSecond: quality === 1080 ? 8000000 : 4000000
     });
 
     const chunks = [];
     recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunks.push(e.data);
+      if (e.data && e.data.size > 0) chunks.push(e.data);
     };
 
-    // 4. بدء التسجيل وتشغيل الصوت
+    const recorderStopped = new Promise((resolve) => {
+      recorder.onstop = resolve;
+    });
+
     recorder.start(100);
     player.currentTime = state.audioStart;
-    await player.play();
 
-    // 5. حلقة الرسم: التقاط صورة في كل إطار
+    try {
+      await player.play();
+    } catch (playErr) {
+      recorder.stop();
+      throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
+    }
+
+    // ✅ المتغيرات الصحيحة (بلا أخطاء)
     const startTime = performance.now();
     const totalDuration = state.audioEnd - state.audioStart;
+    const frameDelay = 1000 / fps;
+    let isRendering = true;
 
     async function renderLoop() {
+      if (!isRendering) return;
+
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
 
+      // ✅ الشرط الصحيح
       if (elapsed >= totalDuration || player.ended) {
-        // 6. إيقاف التسجيل وتحويل الملف
-        recorder.stop();
-        setTimeout(async () => {
-          const webmBlob = new Blob(chunks, { type: 'video/webm' });
-          
-          // 7. تحويل WebM إلى MP4 باستخدام mp4-muxer
-          const mp4Blob = await convertWebMToMP4(webmBlob);
-          
-          // 8. تنزيل الملف
-          const url = URL.createObjectURL(mp4Blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'dk-llyric-' + Date.now() + '.mp4';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 5000);
-
-          startBtn.disabled = false;
-          progressFill.style.width = '100%';
-          progressText.textContent = '100%';
-          setTimeout(() => {
-            progress.style.display = 'none';
-            closeExportModal();
-          }, 1500);
-        }, 500);
+        isRendering = false;
+        if (recorder.state !== 'inactive') recorder.stop();
+        await recorderStopped;
+        downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText);
         return;
       }
 
-      // التقاط صورة مطابقة للمعاينة
-      const snapshotCanvas = await html2canvas(targetElement, {
-        scale: scale,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: null // للحفاظ على الشفافية
-      });
-      
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(snapshotCanvas, 0, 0, canvas.width, canvas.height);
+      const currentTime = state.audioStart + elapsed;
+      drawPreviewToCanvas(ctx, canvasW, canvasH, currentTime);
 
-      // تحديث شريط التقدم
       const percent = Math.min(100, Math.round((elapsed / totalDuration) * 100));
       progressFill.style.width = percent + '%';
-      progressText.textContent = percent + '%';
+      progressText.textContent = 'جاري التصدير: ' + percent + '%';
 
-      requestAnimationFrame(renderLoop);
+      const workTime = performance.now() - now;
+      const wait = Math.max(0, frameDelay - workTime);
+      setTimeout(() => requestAnimationFrame(renderLoop), wait);
     }
 
     renderLoop();
@@ -1971,25 +2124,4 @@ async function startVideoExport() {
     startBtn.disabled = false;
     progress.style.display = 'none';
   }
-}
-
-/* ============================================
-   🔄 Helper: Convert WebM to MP4
-   ============================================ */
-async function convertWebMToMP4(webmBlob) {
-  // هذا الجزء يحتاج مكتبة مثل ffmpeg.wasm أو mp4-muxer
-  // لتبسيط الأمر، سنستخدم mp4-muxer هنا مع افتراض أن لدينا
-  // وصولاً إلى البيانات المشفرة (وهذا ليس مثاليًا، لكنه يعمل)
-  
-  // **ملاحظة هامة:** التحويل الكامل يتطلب FFmpeg.wasm أو خدمة سيرفر
-  // لأن المتصفحات لا تدعم تسجيل H.264 مباشرة من Canvas.
-  // هذا حل مبدئي قد لا يعمل بشكل مثالي على جميع الأجهزة.
-  
-  // الحل الأفضل: إرسال الـ WebM إلى سيرفر للتحويل.
-  // الحل الحالي: إرجاع WebM كـ MP4 (قد لا يعمل دائمًا).
-  
-  // للأسف، التحويل الحقيقي من WebM إلى MP4 في المتصفح
-  // يتطلب FFmpeg.wasm وهو ضخم جدًا (25MB).
-  
-  return webmBlob; // مؤقتًا
 }
