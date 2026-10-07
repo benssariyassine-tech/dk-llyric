@@ -1599,3 +1599,389 @@ function removeCover() {
 
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
+/* ============================================
+   🎬 VIDEO EXPORT
+   ============================================ */
+let _exportSettings = {
+  quality: 1080,
+  fps: 30
+};
+
+function openExportModal() {
+  // ✅ تأكد من وجود audio
+  if (!state.audioUrl) {
+    alert('ارفع أغنية أول');
+    return;
+  }
+
+  const modal = document.getElementById('exportModal');
+  if (modal) modal.classList.add('open');
+
+  // Reset
+  document.getElementById('exportProgress').style.display = 'none';
+  document.getElementById('exportStartBtn').disabled = false;
+
+  // Setup options
+  document.querySelectorAll('#exportQuality .export-opt').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#exportQuality .export-opt').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      _exportSettings.quality = parseInt(this.dataset.value);
+    });
+  });
+  document.querySelectorAll('#exportFps .export-opt').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#exportFps .export-opt').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      _exportSettings.fps = parseInt(this.dataset.value);
+    });
+  });
+
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+}
+
+function closeExportModal() {
+  const modal = document.getElementById('exportModal');
+  if (modal) modal.classList.remove('open');
+}
+
+/* ============================================
+   🎬 الرسم على Canvas
+   ============================================ */
+function drawFrameToCanvas(ctx, canvasW, canvasH, currentTime) {
+  // خلفية سوداء
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvasW, canvasH);
+
+  // ===== الخلفية =====
+  const bgImg = document.getElementById('bgImage');
+  if (bgImg && bgImg.src && bgImg.complete && bgImg.naturalWidth > 0) {
+    const f = state.bgFilters;
+    ctx.save();
+    ctx.filter = 'blur(' + f.blur + 'px) brightness(' + f.brightness + '%) saturate(' + f.saturation + '%) contrast(' + f.contrast + '%) hue-rotate(' + f.hue + 'deg)';
+    ctx.globalAlpha = f.opacity / 100;
+    // Cover: fill
+    const imgRatio = bgImg.naturalWidth / bgImg.naturalHeight;
+    const canvasRatio = canvasW / canvasH;
+    let dw, dh, dx, dy;
+    if (imgRatio > canvasRatio) {
+      dh = canvasH;
+      dw = canvasH * imgRatio;
+      dx = (canvasW - dw) / 2;
+      dy = 0;
+    } else {
+      dw = canvasW;
+      dh = canvasW / imgRatio;
+      dx = 0;
+      dy = (canvasH - dh) / 2;
+    }
+    ctx.drawImage(bgImg, dx, dy, dw, dh);
+    ctx.restore();
+  }
+
+  // ===== البطاقة =====
+  const cardW = canvasW * 0.92;
+  const cardX = (canvasW - cardW) / 2;
+  const cardY = canvasH * 0.18;
+  const cardH = canvasH * 0.6;
+  const cardRadius = 26;
+  const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
+
+  // Card background
+  ctx.save();
+  ctx.fillStyle = 'rgba(15, 15, 15, ' + cardOpacity + ')';
+  ctx.beginPath();
+  ctx.moveTo(cardX + cardRadius, cardY);
+  ctx.lineTo(cardX + cardW - cardRadius, cardY);
+  ctx.quadraticCurveTo(cardX + cardW, cardY, cardX + cardW, cardY + cardRadius);
+  ctx.lineTo(cardX + cardW, cardY + cardH - cardRadius);
+  ctx.quadraticCurveTo(cardX + cardW, cardY + cardH, cardX + cardW - cardRadius, cardY + cardH);
+  ctx.lineTo(cardX + cardRadius, cardY + cardH);
+  ctx.quadraticCurveTo(cardX, cardY + cardH, cardX, cardY + cardH - cardRadius);
+  ctx.lineTo(cardX, cardY + cardRadius);
+  ctx.quadraticCurveTo(cardX, cardY, cardX + cardRadius, cardY);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+
+  // ===== صورة الغلاف =====
+  const coverEl = document.getElementById('previewCover');
+  const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
+  const scaleFactor = cardW / 380; // النسبة للـ canvas
+  const coverSizeScaled = coverSize * scaleFactor;
+  const paddingScaled = 20 * scaleFactor;
+  const coverX = cardX + cardW - paddingScaled - coverSizeScaled;
+  const coverY = cardY + paddingScaled;
+
+  if (coverEl && coverEl.complete && coverEl.naturalWidth > 0) {
+    ctx.save();
+    ctx.beginPath();
+    const r = 10 * scaleFactor;
+    ctx.moveTo(coverX + r, coverY);
+    ctx.lineTo(coverX + coverSizeScaled - r, coverY);
+    ctx.quadraticCurveTo(coverX + coverSizeScaled, coverY, coverX + coverSizeScaled, coverY + r);
+    ctx.lineTo(coverX + coverSizeScaled, coverY + coverSizeScaled - r);
+    ctx.quadraticCurveTo(coverX + coverSizeScaled, coverY + coverSizeScaled, coverX + coverSizeScaled - r, coverY + coverSizeScaled);
+    ctx.lineTo(coverX + r, coverY + coverSizeScaled);
+    ctx.quadraticCurveTo(coverX, coverY + coverSizeScaled, coverX, coverY + coverSizeScaled - r);
+    ctx.lineTo(coverX, coverY + r);
+    ctx.quadraticCurveTo(coverX, coverY, coverX + r, coverY);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(coverEl, coverX, coverY, coverSizeScaled, coverSizeScaled);
+    ctx.restore();
+  }
+
+  // ===== اسم الأغنية + الفنان =====
+  const songText = state.songName || '';
+  const artistText = state.artistName || '';
+  const songFontSize = 18 * scaleFactor;
+  const artistFontSize = 14 * scaleFactor;
+
+  ctx.save();
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 ' + songFontSize + 'px Cairo, sans-serif';
+  const textX = coverX - (14 * scaleFactor);
+  ctx.fillText(songText, textX, coverY + (4 * scaleFactor));
+  ctx.fillStyle = '#b3b3b3';
+  ctx.font = '500 ' + artistFontSize + 'px Cairo, sans-serif';
+  ctx.fillText(artistText, textX, coverY + (28 * scaleFactor));
+  ctx.restore();
+
+  // ===== Divider 1 =====
+  const divY1 = coverY + coverSizeScaled + (16 * scaleFactor);
+  ctx.save();
+  const grad = ctx.createLinearGradient(cardX, 0, cardX + cardW, 0);
+  grad.addColorStop(0, 'rgba(180, 180, 190, 0)');
+  grad.addColorStop(0.25, 'rgba(180, 180, 190, 0.45)');
+  grad.addColorStop(0.5, 'rgba(220, 220, 230, 0.65)');
+  grad.addColorStop(0.75, 'rgba(180, 180, 190, 0.45)');
+  grad.addColorStop(1, 'rgba(180, 180, 190, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(cardX + paddingScaled, divY1, cardW - (paddingScaled * 2), 1);
+  ctx.restore();
+
+  // ===== الكلمات =====
+  // جيب السطر النشط
+  let activeIdx = -1;
+  for (let i = 0; i < state.lyrics.length; i++) {
+    const l = state.lyrics[i];
+    if (currentTime >= l.start && currentTime < l.start + l.duration) {
+      activeIdx = i;
+      break;
+    }
+  }
+
+  const prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
+  const currText = activeIdx >= 0 ? (state.lyrics[activeIdx].text || '...') : '...';
+  const nextText = activeIdx >= 0 && activeIdx < state.lyrics.length - 1 ? (state.lyrics[activeIdx + 1].text || '') : '';
+
+  const lyricsY = cardY + cardH * 0.45;
+  const currFontSize = (state.font.size || 20) * scaleFactor;
+  const smallFontSize = 15 * scaleFactor;
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // سابق
+  if (prevText) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '500 ' + smallFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
+    ctx.fillText(prevText, canvasW / 2, lyricsY - currFontSize * 1.5);
+  }
+
+  // حالي
+  ctx.fillStyle = state.font.color || '#ffffff';
+  ctx.font = '700 ' + currFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
+  ctx.fillText(currText, canvasW / 2, lyricsY);
+
+  // جاي
+  if (nextText) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '500 ' + smallFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
+    ctx.fillText(nextText, canvasW / 2, lyricsY + currFontSize * 1.5);
+  }
+  ctx.restore();
+
+  // ===== Divider 2 =====
+  const divY2 = cardY + cardH - (44 * scaleFactor);
+  ctx.save();
+  const grad2 = ctx.createLinearGradient(cardX, 0, cardX + cardW, 0);
+  grad2.addColorStop(0, 'rgba(180, 180, 190, 0)');
+  grad2.addColorStop(0.25, 'rgba(180, 180, 190, 0.45)');
+  grad2.addColorStop(0.5, 'rgba(220, 220, 230, 0.65)');
+  grad2.addColorStop(0.75, 'rgba(180, 180, 190, 0.45)');
+  grad2.addColorStop(1, 'rgba(180, 180, 190, 0)');
+  ctx.fillStyle = grad2;
+  ctx.fillRect(cardX + paddingScaled, divY2, cardW - (paddingScaled * 2), 1);
+  ctx.restore();
+
+  // ===== Footer (Instagram) =====
+  const footerY = cardY + cardH - (22 * scaleFactor);
+  const footerX = cardX + paddingScaled;
+  const iconSize = 18 * scaleFactor;
+  const footerFontSize = 14 * scaleFactor;
+
+  ctx.save();
+  // Instagram icon (simplified - square + circle)
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5 * scaleFactor;
+  ctx.strokeRect(footerX, footerY - iconSize / 2, iconSize, iconSize);
+  ctx.beginPath();
+  ctx.arc(footerX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '500 ' + footerFontSize + 'px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(state.igName || 'dk.llyric', footerX + iconSize + (6 * scaleFactor), footerY);
+  ctx.restore();
+}
+
+/* ============================================
+   🎬 Start Export
+   ============================================ */
+async function startVideoExport() {
+  if (!state.audioUrl) {
+    alert('ارفع أغنية أول');
+    return;
+  }
+
+  const startBtn = document.getElementById('exportStartBtn');
+  const progress = document.getElementById('exportProgress');
+  const progressFill = document.getElementById('exportProgressFill');
+  const progressText = document.getElementById('exportProgressText');
+
+  startBtn.disabled = true;
+  progress.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = '0%';
+
+  try {
+    // 1. Setup Canvas
+    const quality = _exportSettings.quality;
+    const fps = _exportSettings.fps;
+    const frame = document.getElementById('previewFrame');
+    const rect = frame.getBoundingClientRect();
+    const baseRatio = rect.width / rect.height;
+
+    let canvasW, canvasH;
+    if (baseRatio < 1) {
+      // عمودي
+      canvasH = quality * 16 / 9;
+      canvasW = quality;
+    } else {
+      canvasW = quality;
+      canvasH = quality / baseRatio;
+    }
+    // تأكد أرقام زوجية
+    canvasW = Math.round(canvasW / 2) * 2;
+    canvasH = Math.round(canvasH / 2) * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    const ctx = canvas.getContext('2d');
+
+    // 2. Setup MediaRecorder
+    const stream = canvas.captureStream(fps);
+
+    // Add audio track
+    const player = document.getElementById('audioPlayer');
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaElementSource(player);
+    const dest = audioCtx.createMediaStreamDestination();
+    source.connect(dest);
+    source.connect(audioCtx.destination);
+    dest.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+
+    // 3. MimeType
+    let mimeType = 'video/webm';
+    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+      mimeType = 'video/webm;codecs=vp9,opus';
+    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+      mimeType = 'video/webm;codecs=vp8,opus';
+    } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+      mimeType = 'video/mp4';
+    }
+
+    const recorder = new MediaRecorder(stream, {
+      mimeType: mimeType,
+      videoBitsPerSecond: 5000000
+    });
+
+    const chunks = [];
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    // 4. Start recording
+    recorder.start(100);
+
+    // 5. Play audio from start
+    player.currentTime = state.audioStart;
+    await player.play();
+
+    // 6. Render loop
+    const startTime = performance.now();
+    const totalDuration = state.audioEnd - state.audioStart;
+
+    function renderLoop() {
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000;
+
+      if (elapsed >= totalDuration || player.ended) {
+        // Stop
+        recorder.stop();
+        setTimeout(() => {
+          // Download
+          const blob = new Blob(chunks, { type: mimeType });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'dk-llyric-' + Date.now() + (mimeType.includes('mp4') ? '.mp4' : '.webm');
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+          startBtn.disabled = false;
+          progressFill.style.width = '100%';
+          progressText.textContent = '100%';
+          setTimeout(() => {
+            progress.style.display = 'none';
+            closeExportModal();
+          }, 1500);
+        }, 500);
+        return;
+      }
+
+      // Draw current frame
+      const currentTime = state.audioStart + elapsed;
+      drawFrameToCanvas(ctx, canvasW, canvasH, currentTime);
+
+      // Update progress
+      const percent = Math.min(100, Math.round((elapsed / totalDuration) * 100));
+      progressFill.style.width = percent + '%';
+      progressText.textContent = percent + '%';
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    renderLoop();
+
+  } catch (err) {
+    console.error('Export error:', err);
+    alert('خطأ في التصدير: ' + err.message);
+    startBtn.disabled = false;
+    progress.style.display = 'none';
+  }
+}
