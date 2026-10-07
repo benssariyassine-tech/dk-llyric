@@ -4,93 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>dk.llyric — Music Cards Maker</title>
-<meta name="theme-color" content="#0b0b0f">
+<meta name="theme-color" content="#0a0a12">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;min-height:100dvh;background:#07070d;color:#fff;font-family:Cairo,Inter,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* Animated gradient blobs */
+.ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.55;animation:float 18s ease-in-out infinite}
+.blob-1{width:340px;height:340px;background:#0a84ff;top:-80px;right:-80px}
+.blob-2{width:300px;height:300px;background:#bf5af2;bottom:-60px;left:-60px;animation-delay:-6s}
+.blob-3{width:220px;height:220px;background:#ff2d92;top:40%;left:30%;animation-delay:-12s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.1)}66%{transform:translate(-30px,30px) scale(0.9)}}
+
+/* Landing layout */
+.landing{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:calc(env(safe-area-inset-top,0px) + 32px) 22px calc(env(safe-area-inset-bottom,0px) + 24px)}
+.landing-top{text-align:center;margin-bottom:36px}
+.brand-logo{font-family:Inter,sans-serif;font-size:38px;font-weight:900;letter-spacing:-2px;line-height:1;display:flex;align-items:baseline;justify-content:center}
+.brand-dk{color:#fff}
+.brand-dot{color:#0a84ff;margin:0 2px}
+.brand-lyric{background:linear-gradient(135deg,#0a84ff,#5ac8fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-tagline{font-size:10.5px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:4px;margin-top:10px;text-transform:uppercase}
+
+/* Glass card */
+.glass{background:rgba(255,255,255,0.055);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)}
+
+/* Preview */
+.preview-wrap{display:flex;justify-content:center;margin-bottom:32px}
+.preview-card{width:210px;aspect-ratio:9/16;border-radius:26px;padding:16px 14px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;animation:cardFloat 5s ease-in-out infinite}
+.preview-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent 45%);pointer-events:none}
+@keyframes cardFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-0.5deg)}}
+.pv-header{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.pv-cover{width:38px;height:38px;border-radius:10px;object-fit:cover;box-shadow:0 6px 16px rgba(0,0,0,0.5)}
+.pv-info{flex:1;min-width:0}
+.pv-song{font-size:11.5px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-artist{font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-lyrics{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;z-index:1}
+.pv-lyric-text{font-size:15px;font-weight:800;color:#fff;line-height:1.5;text-shadow:0 4px 20px rgba(0,0,0,0.6)}
+.pv-footer{text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.85);position:relative;z-index:1}
+
+/* CTA */
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:320px;margin:0 auto;padding:18px 24px;background:linear-gradient(135deg,rgba(10,132,255,0.9),rgba(0,98,210,0.9));color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:50px;font-family:inherit;font-size:16px;font-weight:900;text-decoration:none;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 12px 40px rgba(10,132,255,0.45),inset 0 1px 0 rgba(255,255,255,0.2);cursor:pointer;transition:transform 0.15s ease}
+.cta:active{transform:scale(0.96)}
+.cta svg{width:18px;height:18px}
+.hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.45);margin-top:14px;font-weight:600}
+
+/* Features */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:420px;margin:44px auto 0}
+.feat{border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.feat-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(10,132,255,0.35),rgba(10,132,255,0.1));border:1px solid rgba(10,132,255,0.3);display:flex;align-items:center;justify-content:center;font-size:17px}
+.feat-title{font-size:12.5px;font-weight:900;color:#fff}
+.feat-desc{font-size:10.5px;color:rgba(255,255,255,0.5);line-height:1.4}
+
+/* Footer */
+.foot{text-align:center;margin-top:auto;padding-top:40px;font-size:11px;color:rgba(255,255,255,0.35)}
+.foot strong{color:#0a84ff;font-weight:800}
+</style>
 </head>
-<body class="home-body">
+<body>
 
-  <div class="ambient-bg"></div>
+<div class="ambient">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
 
-  <header class="home-topbar">
+<div class="landing">
+
+  <div class="landing-top">
     <div class="brand-logo">
       <span class="brand-dk">dk</span><span class="brand-dot">.</span><span class="brand-lyric">llyric</span>
     </div>
     <div class="brand-tagline">MUSIC CARDS</div>
-  </header>
+  </div>
 
-  <main class="home-content">
-
-    <div class="home-preview-wrap">
-      <div class="home-preview-card">
-        <div class="home-ph">
-          <img class="home-cover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
-          <div class="home-ph-text">
-            <div class="home-song">راجع</div>
-            <div class="home-artist">عمرو دياب</div>
-          </div>
-        </div>
-        <div class="home-lyrics">
-          <div class="home-lyric-text">راجع بتقولي اللي ما بينا</div>
-        </div>
-        <div class="home-footer-card">
-          <span>Spotify</span>
+  <div class="preview-wrap">
+    <div class="preview-card glass">
+      <div class="pv-header">
+        <img class="pv-cover" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80" alt="">
+        <div class="pv-info">
+          <div class="pv-song">راجع</div>
+          <div class="pv-artist">عمرو دياب</div>
         </div>
       </div>
+      <div class="pv-lyrics">
+        <div class="pv-lyric-text">راجع بتقولي اللي ما بينا</div>
+      </div>
+      <div class="pv-footer">@dk.llyric</div>
     </div>
+  </div>
 
-    <a href="editor.html" class="home-cta">
-      <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>ابدأ التصميم</span>
-    </a>
-    <p class="home-hint">صمّم فيديو الكلمات في دقائق</p>
+  <a href="editor.html" class="cta">
+    <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <span>ابدأ التحرير</span>
+  </a>
+  <p class="hint">صمّم فيديو الكلمات في دقائق</p>
 
-    <div class="home-features">
-      <div class="hf-item">
-        <div class="hf-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        </div>
-        <div class="hf-text">
-          <div class="hf-title">صورة الغلاف</div>
-          <div class="hf-desc">ارفع صورة من جهازك</div>
-        </div>
-      </div>
-      <div class="hf-item">
-        <div class="hf-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        </div>
-        <div class="hf-text">
-          <div class="hf-title">الأغنية</div>
-          <div class="hf-desc">اختر مقطع من جهازك</div>
-        </div>
-      </div>
-      <div class="hf-item">
-        <div class="hf-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
-        </div>
-        <div class="hf-text">
-          <div class="hf-title">الكلمات المتزامنة</div>
-          <div class="hf-desc">اكتب وحدّد الوقت</div>
-        </div>
-      </div>
-      <div class="hf-item">
-        <div class="hf-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </div>
-        <div class="hf-text">
-          <div class="hf-title">تصدير الفيديو</div>
-          <div class="hf-desc">حمّل بأعلى جودة</div>
-        </div>
-      </div>
+  <div class="features">
+    <div class="feat glass">
+      <div class="feat-icon">🎵</div>
+      <div class="feat-title">الأغنية</div>
+      <div class="feat-desc">ارفع من جهازك</div>
     </div>
+    <div class="feat glass">
+      <div class="feat-icon">✍️</div>
+      <div class="feat-title">الكلمات</div>
+      <div class="feat-desc">مزامنة تلقائية</div>
+    </div>
+    <div class="feat glass">
+      <div class="feat-icon">🎨</div>
+      <div class="feat-title">تأثيرات</div>
+      <div class="feat-desc">فلاتر احترافية</div>
+    </div>
+    <div class="feat glass">
+      <div class="feat-icon">📱</div>
+      <div class="feat-title">تصدير</div>
+      <div class="feat-desc">MP4 على iPhone</div>
+    </div>
+  </div>
 
-    <footer class="home-footer">
-      <p>صُنع بواسطة <strong>dk.llyric</strong> — 2026</p>
-    </footer>
+  <div class="foot">
+    صُنع بواسطة <strong>dk.llyric</strong> — 2026
+  </div>
 
-  </main>
+</div>
 
 </body>
 </html>
