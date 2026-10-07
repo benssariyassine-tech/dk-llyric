@@ -17,7 +17,7 @@ const state = {
   bgEnd: 15,
   currentTime: 0,
   isPlaying: false,
-songName: '',
+  songName: '',
   artistName: '',
   igName: 'dk.llyric',
   bgUrl: null,
@@ -29,7 +29,15 @@ songName: '',
   selectedType: null,
   selectedIndex: -1,
   activeSegment: -1,
-  font: { family: 'Cairo', size: 20, weight: 700, color: '#ffffff' }
+  font: { family: 'Cairo', size: 20, weight: 700, color: '#ffffff' },
+  bgFilters: {
+    blur: 0,
+    brightness: 100,
+    saturation: 100,
+    contrast: 100,
+    opacity: 100,
+    hue: 0
+  }
 };
 
 let currentTab = null;
@@ -213,8 +221,10 @@ function openTab(tabName, btnEl) {
   document.querySelectorAll('.sheet-content').forEach(el => el.classList.remove('active'));
   const target = document.querySelector('[data-sheet="' + tabName + '"]');
   if (target) target.classList.add('active');
-  document.getElementById('bottomSheet').classList.add('open');
-  document.getElementById('sheetBackdrop').classList.add('open');
+  const bs = document.getElementById('bottomSheet');
+  const sb = document.getElementById('sheetBackdrop');
+  if (bs) bs.classList.add('open');
+  if (sb) sb.classList.add('open');
   if (navigator.vibrate) try { navigator.vibrate(8); } catch (e) {}
 }
 
@@ -290,6 +300,7 @@ function openAudioPicker() {
   document.getElementById('audioInput').click();
 }
 
+/* ✅ مصحّح: state.selectedType = 'audio' قبل startResize */
 function initAudioSegmentListeners() {
   const audioSeg = document.getElementById('audioSegment');
   if (!audioSeg) return;
@@ -301,14 +312,26 @@ function initAudioSegmentListeners() {
 
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
-  hL.addEventListener('mousedown', e => startResize(e, 0, 'left'));
-  hL.addEventListener('touchstart', e => startResize(e, 0, 'left'), { passive: false });
+  hL.addEventListener('mousedown', (e) => {
+    state.selectedType = 'audio';
+    startResize(e, 0, 'left');
+  });
+  hL.addEventListener('touchstart', (e) => {
+    state.selectedType = 'audio';
+    startResize(e, 0, 'left');
+  }, { passive: false });
   audioSeg.appendChild(hL);
 
   const hR = document.createElement('div');
   hR.className = 'seg-handle handle-right';
-  hR.addEventListener('mousedown', e => startResize(e, 0, 'right'));
-  hR.addEventListener('touchstart', e => startResize(e, 0, 'right'), { passive: false });
+  hR.addEventListener('mousedown', (e) => {
+    state.selectedType = 'audio';
+    startResize(e, 0, 'right');
+  });
+  hR.addEventListener('touchstart', (e) => {
+    state.selectedType = 'audio';
+    startResize(e, 0, 'right');
+  }, { passive: false });
   audioSeg.appendChild(hR);
 
   const lp = (e) => {
@@ -367,9 +390,6 @@ function renderLyricsList() {
    Timeline + Selection + Menu + Resize + Long Press
    ============================================ */
 
-/* ============================================
-   Timeline Duration
-   ============================================ */
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
   if (hasAudio()) {
@@ -378,9 +398,6 @@ function getTimelineDuration() {
   return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
-/* ============================================
-   Ruler
-   ============================================ */
 function renderRuler() {
   const ruler = document.getElementById('timelineRuler');
   if (!ruler) return;
@@ -396,9 +413,6 @@ function renderRuler() {
   }
 }
 
-/* ============================================
-   Timeline
-   ============================================ */
 function renderTimeline() {
   const trackText = document.getElementById('trackText');
   if (!trackText) return;
@@ -439,23 +453,23 @@ function renderTimeline() {
     });
     seg.addEventListener('touchstart', e => {
       if (e.target.classList.contains('seg-handle')) return;
-      startLongPressText(e, index, seg);
-    }, { passive: true });
+      startLong }
+PressText(e, index, seg);
+    }, {      passive: true });
 
-    trackText.appendChild(seg);
+    trackText.appendChild(seg }
+);
   });
 
-  setTimeout(checkAllTextOverlaps, 10);
+  setTimeout(checkAllTextOverl   aps, 10);
 }
 
-/* ============================================
-   Selection
-   ============================================ */
-function selectText(index) {
+function selectText(index }
+) {
   state.selectedType = 'text';
-  state.selectedIndex = index;
+  state.selected   Index = index;
   renderTimeline();
-  showCapcutMenu('text');
+  hide showCapcutMenu('text');
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
 
@@ -489,8 +503,7 @@ function showCapcutMenu(type) {
   menu.classList.add('open');
   document.body.classList.add('menu-open');
 
-  if (type === 'bg') {
-    // For background: hide glass + edit
+  if (type === 'bg' || type === 'audio') {
     menu.querySelectorAll('.cm-item').forEach(function(item) {
       const svg = item.querySelector('svg');
       if (!svg) return;
@@ -504,20 +517,7 @@ function showCapcutMenu(type) {
     return;
   }
 
-  if (type === 'audio') {
-    menu.querySelectorAll('.cm-item').forEach(item => {
-      const svg = item.querySelector('svg');
-      if (!svg) return;
-      const svgData = svg.outerHTML;
-      if (svgData.indexOf('M11 4H4') !== -1 || svgData.indexOf('rx="4"') !== -1) {
-        item.style.display = 'none';
-      } else {
-        item.style.display = '';
-      }
-    });
-  } else {
-    menu.querySelectorAll('.cm-item').forEach(item => item.style.display = '');
-  }
+  menu.querySelectorAll('.cm-item').forEach(item => item.style.display = '');
 }
 
 function hideCapcutMenu() {
@@ -579,21 +579,16 @@ function cmAction(action) {
         if (state.currentTime > state.audioEnd) {
           state.currentTime = state.audioEnd;
           setPlayheadPosition(state.currentTime);
-        }
-      }
-    }
-    hideCapcutMenu();
+       CapcutMenu();
   }
 }
 
-/* ============================================
-   Resize
-   ============================================ */
 function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
-_resize = {
+
+  _resize = {
     active: true,
     index: index,
     side: side,
@@ -607,6 +602,7 @@ _resize = {
     startTrimIn: state.audioTrimIn,
     startTrimOut: state.audioTrimOut
   };
+
   if (e.touches) {
     document.addEventListener('touchmove', onResizeMove, { passive: false });
     document.addEventListener('touchend', onResizeEnd);
@@ -616,14 +612,15 @@ _resize = {
   }
 }
 
+/* ✅ مصحّح — كان فيه تخربقة وسط الدالة */
 function onResizeMove(e) {
   if (!_resize || !_resize.active) return;
   e.preventDefault();
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const dx = cx - _resize.startX;
   const deltaSec = dx / PX_PER_SEC;
-if (_resize.isBg) {
-    // Background segment: مستقل تماماً
+
+  if (_resize.isBg) {
     if (_resize.side === 'left') {
       const newStart = Math.max(0, _resize.startStart + deltaSec);
       state.bgStart = Math.round(newStart * 10) / 10;
@@ -634,7 +631,6 @@ if (_resize.isBg) {
     updateBgSegment();
     return;
   }
-
 
   if (_resize.isAudio) {
     if (_resize.side === 'left') {
@@ -694,7 +690,7 @@ if (_resize.isBg) {
 
 function onResizeEnd() {
   if (!_resize) return;
-  const wasText = !_resize.isAudio;
+  const wasText = !_resize.isAudio && !_resize.isBg;
   _resize.active = false;
   _resize = null;
   document.removeEventListener('mousemove', onResizeMove);
@@ -710,9 +706,6 @@ function onResizeEnd() {
   }
 }
 
-/* ============================================
-   Text Overlap
-   ============================================ */
 function checkTextOverlap() {
   const segs = document.querySelectorAll('.text-segment');
   segs.forEach(s => s.classList.remove('overlap'));
@@ -737,9 +730,6 @@ function checkAllTextOverlaps() {
   checkTextOverlap();
 }
 
-/* ============================================
-   Long Press → Text
-   ============================================ */
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -809,9 +799,6 @@ function startLongPressText(e, index, segEl) {
   }, LONG_PRESS_MS);
 }
 
-/* ============================================
-   Long Press → Audio
-   ============================================ */
 function startLongPressAudio(e, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
@@ -882,14 +869,11 @@ function startLongPressAudio(e, segEl) {
     }
   }, LONG_PRESS_MS);
 }
-/* ============================================
+       /* ============================================
    dk.llyric Editor — Part 3/3
-   Playhead + Sync + Play/Pause + Font + Background + Instagram + Misc
+   Playhead + Sync + Play/Pause + Font + Background + Instagram + Export
    ============================================ */
 
-/* ============================================
-   Playhead Position
-   ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
@@ -901,9 +885,6 @@ function setPlayheadPosition(sec) {
   updateTimeDisplay();
 }
 
-/* ============================================
-   Playhead Drag
-   ============================================ */
 function setupPlayheadDrag() {
   const ph = document.getElementById('playhead');
   const vp = document.getElementById('timelineViewport');
@@ -973,7 +954,8 @@ function setupPlayheadDrag() {
     ruler.addEventListener('mousedown', onRulerTouch);
     ruler.addEventListener('touchstart', onRulerTouch, { passive: true });
   }
-vp.addEventListener('click', (e) => {
+
+  vp.addEventListener('click', (e) => {
     if (e.target.closest('.text-segment')) return;
     if (e.target.closest('.audio-segment')) return;
     if (e.target.closest('.bg-segment')) return;
@@ -985,13 +967,10 @@ vp.addEventListener('click', (e) => {
     seekTo(sec);
   });
 
-  // ✅ كي المستخدم يلمس الـ Timeline → وقف Auto-scroll
-  const pauseAutoScroll = () => {
-    _userTouchingTimeline = true;
-  };
+  const pauseAutoScroll = () => { _userTouchingTimeline = true; };
   const resumeAutoScroll = () => {
     _userTouchingTimeline = false;
-    _autoScrollPausedUntil = Date.now() + 3000; // 3 ثواني سماح
+    _autoScrollPausedUntil = Date.now() + 3000;
   };
 
   vp.addEventListener('touchstart', pauseAutoScroll, { passive: true });
@@ -1001,7 +980,6 @@ vp.addEventListener('click', (e) => {
   vp.addEventListener('mouseup', resumeAutoScroll);
   vp.addEventListener('mouseleave', resumeAutoScroll);
 
-  // ✅ سكرول بالسحب (Swipe) → وقف Auto-scroll مؤقتاً
   let scrollTimeout = null;
   vp.addEventListener('scroll', () => {
     if (scrollTimeout) clearTimeout(scrollTimeout);
@@ -1011,10 +989,6 @@ vp.addEventListener('click', (e) => {
   }, { passive: true });
 }
 
-
-/* ============================================
-   Playhead Loop
-   ============================================ */
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
   _lastRAFTime = performance.now();
@@ -1082,7 +1056,6 @@ function stopPlayheadLoop() {
 }
 
 function autoScrollPlayhead() {
-  // ✅ إذا المستخدم لمس الـ Timeline → ما نتحركوش
   if (_userTouchingTimeline) return;
   if (Date.now() < _autoScrollPausedUntil) return;
 
@@ -1100,9 +1073,6 @@ function autoScrollPlayhead() {
   }
 }
 
-/* ============================================
-   Sync Playhead → Lyric (3 lines)
-   ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
   let idx = -1;
@@ -1136,7 +1106,7 @@ function renderLyricFromPlayhead(idx) {
       currEl.classList.add('animate-in');
       return;
     }
-if (prevEl) prevEl.textContent = '';
+    if (prevEl) prevEl.textContent = '';
     if (nextEl) nextEl.textContent = '';
     currEl.textContent = '...';
     currEl.style.opacity = '0.3';
@@ -1153,9 +1123,6 @@ if (prevEl) prevEl.textContent = '';
   currEl.classList.add('animate-in');
 }
 
-/* ============================================
-   Play / Pause
-   ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const isAudioActive = hasAudio();
@@ -1208,9 +1175,6 @@ function fmt(s) {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 
-/* ============================================
-   Font Controls
-   ============================================ */
 function setupFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1263,7 +1227,7 @@ function setFontFilter(filter, btnEl) {
 }
 
 /* ============================================
-   Background Upload
+   Background
    ============================================ */
 function initBgUpload() {
   const bgInput = document.getElementById('bgInput');
@@ -1280,11 +1244,9 @@ function initBgUpload() {
     document.getElementById('bgPreviewImg').src = state.bgUrl;
     document.getElementById('bgPreviewName').textContent = file.name;
 
-// ✅ تعيين طول الخلفية = طول الأغنية
     state.bgStart = hasAudio() ? state.audioStart : 0;
     state.bgEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
 
-    // ✅ Update segment + show filters + apply
     const filtersBox = document.getElementById('bgFiltersBox');
     if (filtersBox) filtersBox.style.display = 'block';
     updateBgSegment();
@@ -1292,20 +1254,16 @@ function initBgUpload() {
     renderRuler();
   });
 }
-/* ============================================
-   🎨 BG Segment Listeners
-   ============================================ */
+
 function initBgSegmentListeners() {
   const seg = document.getElementById('bgSegment');
   if (!seg) return;
 
-  // Click → Select
   seg.addEventListener('click', function(e) {
     if (e.target.classList.contains('seg-handle')) return;
     selectBg();
   });
 
-  // ✅ فرض selectedType = 'bg' قبل startResize
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
   hL.addEventListener('mousedown', function(e) {
@@ -1330,6 +1288,7 @@ function initBgSegmentListeners() {
   }, { passive: false });
   seg.appendChild(hR);
 }
+
 function removeBackground() {
   if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
   state.bgUrl = null;
@@ -1342,106 +1301,30 @@ function removeBackground() {
   document.getElementById('bgPreview').classList.add('hidden');
   document.getElementById('bgInput').value = '';
 
-  // ✅ Hide filters + Hide segment
   const filtersBox = document.getElementById('bgFiltersBox');
   if (filtersBox) filtersBox.style.display = 'none';
   updateBgSegment();
 
-  // If bg was selected, clear
   if (state.selectedType === 'bg') {
     clearSelection();
   }
 }
 
-/* ============================================
-   Instagram
-   ============================================ */
-function initIgInput() {
-  const igInput = document.getElementById('igNameInput');
-  if (!igInput) return;
-  igInput.addEventListener('input', (e) => {
-    const val = e.target.value.trim() || 'dk.llyric';
-    const igNameEl = document.getElementById('igName');
-    if (igNameEl) igNameEl.textContent = val;
-    state.igName = val;
-  });
-}
-
-function openInstagram() {
-  const name = state.igName || 'dk.llyric';
-  window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
-}
-
-/* ============================================
-   Tap → Hide Menu
-   ============================================ */
-document.addEventListener('click', (e) => {
-  if (state.selectedType) {
-    if (e.target.closest('.capcut-menu')) return;
-    if (e.target.closest('.editor-nav')) return;
-    if (e.target.closest('.bottom-sheet')) return;
-    if (e.target.closest('.sheet-backdrop')) return;
-    if (e.target.closest('.text-segment')) return;
-    if (e.target.closest('.audio-segment')) return;
-    if (e.target.closest('.bg-segment')) return;
-    if (e.target.closest('.seg-handle')) return;
-    if (e.target.closest('.playhead')) return;
-    if (e.target.closest('.playhead-cap')) return;
-    clearSelection();
-  }
-}, true);
-/* ============================================
-   Misc
-   ============================================ */
-function closeEditor() {
-  if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
-}
-
-function exportVideo() {
-  alert('التصدير راح يتوفر قريباً!');
-}
-
-function undoAction() {}
-function redoAction() {}
-/* ============================================
-   🎨 BACKGROUND SEGMENT + FILTERS
-   ============================================ */
-
-// المتغيرات العامة للخلفية
-state.bgFilters = {
-  blur: 0,
-  brightness: 100,
-  saturation: 100,
-  contrast: 100,
-  opacity: 100,
-  hue: 0
-};
-
-/* ============================================
-   🎨 Update BG Segment in Timeline
-   ============================================ */
 function updateBgSegment() {
   const seg = document.getElementById('bgSegment');
   if (!seg) return;
-
   if (!state.bgUrl) {
     seg.classList.add('hidden');
     return;
   }
-
   seg.classList.remove('hidden');
-
   seg.style.left = (state.bgStart * PX_PER_SEC) + 'px';
   seg.style.width = ((state.bgEnd - state.bgStart) * PX_PER_SEC) + 'px';
 }
 
-/* ============================================
-   🎨 Apply BG Filters to Image
-   ============================================ */
 function applyBgFilters() {
   const bgImg = document.getElementById('bgImage');
   if (!bgImg) return;
-
   const f = state.bgFilters;
   bgImg.style.filter =
     'blur(' + f.blur + 'px) ' +
@@ -1452,9 +1335,6 @@ function applyBgFilters() {
   bgImg.style.opacity = (f.opacity / 100).toString();
 }
 
-/* ============================================
-   🎨 Init BG Filters Controls
-   ============================================ */
 function initBgFilters() {
   const pairs = [
     { range: 'bgBlurRange', val: 'bgBlurVal', key: 'blur' },
@@ -1469,7 +1349,6 @@ function initBgFilters() {
     const r = document.getElementById(p.range);
     const v = document.getElementById(p.val);
     if (!r) return;
-
     r.addEventListener('input', function(e) {
       const value = parseInt(e.target.value);
       state.bgFilters[p.key] = value;
@@ -1479,20 +1358,9 @@ function initBgFilters() {
   });
 }
 
-/* ============================================
-   🎨 Reset BG Filters
-   ============================================ */
 function resetBgFilters() {
-  state.bgFilters = {
-    blur: 0,
-    brightness: 100,
-    saturation: 100,
-    contrast: 100,
-    opacity: 100,
-    hue: 0
-  };
+  state.bgFilters = { blur: 0, brightness: 100, saturation: 100, contrast: 100, opacity: 100, hue: 0 };
 
-  // Reset UI
   const setVal = function(id, value) {
     const el = document.getElementById(id);
     if (el) el.value = value;
@@ -1510,13 +1378,9 @@ function resetBgFilters() {
   setVal('bgHueRange', 0); setText('bgHueVal', 0);
 
   applyBgFilters();
-
   if (navigator.vibrate) try { navigator.vibrate(15); } catch (e) {}
 }
 
-/* ============================================
-   🎨 Select BG Segment
-   ============================================ */
 function selectBg() {
   state.selectedType = 'bg';
   state.selectedIndex = -1;
@@ -1531,9 +1395,26 @@ function renderBgSelection() {
   if (!seg) return;
   seg.classList.toggle('selected', state.selectedType === 'bg');
 }
+
 /* ============================================
-   📝 Song Name + Artist Name Inputs
+   Instagram + Song
    ============================================ */
+function initIgInput() {
+  const igInput = document.getElementById('igNameInput');
+  if (!igInput) return;
+  igInput.addEventListener('input', (e) => {
+    const val = e.target.value.trim() || 'dk.llyric';
+    const igNameEl = document.getElementById('igName');
+    if (igNameEl) igNameEl.textContent = val;
+    state.igName = val;
+  });
+}
+
+function openInstagram() {
+  const name = state.igName || 'dk.llyric';
+  window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
+}
+
 function initSongInputs() {
   const songInput = document.getElementById('songNameInput');
   const artistInput = document.getElementById('artistNameInput');
@@ -1554,8 +1435,9 @@ function initSongInputs() {
     });
   }
 }
+
 /* ============================================
-   🖼️ Cover Image Upload
+   Cover Upload
    ============================================ */
 function initCoverUpload() {
   const coverInput = document.getElementById('coverInput');
@@ -1565,7 +1447,6 @@ function initCoverUpload() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // تحقق من الحجم (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       alert('الصورة كبيرة بزاف (الأقصى 5MB)');
       return;
@@ -1599,621 +1480,50 @@ function removeCover() {
 
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
-/* ============================================
-   🎬 VIDEO EXPORT
-   ============================================ */
-let _exportSettings = {
-  quality: 1080,
-  fps: 30
-};
-
-function openExportModal() {
-  // ✅ تأكد من وجود audio
-  if (!state.audioUrl) {
-    alert('ارفع أغنية أول');
-    return;
-  }
-
-  const modal = document.getElementById('exportModal');
-  if (modal) modal.classList.add('open');
-
-  // Reset
-  document.getElementById('exportProgress').style.display = 'none';
-  document.getElementById('exportStartBtn').disabled = false;
-
-  // Setup options
-  document.querySelectorAll('#exportQuality .export-opt').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#exportQuality .export-opt').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      _exportSettings.quality = parseInt(this.dataset.value);
-    });
-  });
-  document.querySelectorAll('#exportFps .export-opt').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('#exportFps .export-opt').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      _exportSettings.fps = parseInt(this.dataset.value);
-    });
-  });
-
-  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
-}
-
-function closeExportModal() {
-  const modal = document.getElementById('exportModal');
-  if (modal) modal.classList.remove('open');
-}
-
 
 /* ============================================
-   🎨 رسم الإطار (Canvas Render — iOS Compatible)
+   Tap → Hide Menu
    ============================================ */
-function drawPreviewToCanvas(ctx, W, H, currentTime) {
-  // ===== 1. الخلفية =====
-  const bgImg = document.getElementById('bgImage');
-  const hasBg = bgImg && bgImg.src && bgImg.naturalWidth > 0;
-
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, W, H);
-
-  if (hasBg) {
-    const f = state.bgFilters;
-
-    // ✅ Blur يدوي عبر Downscale
-    if (f.blur > 0) {
-      drawBlurredImage(ctx, bgImg, 0, 0, W, H, f.blur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
-    } else {
-      drawImageWithFilters(ctx, bgImg, 0, 0, W, H, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
-    }
+document.addEventListener('click', (e) => {
+  if (state.selectedType) {
+    if (e.target.closest('.capcut-menu')) return;
+    if (e.target.closest('.editor-nav')) return;
+    if (e.target.closest('.bottom-sheet')) return;
+    if (e.target.closest('.sheet-backdrop')) return;
+    if (e.target.closest('.text-segment')) return;
+    if (e.target.closest('.audio-segment')) return;
+    if (e.target.closest('.bg-segment')) return;
+    if (e.target.closest('.seg-handle')) return;
+    if (e.target.closest('.playhead')) return;
+    if (e.target.closest('.playhead-cap')) return;
+    clearSelection();
   }
-
-  // ===== 2. قياسات البطاقة =====
-  const previewFrame = document.getElementById('previewFrame');
-  const previewRect = previewFrame.getBoundingClientRect();
-  const pxScale = W / previewRect.width;
-
-  const cardScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 1;
-  const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
-  const cardRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-radius')) || 26;
-  const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
-
-  const frameW = previewRect.width;
-  let baseW = frameW * 0.92;
-  if (baseW > 440) baseW = 440;
-  const cardBaseW = baseW * cardScale;
-  const cardBaseH = cardBaseW;
-
-  const cardW = cardBaseW * pxScale;
-  const cardH = cardBaseH * pxScale;
-  const cardX = (W - cardW) / 2;
-  const cardY = (H - cardH) / 2;
-  const radius = cardRadius * pxScale;
-
-  // ===== 3. Glass Effect (بديل بدون backdrop-filter) =====
-  // ✅ نرسم نسخة مبلورة من الخلفية داخل البطاقة (لو كاينة)
-  if (hasBg) {
-    ctx.save();
-    roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
-    ctx.clip();
-
-    // نرسم صورة الخلفية مبلورة بشدة داخل البطاقة
-    const f = state.bgFilters;
-    const glassBlur = Math.max(f.blur, 20);
-    drawBlurredImage(ctx, bgImg, 0, 0, W, H, glassBlur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
-    ctx.restore();
-  }
-
-  // ✅ طبقة داكنة شفافة فوق الـ glass (تحاكي الـ tint)
-  ctx.save();
-  ctx.fillStyle = 'rgba(15, 15, 15, ' + cardOpacity + ')';
-  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
-  ctx.fill();
-  ctx.restore();
-
-  // ✅ حدود خفيفة
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1 * pxScale;
-  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
-  ctx.stroke();
-  ctx.restore();
-
-  // ===== 4. الحشوة =====
-  const padX = 22 * pxScale;
-  const padY = 20 * pxScale;
-  const innerX = cardX + padX;
-  const innerY = cardY + padY;
-  const innerW = cardW - padX * 2;
-
-  // ===== 5. Album Art =====
-  const artW = coverSize * pxScale;
-  const artH = artW;
-  const artRadius = 10 * pxScale;
-  const artX = cardX + cardW - padX - artW;
-  const artY = innerY;
-
-  const coverImg = document.getElementById('previewCover');
-  if (coverImg && coverImg.complete && coverImg.naturalWidth > 0) {
-    ctx.save();
-    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
-    ctx.clip();
-    drawCoverFit(ctx, coverImg, artX, artY, artW, artH);
-    ctx.restore();
-  } else {
-    ctx.fillStyle = '#1a1a24';
-    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
-    ctx.fill();
-  }
-
-  // ===== 6. Song + Artist =====
-  const songText = state.songName || '';
-  const artistText = state.artistName || '';
-  const textRightX = artX - 14 * pxScale;
-
-  ctx.save();
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-
-  if (songText) {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '700 ' + (18 * pxScale) + 'px Cairo, Inter, sans-serif';
-    ctx.fillText(songText, textRightX, artY + artH * 0.35);
-  }
-  if (artistText) {
-    ctx.fillStyle = '#b3b3b3';
-    ctx.font = '500 ' + (14 * pxScale) + 'px Cairo, Inter, sans-serif';
-    ctx.fillText(artistText, textRightX, artY + artH * 0.7);
-  }
-  ctx.restore();
-
-  // ===== 7. Divider 1 =====
-  const gap = 16 * pxScale;
-  const div1Y = artY + artH + gap;
-  drawGradientDivider(ctx, innerX, div1Y, innerW, pxScale);
-
-  // ===== 8. Lyrics =====
-  const footerH = 20 * pxScale;
-  const div2Y = cardY + cardH - padY - footerH - gap;
-  const lyricsTop = div1Y + 1 + gap;
-  const lyricsBottom = div2Y - gap;
-  const lyricsCenterY = (lyricsTop + lyricsBottom) / 2;
-
-  let activeIdx = -1;
-  for (let i = 0; i < state.lyrics.length; i++) {
-    const l = state.lyrics[i];
-    if (currentTime >= l.start && currentTime < l.start + l.duration) {
-      activeIdx = i;
-      break;
-    }
-  }
-
-  let prevText = '';
-  let currText = '...';
-  let nextText = '';
-
-  if (activeIdx >= 0) {
-    prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
-    currText = state.lyrics[activeIdx].text || '...';
-    nextText = activeIdx < state.lyrics.length - 1 ? (state.lyrics[activeIdx + 1].text || '') : '';
-  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
-    currText = state.lyrics[0].text;
-    nextText = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
-  }
-
-  const fontFamily = (state.font.family || 'Cairo') + ', Inter, sans-serif';
-  const lyricSize = (state.font.size || 20) * pxScale;
-  const smallSize = 15 * pxScale;
-
-  // Prev
-  if (prevText) {
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
-    ctx.fillText(prevText, cardX + cardW / 2, lyricsCenterY - lyricSize * 1.4);
-    ctx.restore();
-  }
-
-  // Current (مع ظل)
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = state.font.color || '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 20 * pxScale;
-  ctx.font = '700 ' + lyricSize + 'px ' + fontFamily;
-  ctx.fillText(currText, cardX + cardW / 2, lyricsCenterY);
-  ctx.restore();
-
-  // Next
-  if (nextText) {
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
-    ctx.fillText(nextText, cardX + cardW / 2, lyricsCenterY + lyricSize * 1.4);
-    ctx.restore();
-  }
-/* ============================================
-   🖼️ Blur يدوي (iOS Compatible — via Downscale)
-   ============================================ */
-function drawBlurredImage(ctx, img, x, y, w, h, blurAmount, brightness, saturation, contrast, hue tmp, opacity) {
-  // ✅ تقنيةH Downscale لخلق blur يدوي (تخدم;
- على iOS)
-  const factor = Math.max(2, Math.min(20, Math.round(blurAmount / 1.5)));
-  const tmpW = Math.max(2, Math.round(w / factor));
-  const tmpH = Math.max(2, Math.round(h / factor));
-
-  const tmpCanvas = document.createElement('canvas');
-  tmpCanvas.width = tmpW;
-  tmpCanvas.height = tmpH;
-  const tmpCtx = tmpCanvas.getContext('2d');
-
-  // Draw image at small size
-  drawCoverFitOnContext(tmpCtx, img, 0, 0, tmpW, tmpH);
-
-  // ✅ تكرار Downscale + Upscale 3 مرات لمحاكاة blur سلس
-  let srcCanvas = tmpCanvas;
-  for (let i = 0; i < 2; i++) {
-    const stepCanvas = document.createElement('canvas');
-    stepCanvas.width = tmpW;
-    stepCanvas.height =    const stepCtx = stepCanvas.getContext('2d');
-    stepCtx.drawImage(srcCanvas, 0, 0);
-    srcCanvas = stepCanvas;
-  }
-
-  // ✅ نرسم النسخة الصغيرة ونكبّرها
-  ctx.save();
-  ctx.globalAlpha = opacity / 100;
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
-  // تطبيق الفلاتر البسيطة يدوياً
-  applyManualFilters(ctx, brightness, saturation, contrast, hue);
-  ctx.drawImage(srcCanvas, 0, 0, tmpW, tmpH, x, y, w, h);
-  ctx.restore();
-}
+}, true);
 
 /* ============================================
-   🎨 الفلاتر البسيطة (بدون ctx.filter)
+   Misc
    ============================================ */
-function drawImageWithFilters(ctx, img, x, y, w, h, brightness, saturation, contrast, hue, opacity) {
-  ctx.save();
-  ctx.globalAlpha = opacity / 100;
-  applyManualFilters(ctx, brightness, saturation, contrast, hue);
-  drawCoverFitOnContext(ctx, img, x, y, w, h);
-  ctx.restore();
+function closeEditor() {
+  if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
 }
 
-function applyManualFilters(ctx, brightness, saturation, contrast, hue) {
-  // ✅ نطبقو الفلاتر البسيطة عبر تحويلات يدوية
-  // (Bلا ctx.filter باش يخدم على iOS)
-
-  const b = brightness / 100;
-  const c = contrast / 100;
-  const s = saturation / 100;
-
-  // ✅ إذا كل القيم عادية، ما نديرو والو
-  if (b === 1 && c === 1 && s === 1 && hue === 0) return;
-
-  // ✅ نستعملو ctx.filter إذا كان مدعوم (Chrome/PC)
-  if (ctx.filter !== undefined && ctx.filter !== null) {
-    try {
-      ctx.filter = 'brightness(' + brightness + '%) saturate(' + saturation + '%) contrast(' + contrast + '%) hue-rotate(' + hue + 'deg)';
-    } catch (e) {
-      // iOS ما يدعمش
-    }
-  }
-  // ✅ على iOS، الفلاتر ما راح تتطبق (نتركها)
+function exportVideo() {
+  openExportModal();
 }
+
+function undoAction() {}
+function redoAction() {}
 
 /* ============================================
-   🖼️ drawCoverFit على Context معين
+   ✅ Canvas Helpers (كانو ناقصين)
    ============================================ */
-function drawCoverFitOnContext(c, img, dx, dy, dw, dh) {
-  const ir = img.naturalWidth / img.naturalHeight;
-  const cr = dw / dh;
-  let w, h, x, y;
-  if (ir > cr) {
-    h = dh;
-    w = dh * ir;
-    x = dx + (dw - w) / 2;
-    y = dy;
-  } else {
-    w = dw;
-    h = dw / ir;
-    x = dx;
-    y = dy + (dh - h) / 2;
+function roundRectPath(ctx, x, y, w, h, r) {
+  if (typeof r === 'number') {
+    r = { tl: r, tr: r, br: r, bl: r };
   }
-  c.drawImage(img, x, y, w, h);
-}
-  // ===== 9. Divider 2 =====
-  drawGradientDivider(ctx, innerX, div2Y, innerW, pxScale);
-
-  // ===== 10. Footer =====
-  const footerY = cardY + cardH - padY - footerH / 2;
-  const iconSize = 18 * pxScale;
-  const footerX = cardX + padX;
-
-  ctx.save();
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 1.5 * pxScale;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  const igX = footerX;
-  const igY = footerY - iconSize / 2;
-  roundRectPath(ctx, igX, igY, iconSize, iconSize, iconSize * 0.28);
-  ctx.stroke();
-
   ctx.beginPath();
-  ctx.arc(igX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(igX + iconSize * 0.72, footerY - iconSize * 0.22, iconSize * 0.06, 0, Math.PI * 2);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
-  ctx.restore();
-
-  ctx.save();
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '500 ' + (14 * pxScale) + 'px Inter, Cairo, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(state.igName || 'dk.llyric', igX + iconSize + 6 * pxScale, footerY);
-  ctx.restore();
-}
-
-  // ===== اسم الأغنية + الفنان =====
-  const songText = state.songName || '';
-  const artistText = state.artistName || '';
-  const songFontSize = 18 * scaleFactor;
-  const artistFontSize = 14 * scaleFactor;
-
-  ctx.save();
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'top';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 ' + songFontSize + 'px Cairo, sans-serif';
-  const textX = coverX - (14 * scaleFactor);
-  ctx.fillText(songText, textX, coverY + (4 * scaleFactor));
-  ctx.fillStyle = '#b3b3b3';
-  ctx.font = '500 ' + artistFontSize + 'px Cairo, sans-serif';
-  ctx.fillText(artistText, textX, coverY + (28 * scaleFactor));
-  ctx.restore();
-
-  // ===== Divider 1 =====
-  const divY1 = coverY + coverSizeScaled + (16 * scaleFactor);
-  ctx.save();
-  const grad = ctx.createLinearGradient(cardX, 0, cardX + cardW, 0);
-  grad.addColorStop(0, 'rgba(180, 180, 190, 0)');
-  grad.addColorStop(0.25, 'rgba(180, 180, 190, 0.45)');
-  grad.addColorStop(0.5, 'rgba(220, 220, 230, 0.65)');
-  grad.addColorStop(0.75, 'rgba(180, 180, 190, 0.45)');
-  grad.addColorStop(1, 'rgba(180, 180, 190, 0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(cardX + paddingScaled, divY1, cardW - (paddingScaled * 2), 1);
-  ctx.restore();
-
-  // ===== الكلمات =====
-  // جيب السطر النشط
-  let activeIdx = -1;
-  for (let i = 0; i < state.lyrics.length; i++) {
-    const l = state.lyrics[i];
-    if (currentTime >= l.start && currentTime < l.start + l.duration) {
-      activeIdx = i;
-      break;
-    }
-  }
-
-  const prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
-  const currText = activeIdx >= 0 ? (state.lyrics[activeIdx].text || '...') : '...';
-  const nextText = activeIdx >= 0 && activeIdx < state.lyrics.length - 1 ? (state.lyrics[activeIdx + 1].text || '') : '';
-
-  const lyricsY = cardY + cardH * 0.45;
-  const currFontSize = (state.font.size || 20) * scaleFactor;
-  const smallFontSize = 15 * scaleFactor;
-
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  // سابق
-  if (prevText) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.font = '500 ' + smallFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
-    ctx.fillText(prevText, canvasW / 2, lyricsY - currFontSize * 1.5);
-  }
-
-  // حالي
-  ctx.fillStyle = state.font.color || '#ffffff';
-  ctx.font = '700 ' + currFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
-  ctx.fillText(currText, canvasW / 2, lyricsY);
-
-  // جاي
-  if (nextText) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.font = '500 ' + smallFontSize + 'px ' + (state.font.family || 'Cairo') + ', sans-serif';
-    ctx.fillText(nextText, canvasW / 2, lyricsY + currFontSize * 1.5);
-  }
-  ctx.restore();
-
-  // ===== Divider 2 =====
-  const divY2 = cardY + cardH - (44 * scaleFactor);
-  ctx.save();
-  const grad2 = ctx.createLinearGradient(cardX, 0, cardX + cardW, 0);
-  grad2.addColorStop(0, 'rgba(180, 180, 190, 0)');
-  grad2.addColorStop(0.25, 'rgba(180, 180, 190, 0.45)');
-  grad2.addColorStop(0.5, 'rgba(220, 220, 230, 0.65)');
-  grad2.addColorStop(0.75, 'rgba(180, 180, 190, 0.45)');
-  grad2.addColorStop(1, 'rgba(180, 180, 190, 0)');
-  ctx.fillStyle = grad2;
-  ctx.fillRect(cardX + paddingScaled, divY2, cardW - (paddingScaled * 2), 1);
-  ctx.restore();
-
-  // ===== Footer (Instagram) =====
-  const footerY = cardY + cardH - (22 * scaleFactor);
-  const footerX = cardX + paddingScaled;
-  const iconSize = 18 * scaleFactor;
-  const footerFontSize = 14 * scaleFactor;
-
-  ctx.save();
-  // Instagram icon (simplified - square + circle)
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 1.5 * scaleFactor;
-  ctx.strokeRect(footerX, footerY - iconSize / 2, iconSize, iconSize);
-  ctx.beginPath();
-  ctx.arc(footerX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Name
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '500 ' + footerFontSize + 'px Inter, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(state.igName || 'dk.llyric', footerX + iconSize + (6 * scaleFactor), footerY);
-  ctx.restore();
-}
-
-async function startVideoExport() {
-  if (!state.audioUrl) {
-    alert('ارفع أغنية أول');
-    return;
-  }
-
-  const startBtn = document.getElementById('exportStartBtn');
-  const progress = document.getElementById('exportProgress');
-  const progressFill = document.getElementById('exportProgressFill');
-  const progressText = document.getElementById('exportProgressText');
-
-  startBtn.disabled = true;
-  progress.style.display = 'block';
-  progressFill.style.width = '0%';
-  progressText.textContent = 'جاري التجهيز...';
-
-  try {
-    await ensureImagesLoaded();
-
-    const quality = _exportSettings.quality;
-    const fps = _exportSettings.fps;
-
-    const frame = document.getElementById('previewFrame');
-    const rect = frame.getBoundingClientRect();
-    const ratio = rect.width / rect.height;
-
-    let canvasW, canvasH;
-    if (quality === 1080) {
-      canvasW = 1080;
-      canvasH = Math.round(1080 / ratio);
-    } else {
-      canvasW = 720;
-      canvasH = Math.round(720 / ratio);
-    }
-    canvasW = Math.round(canvasW / 2) * 2;
-    canvasH = Math.round(canvasH / 2) * 2;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasW;
-    canvas.height = canvasH;
-    const ctx = canvas.getContext('2d', { alpha: false });
-
-    const videoStream = canvas.captureStream(fps);
-
-    const player = document.getElementById('audioPlayer');
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaElementSource(player);
-      const dest = audioCtx.createMediaStreamDestination();
-      source.connect(dest);
-      dest.stream.getAudioTracks().forEach(track => videoStream.addTrack(track));
-    } catch (audioErr) {
-      console.warn('Audio setup failed:', audioErr);
-    }
-
-    let mimeType = 'video/webm';
-    const supported = [
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp8,opus',
-      'video/webm;codecs=vp9',
-      'video/webm;codecs=vp8',
-      'video/webm'
-    ];
-    for (const m of supported) {
-      if (MediaRecorder.isTypeSupported(m)) {
-        mimeType = m;
-        break;
-      }
-    }
-
-    const recorder = new MediaRecorder(videoStream, {
-      mimeType: mimeType,
-      videoBitsPerSecond: quality === 1080 ? 8000000 : 4000000
-    });
-
-    const chunks = [];
-    recorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) chunks.push(e.data);
-    };
-
-    const recorderStopped = new Promise((resolve) => {
-      recorder.onstop = resolve;
-    });
-
-    recorder.start(100);
-    player.currentTime = state.audioStart;
-
-    try {
-      await player.play();
-    } catch (playErr) {
-      recorder.stop();
-      throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
-    }
-
-    // ✅ المتغيرات الصحيحة (بلا أخطاء)
-    const startTime = performance.now();
-    const totalDuration = state.audioEnd - state.audioStart;
-    const frameDelay = 1000 / fps;
-    let isRendering = true;
-
-    async function renderLoop() {
-      if (!isRendering) return;
-
-      const now = performance.now();
-      const elapsed = (now - startTime) / 1000;
-
-      // ✅ الشرط الصحيح
-      if (elapsed >= totalDuration || player.ended) {
-        isRendering = false;
-        if (recorder.state !== 'inactive') recorder.stop();
-        await recorderStopped;
-        downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText);
-        return;
-      }
-
-      const currentTime = state.audioStart + elapsed;
-      drawPreviewToCanvas(ctx, canvasW, canvasH, currentTime);
-
-      const percent = Math.min(100, Math.round((elapsed / totalDuration) * 100));
-      progressFill.style.width = percent + '%';
-      progressText.textContent = 'جاري التصدير: ' + percent + '%';
-
-      const workTime = performance.now() - now;
-      const wait = Math.max(0, frameDelay - workTime);
-      setTimeout(() => requestAnimationFrame(renderLoop), wait);
-    }
-
-    renderLoop();
-
-  } catch (err) {
-    console.error('Export error:', err);
-    alert('خطأ في التصدير: ' + err.message);
-    startBtn.disabled = false;
-    progress.style.display = 'none';
-  }
-}
+  ctx.moveTo(x + r.tl, y);
+  ctx.lineTo(x + w - r.tr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+  ctx.lineTo(x + w, y + h - r.br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y
