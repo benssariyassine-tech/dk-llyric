@@ -896,3 +896,172 @@ body.menu-open .editor-nav {
 #bgFiltersBox .font-group {
   margin-bottom: 16px;
 }
+/* ============================================
+   🎬 EXPORT MODAL
+   ============================================ */
+.export-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.export-modal.open { display: flex; }
+
+.export-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+}
+
+.export-box {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(22, 22, 28, 0.98);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 22px calc(30px + env(safe-area-inset-bottom, 0px));
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.export-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.export-close svg { width: 14px; height: 14px; }
+
+.export-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 4px 0;
+  text-align: center;
+}
+.export-subtitle {
+  font-size: 12px;
+  color: #8e8e93;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
+.export-group { margin-bottom: 20px; }
+
+.export-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #8e8e93;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.export-options {
+  display: flex;
+  gap: 8px;
+}
+.export-opt {
+  flex: 1;
+  padding: 12px;
+  background: rgba(11, 11, 15, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.export-opt.active {
+  background: rgba(10, 132, 255, 0.15);
+  border-color: #0a84ff;
+  color: #0a84ff;
+}
+.export-opt:active { transform: scale(0.97); }
+
+.export-progress {
+  margin-bottom: 20px;
+}
+.export-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.export-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #0a84ff, #0062d2);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 12px rgba(10, 132, 255, 0.6);
+}
+.export-progress-text {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0a84ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.export-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #0a84ff, #0062d2);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 10px 28px rgba(10, 132, 255, 0.4);
+  transition: transform 0.2s;
+}
+.export-btn:active { transform: scale(0.97); }
+.export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.export-btn svg { width: 18px; height: 18px; }
+
+.export-note {
+  font-size: 11px;
+  color: #8e8e93;
+  text-align: center;
+  margin: 14px 0 0 0;
+  line-height: 1.5;
+}
