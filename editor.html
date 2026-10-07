@@ -1835,6 +1835,15 @@ document.addEventListener('click', function(e) {
   if (e.target.closest('.playhead')) return;
   clearSelection();
 }, true);
+  <!-- Font Preloader — يجبر المتصفح يحمل كل الخطوط -->
+<div style="position:fixed;left:-9999px;top:-9999px;visibility:hidden;font-size:1px;line-height:1;pointer-events:none;">
+  <span style="font-family:'Cairo';font-weight:700">أ</span>
+  <span style="font-family:'Tajawal';font-weight:700">أ</span>
+  <span style="font-family:'Almarai';font-weight:700">أ</span>
+  <span style="font-family:'Reem Kufi';font-weight:700">أ</span>
+  <span style="font-family:'IBM Plex Sans Arabic';font-weight:700">أ</span>
+  <span style="font-family:'Inter';font-weight:700">A</span>
+</div>
 </script>
 </body>
 </html>
