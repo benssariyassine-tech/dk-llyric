@@ -1621,12 +1621,16 @@ function bindFontButtons() {
       document.querySelectorAll('.font-family-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       state.font.family = btn.dataset.font;
+
       var family = state.font.family;
-      if (document.fonts && document.fonts.load) {
+      if (document.fonts) {
+        // تحميل الخط + انتظار جاهزية document.fonts
         Promise.all([
           document.fonts.load('700 28px "' + family + '"').catch(function() {}),
-          document.fonts.load('500 28px "' + family + '"').catch(function() {})
+          document.fonts.load('400 28px "' + family + '"').catch(function() {})
         ]).then(function() {
+          return document.fonts.ready;
+        }).then(function() {
           if (previewCtx) drawFrame(previewCtx, DESIGN_W, DESIGN_H, state.currentTime);
         });
       }
