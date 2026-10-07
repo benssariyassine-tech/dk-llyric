@@ -1839,7 +1839,99 @@ function drawPreviewToCanvas(ctx, W, H, currentTime) {
     ctx.fillText(nextText, cardX + cardW / 2, lyricsCenterY + lyricSize * 1.4);
     ctx.restore();
   }
+/* ============================================
+   🖼️ Blur يدوي (iOS Compatible — via Downscale)
+   ============================================ */
+function drawBlurredImage(ctx, img, x, y, w, h, blurAmount, brightness, saturation, contrast, hue tmp, opacity) {
+  // ✅ تقنيةH Downscale لخلق blur يدوي (تخدم;
+ على iOS)
+  const factor = Math.max(2, Math.min(20, Math.round(blurAmount / 1.5)));
+  const tmpW = Math.max(2, Math.round(w / factor));
+  const tmpH = Math.max(2, Math.round(h / factor));
 
+  const tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = tmpW;
+  tmpCanvas.height = tmpH;
+  const tmpCtx = tmpCanvas.getContext('2d');
+
+  // Draw image at small size
+  drawCoverFitOnContext(tmpCtx, img, 0, 0, tmpW, tmpH);
+
+  // ✅ تكرار Downscale + Upscale 3 مرات لمحاكاة blur سلس
+  let srcCanvas = tmpCanvas;
+  for (let i = 0; i < 2; i++) {
+    const stepCanvas = document.createElement('canvas');
+    stepCanvas.width = tmpW;
+    stepCanvas.height =    const stepCtx = stepCanvas.getContext('2d');
+    stepCtx.drawImage(srcCanvas, 0, 0);
+    srcCanvas = stepCanvas;
+  }
+
+  // ✅ نرسم النسخة الصغيرة ونكبّرها
+  ctx.save();
+  ctx.globalAlpha = opacity / 100;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  // تطبيق الفلاتر البسيطة يدوياً
+  applyManualFilters(ctx, brightness, saturation, contrast, hue);
+  ctx.drawImage(srcCanvas, 0, 0, tmpW, tmpH, x, y, w, h);
+  ctx.restore();
+}
+
+/* ============================================
+   🎨 الفلاتر البسيطة (بدون ctx.filter)
+   ============================================ */
+function drawImageWithFilters(ctx, img, x, y, w, h, brightness, saturation, contrast, hue, opacity) {
+  ctx.save();
+  ctx.globalAlpha = opacity / 100;
+  applyManualFilters(ctx, brightness, saturation, contrast, hue);
+  drawCoverFitOnContext(ctx, img, x, y, w, h);
+  ctx.restore();
+}
+
+function applyManualFilters(ctx, brightness, saturation, contrast, hue) {
+  // ✅ نطبقو الفلاتر البسيطة عبر تحويلات يدوية
+  // (Bلا ctx.filter باش يخدم على iOS)
+
+  const b = brightness / 100;
+  const c = contrast / 100;
+  const s = saturation / 100;
+
+  // ✅ إذا كل القيم عادية، ما نديرو والو
+  if (b === 1 && c === 1 && s === 1 && hue === 0) return;
+
+  // ✅ نستعملو ctx.filter إذا كان مدعوم (Chrome/PC)
+  if (ctx.filter !== undefined && ctx.filter !== null) {
+    try {
+      ctx.filter = 'brightness(' + brightness + '%) saturate(' + saturation + '%) contrast(' + contrast + '%) hue-rotate(' + hue + 'deg)';
+    } catch (e) {
+      // iOS ما يدعمش
+    }
+  }
+  // ✅ على iOS، الفلاتر ما راح تتطبق (نتركها)
+}
+
+/* ============================================
+   🖼️ drawCoverFit على Context معين
+   ============================================ */
+function drawCoverFitOnContext(c, img, dx, dy, dw, dh) {
+  const ir = img.naturalWidth / img.naturalHeight;
+  const cr = dw / dh;
+  let w, h, x, y;
+  if (ir > cr) {
+    h = dh;
+    w = dh * ir;
+    x = dx + (dw - w) / 2;
+    y = dy;
+  } else {
+    w = dw;
+    h = dw / ir;
+    x = dx;
+    y = dy + (dh - h) / 2;
+  }
+  c.drawImage(img, x, y, w, h);
+}
   // ===== 9. Divider 2 =====
   drawGradientDivider(ctx, innerX, div2Y, innerW, pxScale);
 
