@@ -55,30 +55,16 @@ button{font-family:inherit;cursor:pointer}
 .text-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(191,90,242,0.85),rgba(142,68,173,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;padding:0 26px;display:flex;align-items:center;font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:box-shadow 0.15s}
 .text-segment.selected{border-color:#ffd60a;box-shadow:0 0 0 2px #ffd60a,0 0 24px rgba(255,214,10,0.5);z-index:10}
 
-.audio-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,45,146,0.85),rgba(214,51,132,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;display:flex;align-items:center;padding:0 26px;color:#fff;font-size:11px;font-weight:800;overflow:hidden;cursor:grab;touch-action:none;user-select:none;transition:box-shadow 0.15s}
-.audio-segment:active{cursor:grabbing}
-.audio-segment.dragging{opacity:0.85;box-shadow:0 0 0 3px #ffd60a,0 0 30px rgba(255,214,10,0.6);z-index:20}
+.audio-segment{position:absolute;top:0;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(255,45,146,0.85),rgba(214,51,132,0.85));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:2px solid transparent;display:flex;align-items:center;padding:0 26px;color:#fff;font-size:11px;font-weight:800;overflow:hidden;cursor:pointer;touch-action:none;user-select:none;transition:box-shadow 0.15s}
+.audio-segment.dragging{opacity:0.85;box-shadow:0 0 0 3px #ffd60a,0 0 30px rgba(255,214,10,0.6);z-index:20;cursor:grabbing}
 .audio-segment.selected{border-color:#ffd60a;box-shadow:0 0 0 2px #ffd60a,0 0 24px rgba(255,214,10,0.5);z-index:10}
 .audio-wave{flex:1;height:60%;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.6) 0 2px,transparent 2px 5px);margin-left:8px}
 .audio-label{flex-shrink:0;font-size:11px;font-weight:800;white-space:nowrap}
 .audio-add-btn{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.05);border:1.5px dashed rgba(255,255,255,0.25);color:var(--accent);display:flex;align-items:center;justify-content:center;padding:0}
 .audio-add-btn svg{width:20px;height:20px}
 
-/* ✅ مقابض كبيرة وواضحة */
-.seg-handle{
-  position:absolute;top:0;bottom:0;width:22px;
-  background:linear-gradient(180deg,#ffd60a,#ffb800);
-  border-radius:8px;display:none;z-index:6;
-  cursor:ew-resize;
-  box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.4);
-  align-items:center;justify-content:center;
-  touch-action:none;
-}
-.seg-handle::before{
-  content:'';width:2px;height:50%;
-  background:rgba(0,0,0,0.55);border-radius:2px;
-  box-shadow:-4px 0 0 rgba(0,0,0,0.55),4px 0 0 rgba(0,0,0,0.55);
-}
+.seg-handle{position:absolute;top:0;bottom:0;width:22px;background:linear-gradient(180deg,#ffd60a,#ffb800);border-radius:8px;display:none;z-index:6;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.4);align-items:center;justify-content:center;touch-action:none}
+.seg-handle::before{content:'';width:2px;height:50%;background:rgba(0,0,0,0.55);border-radius:2px;box-shadow:-4px 0 0 rgba(0,0,0,0.55),4px 0 0 rgba(0,0,0,0.55)}
 .text-segment.selected .seg-handle,
 .audio-segment.selected .seg-handle{display:flex}
 .handle-left{left:-2px;border-top-left-radius:10px;border-bottom-left-radius:10px}
@@ -274,7 +260,7 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
     </div>
     <div class="font-group" style="margin-top:20px;">
       <label class="font-label">الكلمات</label>
-      <p class="sheet-hint">كل كلمة تظهر في وقتها بتأثير الكاريوكي</p>
+      <p class="sheet-hint">كل سطر يظهر حسب توقيته</p>
       <div id="lyricsList"></div>
       <button class="add-lyric-btn" onclick="addLyric()">+ إضافة سطر</button>
     </div>
@@ -424,15 +410,13 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 
 <script>
 /* ============================================================
-   dk.llyric Editor — Dynamic Karaoke Lyrics Edition
-   Full merged: HTML + CSS + JS
+   dk.llyric Editor — Spotify Lyrics + Smooth Audio Editing
    ============================================================ */
 const DESIGN_W = 360;
 const DESIGN_H = 640;
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 600;
-const WORD_SPACING = 10;      // ✅ 10px بين كل كلمة
-const WORD_ANIM_MS = 350;     // ✅ مدة انتقال كل كلمة
+const LYRIC_ANIM_MS = 450;
 
 const state = {
   audioUrl: null, duration: 0,
@@ -458,9 +442,7 @@ let renderRAF = null;
 let _resize = null;
 let _lpTimer = null;
 let _bgCache = { key: '', imgVersion: -1, canvas: null };
-
-// ✅ حالة تأثير الكاريوكي
-let _wordAnim = { lastLineIdx: -1, lastWordIdx: -1, startTime: 0 };
+let _lyricAnim = { lastIdx: -1, startTime: 0 };
 
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -520,7 +502,7 @@ function startRenderLoop() {
   loop();
 }
 
-/* ===== BOX BLUR (iPhone compatible) ===== */
+/* ===== BOX BLUR (iPhone) ===== */
 function boxBlurCanvas(canvas, radius) {
   const w = canvas.width, h = canvas.height;
   if (w < 2 || h < 2) return;
@@ -642,97 +624,7 @@ function getFilteredBg(W, H) {
 
 function invalidateBgCache() { _bgCache = { key: '', imgVersion: -1, canvas: null }; }
 
-/* ============================================================
-   ⭐ DYNAMIC KARAOKE LYRICS RENDERER
-   ============================================================ */
-function renderKaraoke(ctx, line, currentTime, cardX, cardY, cardW, cardH, padX, padY, gap, s) {
-  const words = line.text.split(/\s+/).filter(w => w.length > 0);
-  if (words.length === 0) return;
-
-  const elapsed = currentTime - line.start;
-  const wordDur = line.duration / words.length;
-  let activeWordIdx = Math.floor(elapsed / wordDur);
-  activeWordIdx = Math.max(0, Math.min(words.length - 1, activeWordIdx));
-
-  // ✅ كشف تغيير الكلمة → أنيميشن
-  if (activeWordIdx !== _wordAnim.lastWordIdx) {
-    _wordAnim.lastWordIdx = activeWordIdx;
-    _wordAnim.startTime = performance.now();
-  }
-
-  const fontSize = state.font.size * s * state.card.scale;
-  const font = '"' + state.font.family + '", "Cairo", "Inter", sans-serif';
-  const spaceW = WORD_SPACING * s;
-
-  ctx.save();
-  ctx.font = '700 ' + fontSize + 'px ' + font;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-
-  const widths = words.map(w => ctx.measureText(w).width);
-
-  // ✅ محاذاة يسارية: النص يبدأ من cardX + padX
-  const startX = cardX + padX;
-
-  // مركز عمودي للكلمات
-  const footerH = 20 * s;
-  const div1Y = cardY + padY + state.card.coverSize * s * state.card.scale + gap;
-  const div2Y = cardY + cardH - padY - footerH - gap;
-  const lyricsCenterY = (div1Y + div2Y) / 2;
-
-  let x = startX;
-  const animElapsed = performance.now() - _wordAnim.startTime;
-  const wordAnimP = Math.min(1, animElapsed / WORD_ANIM_MS);
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const wW = widths[i];
-    let opacity = 1, scale = 1, glowBlur = 0, glowColor = null;
-
-    if (i < activeWordIdx) {
-      // ✅ كلمة سابقة — كاملة الوضوح
-      opacity = 1;
-    } else if (i === activeWordIdx) {
-      // ✅ كلمة نشطة — مع أنيميشن
-      const animP = wordAnimP;
-      const easeOut = 1 - Math.pow(1 - animP, 3);
-      opacity = 1;
-      scale = 0.85 + easeOut * 0.15;
-      glowBlur = 22 * s * (0.4 + 0.6 * Math.sin(performance.now() / 220));
-      glowColor = state.font.color;
-    } else {
-      // ✅ كلمة قادمة — شفافة
-      opacity = 0.22;
-    }
-
-    ctx.save();
-    ctx.globalAlpha = opacity;
-
-    if (scale !== 1) {
-      const cx = x + wW / 2;
-      ctx.translate(cx, lyricsCenterY);
-      ctx.scale(scale, scale);
-      ctx.translate(-cx, -lyricsCenterY);
-    }
-
-    if (glowColor) {
-      ctx.shadowColor = glowColor;
-      ctx.shadowBlur = glowBlur;
-    } else {
-      ctx.shadowColor = 'rgba(0,0,0,0.55)';
-      ctx.shadowBlur = 12 * s;
-    }
-
-    ctx.fillStyle = state.font.color;
-    ctx.fillText(word, x, lyricsCenterY);
-    ctx.restore();
-
-    x += wW + spaceW;
-  }
-  ctx.restore();
-}
-
-/* ===== DRAW FRAME ===== */
+/* ===== DRAW FRAME — Spotify Style Lyrics ===== */
 function drawFrame(ctx, W, H, t) {
   const s = W / DESIGN_W;
   ctx.fillStyle = '#000';
@@ -750,7 +642,6 @@ function drawFrame(ctx, W, H, t) {
   const cardY = (H - cardH) / 2;
   const radius = state.card.radius * s;
 
-  // Glass inside card
   if (state.bgImg) {
     const filtered = getFilteredBg(W, H);
     if (filtered) {
@@ -763,14 +654,12 @@ function drawFrame(ctx, W, H, t) {
     }
   }
 
-  // Tint
   ctx.save();
   ctx.fillStyle = 'rgba(15,15,15,' + state.card.opacity + ')';
   roundRect(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.fill();
   ctx.restore();
 
-  // Border
   ctx.save();
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
   ctx.lineWidth = 1 * s;
@@ -825,13 +714,26 @@ function drawFrame(ctx, W, H, t) {
   const footerH = 20 * s;
   const div2Y = cardY + cardH - padY - footerH - gap;
 
-  // ✅ الكلمات
+  // ✅ Spotify-style lyrics
   const idx = findActiveLyric(t);
-  let prev = '', next = '';
+  let prev = '', curr = '', next = '';
   if (idx >= 0) {
     prev = idx > 0 ? (state.lyrics[idx - 1].text || '') : '';
+    curr = state.lyrics[idx].text || '...';
     next = idx < state.lyrics.length - 1 ? (state.lyrics[idx + 1].text || '') : '';
+  } else if (state.lyrics.length > 0) {
+    curr = state.lyrics[0].text || '...';
+    next = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
   }
+
+  // ✅ أنيميشن تغيير السطر
+  if (idx !== _lyricAnim.lastIdx) {
+    _lyricAnim.lastIdx = idx;
+    _lyricAnim.startTime = performance.now();
+  }
+  const animElapsed = performance.now() - _lyricAnim.startTime;
+  const animP = Math.min(1, animElapsed / LYRIC_ANIM_MS);
+  const easeOut = 1 - Math.pow(1 - animP, 3);
 
   const fontSize = state.font.size * s * state.card.scale;
   const smallSize = 15 * s * state.card.scale;
@@ -842,7 +744,7 @@ function drawFrame(ctx, W, H, t) {
   // سطر سابق
   if (prev) {
     ctx.save();
-    ctx.globalAlpha = 0.35;
+    ctx.globalAlpha = 0.4;
     ctx.fillStyle = '#fff';
     ctx.font = '500 ' + smallSize + 'px ' + font;
     ctx.textAlign = 'center';
@@ -851,20 +753,29 @@ function drawFrame(ctx, W, H, t) {
     ctx.restore();
   }
 
-  // ✅ السطر الحالي — تأثير الكاريوكي
-  if (idx >= 0 && state.lyrics[idx]) {
-    const lineElapsed = t - state.lyrics[idx].start;
-    if (lineElapsed >= 0) {
-      renderKaraoke(ctx, state.lyrics[idx], t, cardX, cardY, cardW, cardH, padX, padY, gap, s);
-    }
-  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
-    renderKaraoke(ctx, state.lyrics[0], t, cardX, cardY, cardW, cardH, padX, padY, gap, s);
+  // ✅ السطر الحالي مع أنيميشن ناعم
+  if (curr) {
+    ctx.save();
+    const slideY = (1 - easeOut) * 10 * s;
+    const scaleAmt = 0.96 + easeOut * 0.04;
+    ctx.globalAlpha = Math.max(0.3, easeOut);
+    ctx.translate(cx, lyricsCenterY + slideY);
+    ctx.scale(scaleAmt, scaleAmt);
+    ctx.translate(-cx, -(lyricsCenterY + slideY));
+    ctx.fillStyle = state.font.color;
+    ctx.font = '700 ' + fontSize + 'px ' + font;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 20 * s;
+    ctx.fillText(curr, cx, lyricsCenterY);
+    ctx.restore();
   }
 
   // سطر قادم
   if (next) {
     ctx.save();
-    ctx.globalAlpha = 0.35;
+    ctx.globalAlpha = 0.4;
     ctx.fillStyle = '#fff';
     ctx.font = '500 ' + smallSize + 'px ' + font;
     ctx.textAlign = 'center';
@@ -1164,43 +1075,43 @@ function clearSelection() {
   hideCapcutMenu();
 }
 
-/* ===== RESIZE ===== */
+/* ===== RESIZE (text) ===== */
 function startResize(e, index, side) {
   e.preventDefault(); e.stopPropagation();
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const l = state.lyrics[index];
   _resize = { index, side, startX: cx, startStart: l.start, startDur: l.duration };
+  let raf = null;
 
-  function move(ev) { onResizeMove(ev); }
+  function move(ev) {
+    ev.preventDefault();
+    const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    const dx = (mx - _resize.startX) / PX_PER_SEC;
+    const l2 = state.lyrics[_resize.index];
+    if (_resize.side === 'right') {
+      l2.duration = Math.max(0.5, _resize.startDur + dx);
+    } else {
+      const ns = Math.max(0, _resize.startStart + dx);
+      const diff = ns - _resize.startStart;
+      l2.start = round1(ns);
+      l2.duration = Math.max(0.5, _resize.startDur - diff);
+    }
+    if (!raf) raf = requestAnimationFrame(() => { raf = null; renderTimeline(); });
+  }
+
   function end() {
     document.removeEventListener('mousemove', move);
     document.removeEventListener('mouseup', end);
     document.removeEventListener('touchmove', move);
     document.removeEventListener('touchend', end);
     _resize = null;
+    if (raf) cancelAnimationFrame(raf);
     renderRuler(); renderTimeline();
   }
   document.addEventListener('mousemove', move);
   document.addEventListener('mouseup', end);
   document.addEventListener('touchmove', move, { passive: false });
   document.addEventListener('touchend', end);
-}
-
-function onResizeMove(e) {
-  if (!_resize) return;
-  e.preventDefault();
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const dx = (cx - _resize.startX) / PX_PER_SEC;
-  const l = state.lyrics[_resize.index];
-  if (_resize.side === 'right') {
-    l.duration = Math.max(0.5, _resize.startDur + dx);
-  } else {
-    const ns = Math.max(0, _resize.startStart + dx);
-    const diff = ns - _resize.startStart;
-    l.start = round1(ns);
-    l.duration = Math.max(0.5, _resize.startDur - diff);
-  }
-  renderTimeline();
 }
 
 function startLongPress(e, index, segEl) {
@@ -1221,17 +1132,19 @@ function startLongPress(e, index, segEl) {
 
     const startStart = state.lyrics[index].start;
     const startX = cx;
+    let raf = null;
     function move(ev) {
       const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
       const dx = (mx - startX) / PX_PER_SEC;
       state.lyrics[index].start = round1(Math.max(0, startStart + dx));
-      renderTimeline();
+      if (!raf) raf = requestAnimationFrame(() => { raf = null; renderTimeline(); });
     }
     function end() {
       document.removeEventListener('mousemove', move);
       document.removeEventListener('mouseup', end);
       document.removeEventListener('touchmove', move);
       document.removeEventListener('touchend', end);
+      if (raf) cancelAnimationFrame(raf);
       renderRuler();
     }
     document.addEventListener('mousemove', move);
@@ -1306,20 +1219,98 @@ function setupTimelineClick() {
   });
 }
 
-/* ===== AUDIO SEGMENT (drag + resize) ===== */
+/* ============================================================
+   ⭐ AUDIO SEGMENT — Tap = select, Long-press = drag
+   Handles are separate (always trim)
+   ============================================================ */
 function bindAudioSegment() {
   const seg = $('audioSegment');
 
-  // ✅ سحب الكتلة كاملة
-  seg.addEventListener('mousedown', e => {
-    if (e.target.classList.contains('seg-handle')) return;
-    startAudioDrag(e);
-  });
-  seg.addEventListener('touchstart', e => {
-    if (e.target.classList.contains('seg-handle')) return;
-    startAudioDrag(e);
-  }, { passive: false });
+  // ===== Drag logic (long press) =====
+  let lpTimer = null;
+  let dragging = false;
+  let startX = 0;
+  let snapStart = 0;
+  let snapWidth = 0;
+  let moved = false;
+  let rafId = null;
 
+  function onDown(e) {
+    if (e.target.classList.contains('seg-handle')) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    startX = cx;
+    snapStart = state.audioStart;
+    snapWidth = state.audioEnd - state.audioStart;
+    moved = false;
+    dragging = false;
+
+    // Select immediately (shows handles)
+    state.selected = { type: 'audio', index: -1 };
+    renderTimeline();
+    showCapcutMenu();
+
+    // Long-press → enter drag mode
+    lpTimer = setTimeout(() => {
+      dragging = true;
+      seg.classList.add('dragging');
+      if (navigator.vibrate) try { navigator.vibrate(15); } catch(e) {}
+    }, LONG_PRESS_MS);
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+  }
+
+  function onMove(e) {
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const dx = (cx - startX) / PX_PER_SEC;
+
+    // If not yet in drag mode and moved → cancel long press
+    if (!dragging) {
+      if (Math.abs(dx) > 0.15) {
+        clearTimeout(lpTimer);
+      }
+      return;
+    }
+
+    e.preventDefault();
+    moved = true;
+    const newStart = Math.max(0, snapStart + dx);
+
+    // ✅ Smooth update via RAF
+    if (!rafId) {
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        state.audioStart = round1(newStart);
+        state.audioEnd = round1(newStart + snapWidth);
+        updateAudioSegmentUI();
+      });
+    }
+  }
+
+  function onEnd() {
+    clearTimeout(lpTimer);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (dragging) {
+      seg.classList.remove('dragging');
+      renderRuler();
+      updateTimeDisplay();
+    }
+    dragging = false;
+  }
+
+  seg.addEventListener('mousedown', onDown);
+  seg.addEventListener('touchstart', onDown, { passive: false });
+
+  // ===== Trim handles =====
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
   hL.addEventListener('mousedown', e => { state.selected = { type: 'audio', index: -1 }; startAudioResize(e, 'left'); });
@@ -1333,71 +1324,59 @@ function bindAudioSegment() {
   seg.appendChild(hR);
 }
 
-function startAudioDrag(e) {
-  e.preventDefault(); e.stopPropagation();
-  const startX = e.touches ? e.touches[0].clientX : e.clientX;
-  const snapStart = state.audioStart;
-  const width = state.audioEnd - state.audioStart;
-  let moved = false;
-  const seg = $('audioSegment');
-  seg.classList.add('dragging');
-
-  function move(ev) {
-    const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
-    const dx = (cx - startX) / PX_PER_SEC;
-    if (Math.abs(dx) > 0.05) moved = true;
-    const newStart = Math.max(0, snapStart + dx);
-    state.audioStart = round1(newStart);
-    state.audioEnd = round1(newStart + width);
-    updateAudioSegmentUI();
-  }
-
-  function end() {
-    document.removeEventListener('mousemove', move);
-    document.removeEventListener('mouseup', end);
-    document.removeEventListener('touchmove', move);
-    document.removeEventListener('touchend', end);
-    seg.classList.remove('dragging');
-    renderRuler(); updateTimeDisplay();
-    if (!moved) {
-      state.selected = { type: 'audio', index: -1 };
-      renderTimeline();
-      showCapcutMenu();
-    }
-  }
-  document.addEventListener('mousemove', move);
-  document.addEventListener('mouseup', end);
-  document.addEventListener('touchmove', move, { passive: false });
-  document.addEventListener('touchend', end);
-}
-
+// ✅ Smooth trim
 function startAudioResize(e, side) {
   e.preventDefault(); e.stopPropagation();
   const startX = e.touches ? e.touches[0].clientX : e.clientX;
-  const snap = { startStart: state.audioStart, startEnd: state.audioEnd, trimIn: state.trimIn, trimOut: state.trimOut };
+  const snap = {
+    startStart: state.audioStart,
+    startEnd: state.audioEnd,
+    trimIn: state.trimIn,
+    trimOut: state.trimOut
+  };
+  let rafId = null;
+  let pending = null;
 
   function move(ev) {
+    ev.preventDefault();
     const cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
     const dx = (cx - startX) / PX_PER_SEC;
+
     if (side === 'left') {
       let nt = snap.trimIn + dx;
       let ns = snap.startStart + dx;
       if (nt < 0) { ns -= nt; nt = 0; }
       if (nt > snap.trimOut - 0.5) { nt = snap.trimOut - 0.5; ns = snap.startStart + (nt - snap.trimIn); }
-      state.trimIn = round1(nt);
-      state.audioStart = round1(Math.max(0, ns));
-      state.audioEnd = snap.startEnd;
-      state.trimOut = snap.trimOut;
+      pending = {
+        trimIn: round1(nt),
+        audioStart: round1(Math.max(0, ns)),
+        audioEnd: snap.startEnd,
+        trimOut: snap.trimOut
+      };
     } else {
       let nt = snap.trimOut + dx;
       if (nt > state.duration) nt = state.duration;
       if (nt < snap.trimIn + 0.5) nt = snap.trimIn + 0.5;
-      state.trimOut = round1(nt);
-      state.audioEnd = round1(state.audioStart + (nt - state.trimIn));
-      state.audioStart = snap.startStart;
-      state.trimIn = snap.trimIn;
+      pending = {
+        trimOut: round1(nt),
+        audioEnd: round1(state.audioStart + (nt - state.trimIn)),
+        audioStart: snap.startStart,
+        trimIn: snap.trimIn
+      };
     }
-    updateAudioSegmentUI(); renderRuler();
+
+    // ✅ Smooth update via RAF
+    if (!rafId) {
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (!pending) return;
+        state.trimIn = pending.trimIn;
+        state.trimOut = pending.trimOut;
+        state.audioStart = pending.audioStart;
+        state.audioEnd = pending.audioEnd;
+        updateAudioSegmentUI();
+      });
+    }
   }
 
   function end() {
@@ -1405,8 +1384,19 @@ function startAudioResize(e, side) {
     document.removeEventListener('mouseup', end);
     document.removeEventListener('touchmove', move);
     document.removeEventListener('touchend', end);
+    if (rafId) cancelAnimationFrame(rafId);
+    // Apply final
+    if (pending) {
+      state.trimIn = pending.trimIn;
+      state.trimOut = pending.trimOut;
+      state.audioStart = pending.audioStart;
+      state.audioEnd = pending.audioEnd;
+      updateAudioSegmentUI();
+    }
+    renderRuler();
     updateTimeDisplay();
   }
+
   document.addEventListener('mousemove', move);
   document.addEventListener('mouseup', end);
   document.addEventListener('touchmove', move, { passive: false });
@@ -1745,7 +1735,6 @@ async function startExport() {
       throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
     }
 
-    // ✅ HEARTBEAT — iPhone audio keep-alive
     heartbeat = setInterval(() => {
       if (player.paused && !player.ended) player.play().catch(() => {});
       if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume().catch(() => {});
@@ -1756,7 +1745,6 @@ async function startExport() {
       function render() {
         const audioT = player.currentTime;
 
-        // ✅ توقف عند trimOut — قص فعلي
         if (audioT >= state.trimOut - 0.02 || player.ended) {
           if (recorder && recorder.state !== 'inactive') {
             try { recorder.stop(); } catch(e) {}
