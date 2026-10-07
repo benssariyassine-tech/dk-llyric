@@ -19,7 +19,7 @@
     </button>
     <div class="etb-title-wrap"><span class="etb-title">مشروع جديد</span></div>
     <span class="etb-badge">HD</span>
-    <button class="etb-export" onclick="exportVideo()">حفظ</button>
+ <button class="etb-export" onclick="openExportModal()">حفظ</button>
   </header>
 
   <!-- 🎬 PREVIEW -->
@@ -345,7 +345,51 @@
       <span>حذف</span>
     </button>
   </div>
+<!-- ============================================
+       🎬 EXPORT MODAL
+       ============================================ -->
+  <div id="exportModal" class="export-modal">
+    <div class="export-backdrop" onclick="closeExportModal()"></div>
+    <div class="export-box">
+      <button class="export-close" onclick="closeExportModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
 
+      <h3 class="export-title">تصدير الفيديو</h3>
+      <p class="export-subtitle">اختر الإعدادات وحمّل الفيديو</p>
+
+      <div class="export-group">
+        <label class="export-label">الجودة</label>
+        <div class="export-options" id="exportQuality">
+          <button class="export-opt" data-value="720">720p</button>
+          <button class="export-opt active" data-value="1080">1080p</button>
+        </div>
+      </div>
+
+      <div class="export-group">
+        <label class="export-label">FPS</label>
+        <div class="export-options" id="exportFps">
+          <button class="export-opt" data-value="24">24</button>
+          <button class="export-opt active" data-value="30">30</button>
+          <button class="export-opt" data-value="60">60</button>
+        </div>
+      </div>
+
+      <div class="export-progress" id="exportProgress" style="display:none;">
+        <div class="export-progress-bar">
+          <div class="export-progress-fill" id="exportProgressFill"></div>
+        </div>
+        <div class="export-progress-text" id="exportProgressText">0%</div>
+      </div>
+
+      <button class="export-btn" id="exportStartBtn" onclick="startVideoExport()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>حمّل الفيديو</span>
+      </button>
+
+      <p class="export-note">قد يأخذ التحميل بعض الوقت حسب طول الأغنية</p>
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
