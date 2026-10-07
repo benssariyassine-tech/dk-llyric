@@ -37,6 +37,8 @@ let _lastRAFTime = 0;
 let _resize = null;
 let _move = null;
 let _longPressTimer = null;
+let _autoScrollPausedUntil = 0;
+let _userTouchingTimeline = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initAudioUpload();
