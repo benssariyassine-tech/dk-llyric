@@ -1104,7 +1104,7 @@ function renderLyricFromPlayhead(idx) {
     }
 if (prevEl) prevEl.textContent = '';
     if (nextEl) nextEl.textContent = '';
-    currEl.textContent = '';
+    currEl.textContent = '...';
     currEl.style.opacity = '0.3';
     return;
   }
