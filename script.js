@@ -17,10 +17,11 @@ const state = {
   bgEnd: 15,
   currentTime: 0,
   isPlaying: false,
-  songName: '',
+songName: '',
   artistName: '',
   igName: 'dk.llyric',
   bgUrl: null,
+  coverUrl: null,
   lyrics: [
     { text: '', start: 0, duration: 4, glass: false },
     { text: '', start: 5, duration: 3, glass: false }
