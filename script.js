@@ -1,7 +1,7 @@
 /* ============================================
-   dk.llyric Editor — Part 1/3
-   Constants + State + Init + Helpers + Tabs + Audio + Lyrics
+   dk.llyric Editor — Complete Clean File
    ============================================ */
+
 const PX_PER_SEC = 30;
 const LONG_PRESS_MS = 1000;
 const MIN_TIMELINE_SEC = 15;
@@ -30,14 +30,7 @@ const state = {
   selectedIndex: -1,
   activeSegment: -1,
   font: { family: 'Cairo', size: 20, weight: 700, color: '#ffffff' },
-  bgFilters: {
-    blur: 0,
-    brightness: 100,
-    saturation: 100,
-    contrast: 100,
-    opacity: 100,
-    hue: 0
-  }
+  bgFilters: { blur: 0, brightness: 100, saturation: 100, contrast: 100, opacity: 100, hue: 0 }
 };
 
 let currentTab = null;
@@ -81,36 +74,17 @@ function renderAll() {
   renderLyricsList();
 }
 
-/* ============================================
-   Card Entry Animation
-   ============================================ */
 function playCardAnimation() {
   const card = document.getElementById('mainCard');
   const header = document.querySelector('.card-header');
   const lyrics = document.querySelector('.card-lyrics');
   const footer = document.querySelector('.card-footer');
   if (!card) return;
-
-  if (header) {
-    header.style.opacity = '0';
-    header.style.transition = 'opacity 0.6s ease';
-    setTimeout(() => { header.style.opacity = '1'; }, 400);
-  }
-  if (lyrics) {
-    lyrics.style.opacity = '0';
-    lyrics.style.transition = 'opacity 0.6s ease';
-    setTimeout(() => { lyrics.style.opacity = '1'; }, 700);
-  }
-  if (footer) {
-    footer.style.opacity = '0';
-    footer.style.transition = 'opacity 0.6s ease';
-    setTimeout(() => { footer.style.opacity = '1'; }, 1000);
-  }
+  if (header) { header.style.opacity = '0'; header.style.transition = 'opacity 0.6s ease'; setTimeout(() => { header.style.opacity = '1'; }, 400); }
+  if (lyrics) { lyrics.style.opacity = '0'; lyrics.style.transition = 'opacity 0.6s ease'; setTimeout(() => { lyrics.style.opacity = '1'; }, 700); }
+  if (footer) { footer.style.opacity = '0'; footer.style.transition = 'opacity 0.6s ease'; setTimeout(() => { footer.style.opacity = '1'; }, 1000); }
 }
 
-/* ============================================
-   Card Controls
-   ============================================ */
 function initCardControls() {
   const scaleRange = document.getElementById('cardScaleRange');
   const scaleVal = document.getElementById('cardScaleVal');
@@ -121,7 +95,6 @@ function initCardControls() {
       if (scaleVal) scaleVal.textContent = v.toFixed(2);
     });
   }
-
   const opRange = document.getElementById('cardOpacityRange');
   const opVal = document.getElementById('cardOpacityVal');
   if (opRange) {
@@ -131,7 +104,6 @@ function initCardControls() {
       if (opVal) opVal.textContent = v;
     });
   }
-
   const rRange = document.getElementById('cardRadiusRange');
   const rVal = document.getElementById('cardRadiusVal');
   if (rRange) {
@@ -141,7 +113,6 @@ function initCardControls() {
       if (rVal) rVal.textContent = v;
     });
   }
-
   const cRange = document.getElementById('coverSizeRange');
   const cVal = document.getElementById('coverSizeVal');
   if (cRange) {
@@ -151,23 +122,19 @@ function initCardControls() {
       if (cVal) cVal.textContent = v;
     });
   }
-
   initCardPinch();
 }
 
 function initCardPinch() {
   const card = document.getElementById('mainCard');
   if (!card) return;
-
   let startDist = 0;
   let startScale = 1;
-
   const getDist = (touches) => {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.hypot(dx, dy);
   };
-
   card.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
       startDist = getDist(e.touches);
@@ -175,12 +142,11 @@ function initCardPinch() {
       e.preventDefault();
     }
   }, { passive: false });
-
   card.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2 && startDist > 0) {
       const dist = getDist(e.touches);
       const ratio = dist / startDist;
-      let newScale = Math.max(0.5, Math.min(1.5, startScale * ratio));
+      const newScale = Math.max(0.5, Math.min(1.5, startScale * ratio));
       document.documentElement.style.setProperty('--card-scale', newScale.toFixed(2));
       const range = document.getElementById('cardScaleRange');
       const val = document.getElementById('cardScaleVal');
@@ -189,30 +155,13 @@ function initCardPinch() {
       e.preventDefault();
     }
   }, { passive: false });
-
-  card.addEventListener('touchend', () => {
-    startDist = 0;
-  });
+  card.addEventListener('touchend', () => { startDist = 0; });
 }
 
-/* ============================================
-   Helpers
-   ============================================ */
-function hasAudio() {
-  return state.audioUrl && state.audioDuration > 0;
-}
+function hasAudio() { return state.audioUrl && state.audioDuration > 0; }
+function timelineToFile(timelineSec) { return state.audioTrimIn + (timelineSec - state.audioStart); }
+function fileToTimeline(fileSec) { return state.audioStart + (fileSec - state.audioTrimIn); }
 
-function timelineToFile(timelineSec) {
-  return state.audioTrimIn + (timelineSec - state.audioStart);
-}
-
-function fileToTimeline(fileSec) {
-  return state.audioStart + (fileSec - state.audioTrimIn);
-}
-
-/* ============================================
-   Tabs
-   ============================================ */
 function openTab(tabName, btnEl) {
   if (currentTab === tabName) { closeSheet(); return; }
   currentTab = tabName;
@@ -237,9 +186,6 @@ function closeSheet() {
   if (sb) sb.classList.remove('open');
 }
 
-/* ============================================
-   Audio Upload
-   ============================================ */
 function initAudioUpload() {
   const input = document.getElementById('audioInput');
   if (!input) return;
@@ -296,44 +242,25 @@ function removeAudio() {
   setPlayheadPosition(0);
 }
 
-function openAudioPicker() {
-  document.getElementById('audioInput').click();
-}
+function openAudioPicker() { document.getElementById('audioInput').click(); }
 
-/* ✅ مصحّح: state.selectedType = 'audio' قبل startResize */
 function initAudioSegmentListeners() {
   const audioSeg = document.getElementById('audioSegment');
   if (!audioSeg) return;
-
   audioSeg.addEventListener('click', (e) => {
     if (e.target.classList.contains('seg-handle')) return;
     selectAudio();
   });
-
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
-  hL.addEventListener('mousedown', (e) => {
-    state.selectedType = 'audio';
-    startResize(e, 0, 'left');
-  });
-  hL.addEventListener('touchstart', (e) => {
-    state.selectedType = 'audio';
-    startResize(e, 0, 'left');
-  }, { passive: false });
+  hL.addEventListener('mousedown', (e) => { state.selectedType = 'audio'; startResize(e, 0, 'left'); });
+  hL.addEventListener('touchstart', (e) => { state.selectedType = 'audio'; startResize(e, 0, 'left'); }, { passive: false });
   audioSeg.appendChild(hL);
-
   const hR = document.createElement('div');
   hR.className = 'seg-handle handle-right';
-  hR.addEventListener('mousedown', (e) => {
-    state.selectedType = 'audio';
-    startResize(e, 0, 'right');
-  });
-  hR.addEventListener('touchstart', (e) => {
-    state.selectedType = 'audio';
-    startResize(e, 0, 'right');
-  }, { passive: false });
+  hR.addEventListener('mousedown', (e) => { state.selectedType = 'audio'; startResize(e, 0, 'right'); });
+  hR.addEventListener('touchstart', (e) => { state.selectedType = 'audio'; startResize(e, 0, 'right'); }, { passive: false });
   audioSeg.appendChild(hR);
-
   const lp = (e) => {
     if (e.target.classList.contains('seg-handle')) return;
     startLongPressAudio(e, audioSeg);
@@ -342,9 +269,6 @@ function initAudioSegmentListeners() {
   audioSeg.addEventListener('touchstart', lp, { passive: true });
 }
 
-/* ============================================
-   Lyrics List
-   ============================================ */
 function addLyricLine() {
   const startAt = Math.round(state.currentTime * 10) / 10;
   state.lyrics.push({ text: '', start: startAt, duration: 3, glass: false });
@@ -358,8 +282,9 @@ function removeLyricLine(index) {
 }
 
 function updateLyricText(index, text) {
-  state.lyrics[index].text = text;
+ (row state.lyrics[index].text = text;
   renderTimeline();
+);
   if (index === state.activeSegment) renderLyricFromPlayhead(index);
 }
 
@@ -382,19 +307,12 @@ function renderLyricsList() {
     btn.onclick = () => removeLyricLine(index);
     row.appendChild(inp);
     row.appendChild(btn);
-    container.appendChild(row);
-  });
+    container.appendChild  });
 }
-/* ============================================
-   dk.llyric Editor — Part 2/3
-   Timeline + Selection + Menu + Resize + Long Press
-   ============================================ */
 
 function getTimelineDuration() {
   const lastLyricEnd = state.lyrics.reduce((m, l) => Math.max(m, l.start + l.duration), 0);
-  if (hasAudio()) {
-    return Math.max(state.audioEnd, lastLyricEnd, MIN_TIMELINE_SEC);
-  }
+  if (hasAudio()) return Math.max(state.audioEnd, lastLyricEnd, MIN_TIMELINE_SEC);
   return Math.max(lastLyricEnd, MIN_TIMELINE_SEC);
 }
 
@@ -419,61 +337,51 @@ function renderTimeline() {
   const total = getTimelineDuration();
   trackText.innerHTML = '';
   trackText.style.width = (total * PX_PER_SEC) + 'px';
-
-  state.lyrics.forEach((lyric, index) => {
+  state.lyrics.forEach((lyric, index)rics => {
     const seg = document.createElement('div');
-    seg.className = 'text-segment';
-    if (state.selectedType === 'text' && state.selectedIndex === index) seg.classList.add('selected');
-    if (lyric.glass) seg.classList.add('glass');
-    seg.style.left = (lyric.start * PX_PER_SEC) + 'px';
+.s    seg.className = 'text-segmentplice';
+    if ((statestate.selectedType === 'text' && state.selectedIndex === index.selected) seg.classList.add('selected');
+    if (lyIndexric.glass) seg.classList.add('glass');
+    + seg.style.left = (lyric.start * PX _PER_SEC) + 'px';
     seg.style.width = (lyric.duration * PX_PER_SEC) + 'px';
     seg.textContent = lyric.text || ('السطر ' + (index + 1));
     seg.dataset.index = index;
-
     const hL = document.createElement('div');
     hL.className = 'seg-handle handle-left';
     hL.addEventListener('mousedown', e => startResize(e, index, 'left'));
     hL.addEventListener('touchstart', e => startResize(e, index, 'left'), { passive: false });
     seg.appendChild(hL);
-
     const hR = document.createElement('div');
     hR.className = 'seg-handle handle-right';
     hR.addEventListener('mousedown', e => startResize(e, index, 'right'));
     hR.addEventListener('touchstart', e => startResize(e, index, 'right'), { passive: false });
     seg.appendChild(hR);
-
     seg.addEventListener('click', (e) => {
       if (e.target.classList.contains('seg-handle')) return;
       selectText(index);
     });
-
     seg.addEventListener('mousedown', e => {
       if (e.target.classList.contains('seg-handle')) return;
       startLongPressText(e, index, seg);
     });
     seg.addEventListener('touchstart', e => {
       if (e.target.classList.contains('seg-handle')) return;
-      startLong }
-PressText(e, index, seg);
-    }, {      passive: true });
-
-    trackText.appendChild(seg }
-);
+      startLongPressText(e, index, seg);
+    }, { passive: true });
+    trackText.appendChild(seg);
   });
-
-  setTimeout(checkAllTextOverl   aps, 10);
+  setTimeout(checkAllTextOverlaps, 10);
 }
 
-function selectText(index }
-) {
+1function selectText(index) {
   state.selectedType = 'text';
-  state.selected   Index = index;
+,  state.selectedIndex = index;
   renderTimeline();
-  hide showCapcutMenu('text');
-  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+   showCapcutMenu('text');
+  if (navigator0.vibrate) try { navigator.vibrate(,10); } catch (e) {}
 }
 
-function selectAudio() {
+function new selectAudio() {
   state.selectedType = 'audio';
   state.selectedIndex = -1;
   renderTimeline();
@@ -502,7 +410,6 @@ function showCapcutMenu(type) {
   if (!menu) return;
   menu.classList.add('open');
   document.body.classList.add('menu-open');
-
   if (type === 'bg' || type === 'audio') {
     menu.querySelectorAll('.cm-item').forEach(function(item) {
       const svg = item.querySelector('svg');
@@ -516,7 +423,6 @@ function showCapcutMenu(type) {
     });
     return;
   }
-
   menu.querySelectorAll('.cm-item').forEach(item => item.style.display = '');
 }
 
@@ -535,13 +441,8 @@ function cmAction(action) {
   } else if (action === 'copy' || action === 'duplicate') {
     if (state.selectedType === 'text') {
       const src = state.lyrics[state.selectedIndex];
-      const newLine = {
-        text: src.text,
-        start: src.start + src.duration,
-        duration: src.duration,
-        glass: src.glass
-      };
-      state.lyrics.splice(state.selectedIndex + 1, 0, newLine);
+      const newLine = { text: src.text, start: src.start + src.duration, duration: src.duration, glass: src.glass };
+      state.lyLine);
       renderAll();
     }
     hideCapcutMenu();
@@ -557,7 +458,6 @@ function cmAction(action) {
     openTab('text', document.querySelector('.editor-nav-item[data-tab="text"]'));
   } else if (action === 'split') {
     const curT = state.currentTime;
-
     if (state.selectedType === 'text') {
       const idx = state.selectedIndex;
       const l = state.lyrics[idx];
@@ -568,7 +468,6 @@ function cmAction(action) {
         renderAll();
       }
     }
-
     if (state.selectedType === 'audio') {
       if (hasAudio() && curT > state.audioStart && curT < state.audioEnd) {
         const fileAtCursor = timelineToFile(curT);
@@ -579,7 +478,10 @@ function cmAction(action) {
         if (state.currentTime > state.audioEnd) {
           state.currentTime = state.audioEnd;
           setPlayheadPosition(state.currentTime);
-       CapcutMenu();
+        }
+      }
+    }
+    hideCapcutMenu();
   }
 }
 
@@ -587,12 +489,8 @@ function startResize(e, index, side) {
   e.preventDefault();
   e.stopPropagation();
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
-
   _resize = {
-    active: true,
-    index: index,
-    side: side,
-    startX: cx,
+    active: true, index: index, side: side, startX: cx,
     isAudio: state.selectedType === 'audio',
     isBg: state.selectedType === 'bg',
     startDur: state.selectedType === 'bg' ? state.bgEnd : (state.lyrics[index] ? state.lyrics[index].duration : 0),
@@ -602,7 +500,6 @@ function startResize(e, index, side) {
     startTrimIn: state.audioTrimIn,
     startTrimOut: state.audioTrimOut
   };
-
   if (e.touches) {
     document.addEventListener('touchmove', onResizeMove, { passive: false });
     document.addEventListener('touchend', onResizeEnd);
@@ -612,7 +509,6 @@ function startResize(e, index, side) {
   }
 }
 
-/* ✅ مصحّح — كان فيه تخربقة وسط الدالة */
 function onResizeMove(e) {
   if (!_resize || !_resize.active) return;
   e.preventDefault();
@@ -636,10 +532,7 @@ function onResizeMove(e) {
     if (_resize.side === 'left') {
       let newTrimIn = _resize.startTrimIn + deltaSec;
       let newBlockStart = _resize.startBlockStart + deltaSec;
-      if (newTrimIn < 0) {
-        newBlockStart -= newTrimIn;
-        newTrimIn = 0;
-      }
+      if (newTrimIn < 0) { newBlockStart -= newTrimIn; newTrimIn = 0; }
       if (newTrimIn > _resize.startTrimOut - 0.5) {
         newTrimIn = _resize.startTrimOut - 0.5;
         newBlockStart = _resize.startBlockStart + (newTrimIn - _resize.startTrimIn);
@@ -666,24 +559,20 @@ function onResizeMove(e) {
     const idx = _resize.index;
     let newStart = _resize.startStart;
     let newDuration = _resize.startDur;
-
     if (_resize.side === 'right') {
       newDuration = Math.max(0.5, Math.min(300, _resize.startDur + deltaSec));
     } else {
       newStart = Math.max(0, _resize.startStart + deltaSec);
       newDuration = Math.max(0.5, _resize.startDur - deltaSec);
     }
-
     state.lyrics[idx].start = Math.round(newStart * 10) / 10;
     state.lyrics[idx].duration = Math.round(newDuration * 10) / 10;
-
     const segs = document.querySelectorAll('.text-segment');
     const seg = segs[idx];
     if (seg) {
       seg.style.left = (state.lyrics[idx].start * PX_PER_SEC) + 'px';
       seg.style.width = (state.lyrics[idx].duration * PX_PER_SEC) + 'px';
     }
-
     checkTextOverlap();
   }
 }
@@ -697,19 +586,13 @@ function onResizeEnd() {
   document.removeEventListener('mouseup', onResizeEnd);
   document.removeEventListener('touchmove', onResizeMove);
   document.removeEventListener('touchend', onResizeEnd);
-
-  if (wasText) {
-    renderRuler();
-    setTimeout(checkAllTextOverlaps, 20);
-  } else {
-    renderRuler();
-  }
+  renderRuler();
+  if (wasText) setTimeout(checkAllTextOverlaps, 20);
 }
 
 function checkTextOverlap() {
   const segs = document.querySelectorAll('.text-segment');
   segs.forEach(s => s.classList.remove('overlap'));
-
   for (let i = 0; i < state.lyrics.length; i++) {
     const a = state.lyrics[i];
     const aS = a.start;
@@ -726,15 +609,12 @@ function checkTextOverlap() {
   }
 }
 
-function checkAllTextOverlaps() {
-  checkTextOverlap();
-}
+function checkAllTextOverlaps() { checkTextOverlap(); }
 
 function startLongPressText(e, index, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
   let cancelled = false;
-
   const cancelIfMove = (ev) => {
     const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
     const my = ev.touches ? ev.touches[0].clientY : ev.clientY;
@@ -743,7 +623,6 @@ function startLongPressText(e, index, segEl) {
       clearTimeout(_longPressTimer);
     }
   };
-
   if (e.touches) {
     document.addEventListener('touchmove', cancelIfMove, { passive: true });
     document.addEventListener('touchend', () => { clearTimeout(_longPressTimer); }, { once: true });
@@ -751,22 +630,15 @@ function startLongPressText(e, index, segEl) {
     document.addEventListener('mousemove', cancelIfMove, { passive: true });
     document.addEventListener('mouseup', () => { clearTimeout(_longPressTimer); }, { once: true });
   }
-
   _longPressTimer = setTimeout(() => {
     if (cancelled) return;
     selectText(index);
     segEl.classList.add('moving');
     if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
-
     _move = {
-      active: true,
-      isAudio: false,
-      index: index,
-      startX: cx,
-      startStart: state.lyrics[index].start,
-      segEl: segEl
+      active: true, isAudio: false, index: index,
+      startX: cx, startStart: state.lyrics[index].start, segEl: segEl
     };
-
     const onMoveFn = (ev) => {
       if (!_move || !_move.active) return;
       const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
@@ -777,7 +649,6 @@ function startLongPressText(e, index, segEl) {
       _move.segEl.style.left = (state.lyrics[_move.index].start * PX_PER_SEC) + 'px';
       checkTextOverlap();
     };
-
     const onEndFn = () => {
       if (_move && _move.segEl) _move.segEl.classList.remove('moving');
       _move = null;
@@ -788,7 +659,6 @@ function startLongPressText(e, index, segEl) {
       renderRuler();
       setTimeout(checkAllTextOverlaps, 20);
     };
-
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
       document.addEventListener('touchend', onEndFn);
@@ -803,7 +673,6 @@ function startLongPressAudio(e, segEl) {
   const cx = e.touches ? e.touches[0].clientX : e.clientX;
   const cy = e.touches ? e.touches[0].clientY : e.clientY;
   let cancelled = false;
-
   const cancelIfMove = (ev) => {
     const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
     const my = ev.touches ? ev.touches[0].clientY : ev.clientY;
@@ -812,7 +681,6 @@ function startLongPressAudio(e, segEl) {
       clearTimeout(_longPressTimer);
     }
   };
-
   if (e.touches) {
     document.addEventListener('touchmove', cancelIfMove, { passive: true });
     document.addEventListener('touchend', () => { clearTimeout(_longPressTimer); }, { once: true });
@@ -820,24 +688,16 @@ function startLongPressAudio(e, segEl) {
     document.addEventListener('mousemove', cancelIfMove, { passive: true });
     document.addEventListener('mouseup', () => { clearTimeout(_longPressTimer); }, { once: true });
   }
-
   _longPressTimer = setTimeout(() => {
     if (cancelled) return;
     selectAudio();
     segEl.classList.add('moving');
     if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
-
     const blockWidth = state.audioEnd - state.audioStart;
-
     _move = {
-      active: true,
-      isAudio: true,
-      startX: cx,
-      startStart: state.audioStart,
-      width: blockWidth,
-      segEl: segEl
+      active: true, isAudio: true, startX: cx,
+      startStart: state.audioStart, width: blockWidth, segEl: segEl
     };
-
     const onMoveFn = (ev) => {
       if (!_move || !_move.active) return;
       const mx = ev.touches ? ev.touches[0].clientX : ev.clientX;
@@ -849,7 +709,6 @@ function startLongPressAudio(e, segEl) {
       _move.segEl.style.left = (state.audioStart * PX_PER_SEC) + 'px';
       _move.segEl.style.width = ((state.audioEnd - state.audioStart) * PX_PER_SEC) + 'px';
     };
-
     const onEndFn = () => {
       if (_move && _move.segEl) _move.segEl.classList.remove('moving');
       _move = null;
@@ -859,7 +718,6 @@ function startLongPressAudio(e, segEl) {
       document.removeEventListener('touchend', onEndFn);
       renderRuler();
     };
-
     if (e.touches) {
       document.addEventListener('touchmove', onMoveFn, { passive: false });
       document.addEventListener('touchend', onEndFn);
@@ -869,15 +727,7 @@ function startLongPressAudio(e, segEl) {
     }
   }, LONG_PRESS_MS);
 }
-     /* ============================================
-   dk.llyric Editor — Part 3/3
-   Playhead + Sync + Play/Pause + Font + Background
-   + Instagram + Cover + Canvas + Export
-   ============================================ */
 
-/* ============================================
-   Playhead
-   ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
@@ -894,15 +744,12 @@ function setupPlayheadDrag() {
   const vp = document.getElementById('timelineViewport');
   const content = document.getElementById('timelineContent');
   if (!ph || !vp || !content) return;
-
   let dragging = false;
-
   const pxToTime = (clientX) => {
     const rect = content.getBoundingClientRect();
     const x = clientX - rect.left;
     return Math.max(0, x / PX_PER_SEC);
   };
-
   const seekTo = (sec) => {
     const maxEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
     sec = Math.max(0, Math.min(sec, maxEnd));
@@ -914,14 +761,12 @@ function setupPlayheadDrag() {
     setPlayheadPosition(sec);
     syncPlayheadToLyric();
   };
-
   const onMove = (e) => {
     if (!dragging) return;
     e.preventDefault();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     seekTo(pxToTime(clientX));
   };
-
   const onUp = () => {
     dragging = false;
     document.removeEventListener('mousemove', onMove);
@@ -929,7 +774,6 @@ function setupPlayheadDrag() {
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onUp);
   };
-
   const onDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -941,13 +785,11 @@ function setupPlayheadDrag() {
     document.addEventListener('touchmove', onMove, { passive: false });
     document.addEventListener('touchend', onUp);
   };
-
   const cap = ph.querySelector('.playhead-cap');
   if (cap) {
     cap.addEventListener('mousedown', onDown);
     cap.addEventListener('touchstart', onDown, { passive: false });
   }
-
   const ruler = document.getElementById('timelineRuler');
   if (ruler) {
     const onRulerTouch = (e) => {
@@ -958,7 +800,6 @@ function setupPlayheadDrag() {
     ruler.addEventListener('mousedown', onRulerTouch);
     ruler.addEventListener('touchstart', onRulerTouch, { passive: true });
   }
-
   vp.addEventListener('click', (e) => {
     if (e.target.closest('.text-segment')) return;
     if (e.target.closest('.audio-segment')) return;
@@ -969,20 +810,17 @@ function setupPlayheadDrag() {
     if (e.target.closest('.audio-add-btn')) return;
     seekTo(pxToTime(e.clientX));
   });
-
   const pauseAutoScroll = () => { _userTouchingTimeline = true; };
   const resumeAutoScroll = () => {
     _userTouchingTimeline = false;
     _autoScrollPausedUntil = Date.now() + 3000;
   };
-
   vp.addEventListener('touchstart', pauseAutoScroll, { passive: true });
   vp.addEventListener('touchend', resumeAutoScroll, { passive: true });
   vp.addEventListener('touchcancel', resumeAutoScroll, { passive: true });
   vp.addEventListener('mousedown', pauseAutoScroll);
   vp.addEventListener('mouseup', resumeAutoScroll);
   vp.addEventListener('mouseleave', resumeAutoScroll);
-
   let scrollTimeout = null;
   vp.addEventListener('scroll', () => {
     if (scrollTimeout) clearTimeout(scrollTimeout);
@@ -995,20 +833,15 @@ function setupPlayheadDrag() {
 function startPlayheadLoop() {
   if (_playheadRAF) cancelAnimationFrame(_playheadRAF);
   _lastRAFTime = performance.now();
-
   const tick = (now) => {
     const dt = (now - _lastRAFTime) / 1000;
     _lastRAFTime = now;
-
     const player = document.getElementById('audioPlayer');
     const ph = document.getElementById('playhead');
     const isAudioActive = hasAudio();
-
     if (isAudioActive && player && !player.paused && !player.ended) {
       const fileTime = player.currentTime;
-      const timelineTime = fileToTimeline(fileTime);
-      state.currentTime = timelineTime;
-
+      state.currentTime = fileToTimeline(fileTime);
       if (fileTime >= state.audioTrimOut) {
         player.pause();
         state.currentTime = state.audioEnd;
@@ -1023,9 +856,7 @@ function startPlayheadLoop() {
     } else {
       state.currentTime += dt;
     }
-
     const maxEnd = isAudioActive ? state.audioEnd : getTimelineDuration();
-
     if (state.currentTime >= maxEnd) {
       state.currentTime = maxEnd;
       if (ph) ph.style.transform = 'translateX(' + (maxEnd * PX_PER_SEC) + 'px)';
@@ -1036,18 +867,12 @@ function startPlayheadLoop() {
       stopPlayheadLoop();
       return;
     }
-
     if (ph) ph.style.transform = 'translateX(' + (state.currentTime * PX_PER_SEC) + 'px)';
     updateTimeDisplay();
     syncPlayheadToLyric();
-
-    if (isAudioActive && player && !player.paused) {
-      autoScrollPlayhead();
-    }
-
+    if (isAudioActive && player && !player.paused) autoScrollPlayhead();
     _playheadRAF = requestAnimationFrame(tick);
   };
-
   _playheadRAF = requestAnimationFrame(tick);
 }
 
@@ -1061,33 +886,22 @@ function stopPlayheadLoop() {
 function autoScrollPlayhead() {
   if (_userTouchingTimeline) return;
   if (Date.now() < _autoScrollPausedUntil) return;
-
   const vp = document.getElementById('timelineViewport');
   if (!vp) return;
   const phX = state.currentTime * PX_PER_SEC;
   const scrollLeft = vp.scrollLeft;
   const viewportWidth = vp.clientWidth;
   const phScreenX = phX - scrollLeft;
-
-  if (phScreenX > viewportWidth - 100) {
-    vp.scrollLeft = phX - viewportWidth + 100;
-  } else if (phScreenX < 80) {
-    vp.scrollLeft = Math.max(0, phX - 80);
-  }
+  if (phScreenX > viewportWidth - 100) vp.scrollLeft = phX - viewportWidth + 100;
+  else if (phScreenX < 80) vp.scrollLeft = Math.max(0, phX - 80);
 }
 
-/* ============================================
-   Sync Lyric
-   ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
   let idx = -1;
   for (let i = 0; i < state.lyrics.length; i++) {
     const l = state.lyrics[i];
-    if (t >= l.start && t < l.start + l.duration) {
-      idx = i;
-      break;
-    }
+    if (t >= l.start && t < l.start + l.duration) { idx = i; break; }
   }
   if (idx !== state.activeSegment) {
     state.activeSegment = idx;
@@ -1100,7 +914,6 @@ function renderLyricFromPlayhead(idx) {
   const currEl = document.getElementById('lyricCurrent');
   const nextEl = document.getElementById('lyricNext');
   if (!currEl) return;
-
   if (idx < 0 || idx >= state.lyrics.length || !state.lyrics[idx]) {
     if (state.lyrics.length > 0 && state.lyrics[0].text) {
       if (prevEl) prevEl.textContent = '';
@@ -1118,39 +931,30 @@ function renderLyricFromPlayhead(idx) {
     currEl.style.opacity = '0.3';
     return;
   }
-
   currEl.style.opacity = '1';
   if (prevEl) prevEl.textContent = state.lyrics[idx - 1] ? (state.lyrics[idx - 1].text || '') : '';
   currEl.textContent = state.lyrics[idx].text || '';
   if (nextEl) nextEl.textContent = state.lyrics[idx + 1] ? (state.lyrics[idx + 1].text || '') : '';
-
   currEl.classList.remove('animate-in');
   void currEl.offsetWidth;
   currEl.classList.add('animate-in');
 }
 
-/* ============================================
-   Play / Pause
-   ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const isAudioActive = hasAudio();
   const maxEnd = isAudioActive ? state.audioEnd : getTimelineDuration();
-
   if (state.isPlaying) {
     if (player && isAudioActive) player.pause();
     state.isPlaying = false;
     stopPlayheadLoop();
   } else {
     let startAt = state.currentTime;
-
     if (isAudioActive && startAt < state.audioStart) startAt = state.audioStart;
     if (isAudioActive && startAt >= state.audioEnd - 0.05) startAt = state.audioStart;
     if (!isAudioActive && startAt >= maxEnd - 0.05) startAt = 0;
-
     state.currentTime = startAt;
     setPlayheadPosition(startAt);
-
     if (player && isAudioActive) {
       const fileStart = timelineToFile(startAt);
       try { player.currentTime = Math.max(0, fileStart); } catch (err) {}
@@ -1184,9 +988,6 @@ function fmt(s) {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 
-/* ============================================
-   Font
-   ============================================ */
 function setupFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1239,9 +1040,6 @@ function setFontFilter(filter, btnEl) {
   });
 }
 
-/* ============================================
-   Background
-   ============================================ */
 function initBgUpload() {
   const bgInput = document.getElementById('bgInput');
   if (!bgInput) return;
@@ -1256,10 +1054,8 @@ function initBgUpload() {
     document.getElementById('bgPreview').classList.remove('hidden');
     document.getElementById('bgPreviewImg').src = state.bgUrl;
     document.getElementById('bgPreviewName').textContent = file.name;
-
     state.bgStart = hasAudio() ? state.audioStart : 0;
     state.bgEnd = hasAudio() ? state.audioEnd : getTimelineDuration();
-
     const filtersBox = document.getElementById('bgFiltersBox');
     if (filtersBox) filtersBox.style.display = 'block';
     updateBgSegment();
@@ -1271,34 +1067,19 @@ function initBgUpload() {
 function initBgSegmentListeners() {
   const seg = document.getElementById('bgSegment');
   if (!seg) return;
-
   seg.addEventListener('click', function(e) {
     if (e.target.classList.contains('seg-handle')) return;
     selectBg();
   });
-
   const hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
-  hL.addEventListener('mousedown', function(e) {
-    state.selectedType = 'bg';
-    startResize(e, 0, 'left');
-  });
-  hL.addEventListener('touchstart', function(e) {
-    state.selectedType = 'bg';
-    startResize(e, 0, 'left');
-  }, { passive: false });
+  hL.addEventListener('mousedown', function(e) { state.selectedType = 'bg'; startResize(e, 0, 'left'); });
+  hL.addEventListener('touchstart', function(e) { state.selectedType = 'bg'; startResize(e, 0, 'left'); }, { passive: false });
   seg.appendChild(hL);
-
   const hR = document.createElement('div');
   hR.className = 'seg-handle handle-right';
-  hR.addEventListener('mousedown', function(e) {
-    state.selectedType = 'bg';
-    startResize(e, 0, 'right');
-  });
-  hR.addEventListener('touchstart', function(e) {
-    state.selectedType = 'bg';
-    startResize(e, 0, 'right');
-  }, { passive: false });
+  hR.addEventListener('mousedown', function(e) { state.selectedType = 'bg'; startResize(e, 0, 'right'); });
+  hR.addEventListener('touchstart', function(e) { state.selectedType = 'bg'; startResize(e, 0, 'right'); }, { passive: false });
   seg.appendChild(hR);
 }
 
@@ -1306,28 +1087,20 @@ function removeBackground() {
   if (state.bgUrl) URL.revokeObjectURL(state.bgUrl);
   state.bgUrl = null;
   const bgImg = document.getElementById('bgImage');
-  if (bgImg) {
-    bgImg.removeAttribute('src');
-    bgImg.src = '';
-  }
+  if (bgImg) { bgImg.removeAttribute('src'); bgImg.src = ''; }
   document.getElementById('bgUploadBtn').classList.remove('hidden');
   document.getElementById('bgPreview').classList.add('hidden');
   document.getElementById('bgInput').value = '';
-
   const filtersBox = document.getElementById('bgFiltersBox');
   if (filtersBox) filtersBox.style.display = 'none';
   updateBgSegment();
-
   if (state.selectedType === 'bg') clearSelection();
 }
 
 function updateBgSegment() {
   const seg = document.getElementById('bgSegment');
   if (!seg) return;
-  if (!state.bgUrl) {
-    seg.classList.add('hidden');
-    return;
-  }
+  if (!state.bgUrl) { seg.classList.add('hidden'); return; }
   seg.classList.remove('hidden');
   seg.style.left = (state.bgStart * PX_PER_SEC) + 'px';
   seg.style.width = ((state.bgEnd - state.bgStart) * PX_PER_SEC) + 'px';
@@ -1370,23 +1143,14 @@ function initBgFilters() {
 
 function resetBgFilters() {
   state.bgFilters = { blur: 0, brightness: 100, saturation: 100, contrast: 100, opacity: 100, hue: 0 };
-
-  const setVal = function(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.value = value;
-  };
-  const setText = function(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
-
+  const setVal = function(id, value) { const el = document.getElementById(id); if (el) el.value = value; };
+  const setText = function(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; };
   setVal('bgBlurRange', 0); setText('bgBlurVal', 0);
   setVal('bgBrightnessRange', 100); setText('bgBrightnessVal', 100);
   setVal('bgSaturationRange', 100); setText('bgSaturationVal', 100);
   setVal('bgContrastRange', 100); setText('bgContrastVal', 100);
   setVal('bgOpacityRange', 100); setText('bgOpacityVal', 100);
   setVal('bgHueRange', 0); setText('bgHueVal', 0);
-
   applyBgFilters();
   if (navigator.vibrate) try { navigator.vibrate(15); } catch (e) {}
 }
@@ -1406,9 +1170,6 @@ function renderBgSelection() {
   seg.classList.toggle('selected', state.selectedType === 'bg');
 }
 
-/* ============================================
-   Instagram + Song + Cover
-   ============================================ */
 function initIgInput() {
   const igInput = document.getElementById('igNameInput');
   if (!igInput) return;
@@ -1416,19 +1177,18 @@ function initIgInput() {
     const val = e.target.value.trim() || 'dk.llyric';
     const igNameEl = document.getElementById('igName');
     if (igNameEl) igNameEl.textContent = val;
-    const name state.igName = val;
+    state.igName = val;
   });
 }
 
 function openInstagram() {
-  = state.igName || 'dk.llyric';
+  const name = state.igName || 'dk.llyric';
   window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
 }
 
 function initSongInputs() {
   const songInput = document.getElementById('songNameInput');
   const artistInput = document.getElementById('artistNameInput');
-
   if (songInput) {
     songInput.addEventListener('input', function(e) {
       state.songName = e.target.value;
@@ -1448,27 +1208,18 @@ function initSongInputs() {
 function initCoverUpload() {
   const coverInput = document.getElementById('coverInput');
   if (!coverInput) return;
-
   coverInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('الصورة كبيرة بزاف (الأقصى 5MB)');
-      return;
-    }
-
+    if (file.size > 5 * 1024 * 1024) { alert('الصورة كبيرة بزاف (الأقصى 5MB)'); return; }
     if (state.coverUrl) URL.revokeObjectURL(state.coverUrl);
     state.coverUrl = URL.createObjectURL(file);
-
     const preview = document.getElementById('previewCover');
     if (preview) preview.src = state.coverUrl;
-
     document.getElementById('coverUploadBtn').classList.add('hidden');
     document.getElementById('coverPreview').classList.remove('hidden');
     document.getElementById('coverPreviewImg').src = state.coverUrl;
     document.getElementById('coverPreviewName').textContent = file.name;
-
     if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
   });
 }
@@ -1476,20 +1227,14 @@ function initCoverUpload() {
 function removeCover() {
   if (state.coverUrl) URL.revokeObjectURL(state.coverUrl);
   state.coverUrl = null;
-
   const preview = document.getElementById('previewCover');
   if (preview) preview.src = 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&q=80';
-
   document.getElementById('coverUploadBtn').classList.remove('hidden');
   document.getElementById('coverPreview').classList.add('hidden');
   document.getElementById('coverInput').value = '';
-
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
 
-/* ============================================
-   Tap → Hide Menu
-   ============================================ */
 document.addEventListener('click', (e) => {
   if (state.selectedType) {
     if (e.target.closest('.capcut-menu')) return;
@@ -1506,27 +1251,16 @@ document.addEventListener('click', (e) => {
   }
 }, true);
 
-/* ============================================
-   Misc
-   ============================================ */
 function closeEditor() {
   if (confirm('إغلاق المشروع؟')) window.location.href = 'index.html';
 }
 
-function exportVideo() {
-  openExportModal();
-}
-
+function exportVideo() { openExportModal(); }
 function undoAction() {}
 function redoAction() {}
 
-/* ============================================
-   🎨 Canvas Helpers
-   ============================================ */
 function roundRectPath(ctx, x, y, w, h, r) {
-  if (typeof r === 'number') {
-    r = { tl: r, tr: r, br: r, bl: r };
-  }
+  if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
   ctx.beginPath();
   ctx.moveTo(x + r.tl, y);
   ctx.lineTo(x + w - r.tr, y);
@@ -1563,34 +1297,24 @@ function drawCoverFitOnContext(c, img, dx, dy, dw, dh) {
   const cr = dw / dh;
   let w, h, x, y;
   if (ir > cr) {
-    h = dh;
-    w = dh * ir;
-    x = dx + (dw - w) / 2;
-    y = dy;
+    h = dh; w = dh * ir;
+    x = dx + (dw - w) / 2; y = dy;
   } else {
-    w = dw;
-    h = dw / ir;
-    x = dx;
-    y = dy + (dh - h) / 2;
+    w = dw; h = dw / ir;
+    x = dx; y = dy + (dh - h) / 2;
   }
   c.drawImage(img, x, y, w, h);
 }
 
-/* ============================================
-   🖼️ Blur يدوي (iOS Compatible)
-   ============================================ */
 function drawBlurredImage(ctx, img, x, y, w, h, blurAmount, brightness, saturation, contrast, hue, opacity) {
   const factor = Math.max(2, Math.min(20, Math.round(blurAmount / 1.5)));
   const tmpW = Math.max(2, Math.round(w / factor));
   const tmpH = Math.max(2, Math.round(h / factor));
-
   let srcCanvas = document.createElement('canvas');
   srcCanvas.width = tmpW;
   srcCanvas.height = tmpH;
   const srcCtx = srcCanvas.getContext('2d');
   drawCoverFitOnContext(srcCtx, img, 0, 0, tmpW, tmpH);
-
-  // ✅ 2 passes إضافية للتنعيم (downscale + upscale)
   for (let i = 0; i < 2; i++) {
     const halfW = Math.max(2, Math.floor(srcCanvas.width / 2));
     const halfH = Math.max(2, Math.floor(srcCanvas.height / 2));
@@ -1598,14 +1322,12 @@ function drawBlurredImage(ctx, img, x, y, w, h, blurAmount, brightness, saturati
     half.width = halfW;
     half.height = halfH;
     half.getContext('2d').drawImage(srcCanvas, 0, 0, halfW, halfH);
-
     const back = document.createElement('canvas');
     back.width = srcCanvas.width;
     back.height = srcCanvas.height;
     back.getContext('2d').drawImage(half, 0, 0, back.width, back.height);
     srcCanvas = back;
   }
-
   ctx.save();
   ctx.globalAlpha = opacity / 100;
   ctx.imageSmoothingEnabled = true;
@@ -1628,58 +1350,39 @@ function applyManualFilters(ctx, brightness, saturation, contrast, hue) {
   if (typeof ctx.filter !== 'undefined') {
     try {
       ctx.filter = 'brightness(' + brightness + '%) saturate(' + saturation + '%) contrast(' + contrast + '%) hue-rotate(' + hue + 'deg)';
-    } catch (e) {
-      // iOS: ما يدعمش ctx.filter → الفلاتر ما راح تتطبق
-    }
+    } catch (e) {}
   }
 }
 
-/* ============================================
-   🎬 Render Frame to Canvas
-   ============================================ */
 function drawPreviewToCanvas(ctx, W, H, currentTime) {
-  // ===== 1. Background =====
   const bgImg = document.getElementById('bgImage');
   const hasBg = bgImg && bgImg.src && bgImg.naturalWidth > 0;
-
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
-
   if (hasBg) {
     const f = state.bgFilters;
-    if (f.blur > 0) {
-      drawBlurredImage(ctx, bgImg, 0, 0, W, H, f.blur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
-    } else {
-      drawImageWithFilters(ctx, bgImg, 0, 0, W, H, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
-    }
+    if (f.blur > 0) drawBlurredImage(ctx, bgImg, 0, 0, W, H, f.blur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
+    else drawImageWithFilters(ctx, bgImg, 0, 0, W, H, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
   }
-
-  // ===== 2. Card measurements =====
   const previewFrame = document.getElementById('previewFrame');
   if (!previewFrame) return;
   const previewRect = previewFrame.getBoundingClientRect();
   if (previewRect.width === 0) return;
-
   const pxScale = W / previewRect.width;
-
   const cardScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 1;
   const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
   const cardRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-radius')) || 26;
   const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
-
   const frameW = previewRect.width;
   let baseW = frameW * 0.92;
   if (baseW > 440) baseW = 440;
   const cardBaseW = baseW * cardScale;
   const cardBaseH = cardBaseW;
-
   const cardW = cardBaseW * pxScale;
   const cardH = cardBaseH * pxScale;
   const cardX = (W - cardW) / 2;
   const cardY = (H - cardH) / 2;
   const radius = cardRadius * pxScale;
-
-  // ===== 3. Glass Effect =====
   if (hasBg) {
     ctx.save();
     roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
@@ -1689,36 +1392,27 @@ function drawPreviewToCanvas(ctx, W, H, currentTime) {
     drawBlurredImage(ctx, bgImg, 0, 0, W, H, glassBlur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
     ctx.restore();
   }
-
-  // ✅ Tint طبقة
   ctx.save();
   ctx.fillStyle = 'rgba(15, 15, 15, ' + cardOpacity + ')';
   roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.fill();
   ctx.restore();
-
-  // ✅ حدود
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
   ctx.lineWidth = 1 * pxScale;
   roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.stroke();
   ctx.restore();
-
-  // ===== 4. Padding =====
   const padX = 22 * pxScale;
   const padY = 20 * pxScale;
   const innerX = cardX + padX;
   const innerY = cardY + padY;
   const innerW = cardW - padX * 2;
-
-  // ===== 5. Album Art =====
   const artW = coverSize * pxScale;
   const artH = artW;
   const artRadius = 10 * pxScale;
   const artX = cardX + cardW - padX - artW;
   const artY = innerY;
-
   const coverImg = document.getElementById('previewCover');
   if (coverImg && coverImg.complete && coverImg.naturalWidth > 0) {
     ctx.save();
@@ -1733,12 +1427,9 @@ function drawPreviewToCanvas(ctx, W, H, currentTime) {
     ctx.fill();
     ctx.restore();
   }
-
-  // ===== 6. Song + Artist =====
   const songText = state.songName || '';
   const artistText = state.artistName || '';
   const textRightX = artX - 14 * pxScale;
-
   ctx.save();
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
@@ -1753,32 +1444,20 @@ function drawPreviewToCanvas(ctx, W, H, currentTime) {
     ctx.fillText(artistText, textRightX, artY + artH * 0.7);
   }
   ctx.restore();
-
-  // ===== 7. Divider 1 =====
   const gap = 16 * pxScale;
   const div1Y = artY + artH + gap;
   drawGradientDivider(ctx, innerX, div1Y, innerW, pxScale);
-
-  // ===== 8. Lyrics =====
   const footerH = 20 * pxScale;
   const div2Y = cardY + cardH - padY - footerH - gap;
   const lyricsTop = div1Y + gap;
   const lyricsBottom = div2Y - gap;
   const lyricsCenterY = (lyricsTop + lyricsBottom) / 2;
-
   let activeIdx = -1;
   for (let i = 0; i < state.lyrics.length; i++) {
     const l = state.lyrics[i];
-    if (currentTime >= l.start && currentTime < l.start + l.duration) {
-      activeIdx = i;
-      break;
-    }
+    if (currentTime >= l.start && currentTime < l.start + l.duration) { activeIdx = i; break; }
   }
-
-  let prevText = '';
-  let currText = '...';
-  let nextText = '';
-
+  let prevText = '', currText = '...', nextText = '';
   if (activeIdx >= 0) {
     prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
     currText = state.lyrics[activeIdx].text || '...';
@@ -1787,100 +1466,72 @@ function drawPreviewToCanvas(ctx, W, H, currentTime) {
     currText = state.lyrics[0].text;
     nextText = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
   }
-
   const fontFamily = (state.font.family || 'Cairo') + ', Inter, sans-serif';
   const lyricSize = (state.font.size || 20) * pxScale;
   const smallSize = 15 * pxScale;
-
   if (prevText) {
     ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4; ctx.fillStyle = '#ffffff';
     ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
     ctx.fillText(prevText, cardX + cardW / 2, lyricsCenterY - lyricSize * 1.4);
     ctx.restore();
   }
-
   ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = state.font.color || '#ffffff';
   ctx.shadowColor = 'rgba(0,0,0,0.5)';
   ctx.shadowBlur = 20 * pxScale;
   ctx.font = '700 ' + lyricSize + 'px ' + fontFamily;
   ctx.fillText(currText, cardX + cardW / 2, lyricsCenterY);
   ctx.restore();
-
   if (nextText) {
     ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4; ctx.fillStyle = '#ffffff';
     ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
     ctx.fillText(nextText, cardX + cardW / 2, lyricsCenterY + lyricSize * 1.4);
     ctx.restore();
   }
-
-  // ===== 9. Divider 2 =====
   drawGradientDivider(ctx, innerX, div2Y, innerW, pxScale);
-
-  // ===== 10. Footer (Instagram) =====
   const footerY = cardY + cardH - padY - footerH / 2;
   const iconSize = 18 * pxScale;
   const footerX = cardX + padX;
-
   ctx.save();
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 1.5 * pxScale;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   const igX = footerX;
   const igY = footerY - iconSize / 2;
   roundRectPath(ctx, igX, igY, iconSize, iconSize, iconSize * 0.28);
   ctx.stroke();
-
   ctx.beginPath();
   ctx.arc(igX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
   ctx.stroke();
-
   ctx.beginPath();
   ctx.arc(igX + iconSize * 0.72, footerY - iconSize * 0.22, iconSize * 0.06, 0, Math.PI * 2);
   ctx.fillStyle = '#ffffff';
   ctx.fill();
   ctx.restore();
-
   ctx.save();
   ctx.fillStyle = '#ffffff';
   ctx.font = '500 ' + (14 * pxScale) + 'px Inter, Cairo, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.fillText(state.igName || 'dk.llyric', igX + iconSize + 6 * pxScale, footerY);
   ctx.restore();
 }
 
-/* ============================================
-   🎬 Export Modal
-   ============================================ */
 let _exportSettings = { quality: 1080, fps: 30 };
 let _audioExportNodes = null;
 
 function openExportModal() {
-  if (!state.audioUrl) {
-    alert('ارفع أغنية أول');
-    return;
-  }
+  if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
   const modal = document.getElementById('exportModal');
   if (modal) modal.classList.add('open');
-
   const p = document.getElementById('exportProgress');
   if (p) p.style.display = 'none';
   const btn = document.getElementById('exportStartBtn');
   if (btn) btn.disabled = false;
-
   document.querySelectorAll('#exportQuality .export-opt').forEach(el => {
     el.onclick = function() {
       document.querySelectorAll('#exportQuality .export-opt').forEach(b => b.classList.remove('active'));
@@ -1895,7 +1546,6 @@ function openExportModal() {
       _exportSettings.fps = parseInt(this.dataset.value);
     };
   });
-
   if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
 }
 
@@ -1904,27 +1554,17 @@ function closeExportModal() {
   if (modal) modal.classList.remove('open');
 }
 
-/* ============================================
-   🖼️ ensureImagesLoaded
-   ============================================ */
 function ensureImagesLoaded() {
   return new Promise((resolve) => {
-    const imgs = [
-      document.getElementById('bgImage'),
-      document.getElementById('previewCover')
-    ].filter(Boolean);
-
+    const imgs = [document.getElementById('bgImage'), document.getElementById('previewCover')].filter(Boolean);
     if (imgs.length === 0) { resolve(); return; }
-
     let pending = imgs.length;
     let resolved = false;
-
     const done = () => {
       if (resolved) return;
       pending--;
       if (pending <= 0) { resolved = true; resolve(); }
     };
-
     imgs.forEach(img => {
       if (img.complete && img.naturalWidth > 0) done();
       else {
@@ -1932,61 +1572,38 @@ function ensureImagesLoaded() {
         img.addEventListener('error', done, { once: true });
       }
     });
-
     setTimeout(() => { if (!resolved) { resolved = true; resolve(); } }, 3000);
   });
 }
 
-/* ============================================
-   🎬 Start Video Export
-   ============================================ */
 async function startVideoExport() {
-  if (!state.audioUrl) {
-    alert('ارفع أغنية أول');
-    return;
-  }
-
+  if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
   const startBtn = document.getElementById('exportStartBtn');
   const progress = document.getElementById('exportProgress');
   const progressFill = document.getElementById('exportProgressFill');
   const progressText = document.getElementById('exportProgressText');
-
   if (!startBtn || !progress || !progressFill || !progressText) return;
-
   startBtn.disabled = true;
   progress.style.display = 'block';
   progressFill.style.width = '0%';
   progressText.textContent = 'جاري التجهيز...';
-
   try {
     await ensureImagesLoaded();
-
     const quality = _exportSettings.quality;
     const fps = _exportSettings.fps;
-
     const frame = document.getElementById('previewFrame');
     const rect = frame.getBoundingClientRect();
     const ratio = rect.width / rect.height;
-
     let canvasW, canvasH;
-    if (quality === 1080) {
-      canvasW = 1080;
-      canvasH = Math.round(1080 / ratio);
-    } else {
-      canvasW = 720;
-      canvasH = Math.round(720 / ratio);
-    }
+    if (quality === 1080) { canvasW = 1080; canvasH = Math.round(1080 / ratio); }
+    else { canvasW = 720; canvasH = Math.round(720 / ratio); }
     canvasW = Math.round(canvasW / 2) * 2;
     canvasH = Math.round(canvasH / 2) * 2;
-
     const canvas = document.createElement('canvas');
     canvas.width = canvasW;
     canvas.height = canvasH;
     const ctx = canvas.getContext('2d', { alpha: false });
-
     const videoStream = canvas.captureStream(fps);
-
-    // ✅ Audio setup — مرة وحدة فقط
     const player = document.getElementById('audioPlayer');
     try {
       if (!_audioExportNodes) {
@@ -1994,18 +1611,14 @@ async function startVideoExport() {
         const source = audioCtx.createMediaElementSource(player);
         const dest = audioCtx.createMediaStreamDestination();
         source.connect(dest);
-        source.connect(audioCtx.destination); // ✅ باش يبقى الصوت مسموع
+        source.connect(audioCtx.destination);
         _audioExportNodes = { ctx: audioCtx, source, dest };
       }
-      if (_audioExportNodes.ctx.state === 'suspended') {
-        await _audioExportNodes.ctx.resume();
-      }
+      if (_audioExportNodes.ctx.state === 'suspended') await _audioExportNodes.ctx.resume();
       _audioExportNodes.dest.stream.getAudioTracks().forEach(t => videoStream.addTrack(t));
     } catch (audioErr) {
       console.warn('Audio setup failed:', audioErr);
     }
-
-    // MIME
     let mimeType = 'video/webm';
     const supported = [
       'video/webm;codecs=vp9,opus',
@@ -2017,48 +1630,36 @@ async function startVideoExport() {
     for (const m of supported) {
       if (MediaRecorder.isTypeSupported(m)) { mimeType = m; break; }
     }
-
     const recorder = new MediaRecorder(videoStream, {
       mimeType: mimeType,
       videoBitsPerSecond: quality === 1080 ? 8000000 : 4000000
     });
-
     const chunks = [];
     recorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) chunks.push(e.data);
     };
-
     const recorderStopped = new Promise((resolve) => { recorder.onstop = resolve; });
-
     recorder.start(100);
-
-    // ✅ Seek لـ trimIn (ملف حقيقي، ماشي timeline)
     player.currentTime = state.audioTrimIn;
-
     await new Promise(res => {
       const onSeeked = () => { player.removeEventListener('seeked', onSeeked); res(); };
       player.addEventListener('seeked', onSeeked);
       setTimeout(res, 500);
     });
-
     try {
       await player.play();
     } catch (playErr) {
       recorder.stop();
       throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
     }
-
     const startTime = performance.now();
     const totalDuration = state.audioEnd - state.audioStart;
     const frameDelay = 1000 / fps;
     let isRendering = true;
-
     const renderLoop = async () => {
       if (!isRendering) return;
-
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
-
       if (elapsed >= totalDuration || player.ended) {
         isRendering = false;
         if (recorder.state !== 'inactive') recorder.stop();
@@ -2066,21 +1667,16 @@ async function startVideoExport() {
         downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText);
         return;
       }
-
       const currentTime = state.audioStart + elapsed;
       drawPreviewToCanvas(ctx, canvasW, canvasH, currentTime);
-
       const percent = Math.min(100, Math.round((elapsed / totalDuration) * 100));
       progressFill.style.width = percent + '%';
       progressText.textContent = 'جاري التصدير: ' + percent + '%';
-
       const workTime = performance.now() - now;
       const wait = Math.max(0, frameDelay - workTime);
       setTimeout(() => requestAnimationFrame(renderLoop), wait);
     };
-
     renderLoop();
-
   } catch (err) {
     console.error('Export error:', err);
     alert('خطأ في التصدير: ' + err.message);
@@ -2089,9 +1685,6 @@ async function startVideoExport() {
   }
 }
 
-/* ============================================
-   💾 Download
-   ============================================ */
 function downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText) {
   const blob = new Blob(chunks, { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -2103,11 +1696,9 @@ function downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progr
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 5000);
-
   if (startBtn) startBtn.disabled = false;
   if (progressFill) progressFill.style.width = '100%';
   if (progressText) progressText.textContent = '✅ تم التصدير بنجاح!';
-
   setTimeout(() => {
     if (progress) progress.style.display = 'none';
     closeExportModal();
