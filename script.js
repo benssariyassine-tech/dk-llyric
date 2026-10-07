@@ -869,11 +869,15 @@ function startLongPressAudio(e, segEl) {
     }
   }, LONG_PRESS_MS);
 }
-       /* ============================================
+     /* ============================================
    dk.llyric Editor — Part 3/3
-   Playhead + Sync + Play/Pause + Font + Background + Instagram + Export
+   Playhead + Sync + Play/Pause + Font + Background
+   + Instagram + Cover + Canvas + Export
    ============================================ */
 
+/* ============================================
+   Playhead
+   ============================================ */
 function setPlayheadPosition(sec) {
   const ph = document.getElementById('playhead');
   if (!ph) return;
@@ -963,8 +967,7 @@ function setupPlayheadDrag() {
     if (e.target.closest('.playhead-cap')) return;
     if (e.target.closest('.ruler-tick')) return;
     if (e.target.closest('.audio-add-btn')) return;
-    const sec = pxToTime(e.clientX);
-    seekTo(sec);
+    seekTo(pxToTime(e.clientX));
   });
 
   const pauseAutoScroll = () => { _userTouchingTimeline = true; };
@@ -1073,6 +1076,9 @@ function autoScrollPlayhead() {
   }
 }
 
+/* ============================================
+   Sync Lyric
+   ============================================ */
 function syncPlayheadToLyric() {
   const t = state.currentTime;
   let idx = -1;
@@ -1123,6 +1129,9 @@ function renderLyricFromPlayhead(idx) {
   currEl.classList.add('animate-in');
 }
 
+/* ============================================
+   Play / Pause
+   ============================================ */
 function togglePlay() {
   const player = document.getElementById('audioPlayer');
   const isAudioActive = hasAudio();
@@ -1175,6 +1184,9 @@ function fmt(s) {
   return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
 }
 
+/* ============================================
+   Font
+   ============================================ */
 function setupFontControls() {
   document.querySelectorAll('.font-family-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1187,7 +1199,8 @@ function setupFontControls() {
   const r = document.getElementById('fontSizeRange');
   if (r) r.addEventListener('input', e => {
     state.font.size = parseInt(e.target.value);
-    document.getElementById('fontSizeVal').textContent = state.font.size;
+    const vEl = document.getElementById('fontSizeVal');
+    if (vEl) vEl.textContent = state.font.size;
     applyFont();
   });
   document.querySelectorAll('.color-btn').forEach(btn => {
@@ -1305,9 +1318,7 @@ function removeBackground() {
   if (filtersBox) filtersBox.style.display = 'none';
   updateBgSegment();
 
-  if (state.selectedType === 'bg') {
-    clearSelection();
-  }
+  if (state.selectedType === 'bg') clearSelection();
 }
 
 function updateBgSegment() {
@@ -1344,7 +1355,6 @@ function initBgFilters() {
     { range: 'bgOpacityRange', val: 'bgOpacityVal', key: 'opacity' },
     { range: 'bgHueRange', val: 'bgHueVal', key: 'hue' }
   ];
-
   pairs.forEach(function(p) {
     const r = document.getElementById(p.range);
     const v = document.getElementById(p.val);
@@ -1397,7 +1407,7 @@ function renderBgSelection() {
 }
 
 /* ============================================
-   Instagram + Song
+   Instagram + Song + Cover
    ============================================ */
 function initIgInput() {
   const igInput = document.getElementById('igNameInput');
@@ -1406,12 +1416,12 @@ function initIgInput() {
     const val = e.target.value.trim() || 'dk.llyric';
     const igNameEl = document.getElementById('igName');
     if (igNameEl) igNameEl.textContent = val;
-    state.igName = val;
+    const name state.igName = val;
   });
 }
 
 function openInstagram() {
-  const name = state.igName || 'dk.llyric';
+  = state.igName || 'dk.llyric';
   window.open('https://instagram.com/' + name.replace('@', ''), '_blank');
 }
 
@@ -1426,7 +1436,6 @@ function initSongInputs() {
       if (preview) preview.textContent = e.target.value;
     });
   }
-
   if (artistInput) {
     artistInput.addEventListener('input', function(e) {
       state.artistName = e.target.value;
@@ -1436,9 +1445,6 @@ function initSongInputs() {
   }
 }
 
-/* ============================================
-   Cover Upload
-   ============================================ */
 function initCoverUpload() {
   const coverInput = document.getElementById('coverInput');
   if (!coverInput) return;
@@ -1515,7 +1521,7 @@ function undoAction() {}
 function redoAction() {}
 
 /* ============================================
-   ✅ Canvas Helpers (كانو ناقصين)
+   🎨 Canvas Helpers
    ============================================ */
 function roundRectPath(ctx, x, y, w, h, r) {
   if (typeof r === 'number') {
@@ -1526,4 +1532,584 @@ function roundRectPath(ctx, x, y, w, h, r) {
   ctx.lineTo(x + w - r.tr, y);
   ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
   ctx.lineTo(x + w, y + h - r.br);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+  ctx.lineTo(x + r.bl, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+  ctx.lineTo(x, y + r.tl);
+  ctx.quadraticCurveTo(x, y, x + r.tl, y);
+  ctx.closePath();
+}
+
+function drawGradientDivider(ctx, x, y, w, scale) {
+  const grad = ctx.createLinearGradient(x, 0, x + w, 0);
+  grad.addColorStop(0, 'rgba(180, 180, 190, 0)');
+  grad.addColorStop(0.25, 'rgba(180, 180, 190, 0.45)');
+  grad.addColorStop(0.5, 'rgba(220, 220, 230, 0.65)');
+  grad.addColorStop(0.75, 'rgba(180, 180, 190, 0.45)');
+  grad.addColorStop(1, 'rgba(180, 180, 190, 0)');
+  ctx.save();
+  ctx.fillStyle = grad;
+  ctx.fillRect(x, y, w, Math.max(1, scale));
+  ctx.restore();
+}
+
+function drawCoverFit(ctx, img, dx, dy, dw, dh) {
+  drawCoverFitOnContext(ctx, img, dx, dy, dw, dh);
+}
+
+function drawCoverFitOnContext(c, img, dx, dy, dw, dh) {
+  if (!img || !img.naturalWidth || !img.naturalHeight) return;
+  const ir = img.naturalWidth / img.naturalHeight;
+  const cr = dw / dh;
+  let w, h, x, y;
+  if (ir > cr) {
+    h = dh;
+    w = dh * ir;
+    x = dx + (dw - w) / 2;
+    y = dy;
+  } else {
+    w = dw;
+    h = dw / ir;
+    x = dx;
+    y = dy + (dh - h) / 2;
+  }
+  c.drawImage(img, x, y, w, h);
+}
+
+/* ============================================
+   🖼️ Blur يدوي (iOS Compatible)
+   ============================================ */
+function drawBlurredImage(ctx, img, x, y, w, h, blurAmount, brightness, saturation, contrast, hue, opacity) {
+  const factor = Math.max(2, Math.min(20, Math.round(blurAmount / 1.5)));
+  const tmpW = Math.max(2, Math.round(w / factor));
+  const tmpH = Math.max(2, Math.round(h / factor));
+
+  let srcCanvas = document.createElement('canvas');
+  srcCanvas.width = tmpW;
+  srcCanvas.height = tmpH;
+  const srcCtx = srcCanvas.getContext('2d');
+  drawCoverFitOnContext(srcCtx, img, 0, 0, tmpW, tmpH);
+
+  // ✅ 2 passes إضافية للتنعيم (downscale + upscale)
+  for (let i = 0; i < 2; i++) {
+    const halfW = Math.max(2, Math.floor(srcCanvas.width / 2));
+    const halfH = Math.max(2, Math.floor(srcCanvas.height / 2));
+    const half = document.createElement('canvas');
+    half.width = halfW;
+    half.height = halfH;
+    half.getContext('2d').drawImage(srcCanvas, 0, 0, halfW, halfH);
+
+    const back = document.createElement('canvas');
+    back.width = srcCanvas.width;
+    back.height = srcCanvas.height;
+    back.getContext('2d').drawImage(half, 0, 0, back.width, back.height);
+    srcCanvas = back;
+  }
+
+  ctx.save();
+  ctx.globalAlpha = opacity / 100;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  applyManualFilters(ctx, brightness, saturation, contrast, hue);
+  ctx.drawImage(srcCanvas, 0, 0, tmpW, tmpH, x, y, w, h);
+  ctx.restore();
+}
+
+function drawImageWithFilters(ctx, img, x, y, w, h, brightness, saturation, contrast, hue, opacity) {
+  ctx.save();
+  ctx.globalAlpha = opacity / 100;
+  applyManualFilters(ctx, brightness, saturation, contrast, hue);
+  drawCoverFitOnContext(ctx, img, x, y, w, h);
+  ctx.restore();
+}
+
+function applyManualFilters(ctx, brightness, saturation, contrast, hue) {
+  if (brightness === 100 && saturation === 100 && contrast === 100 && hue === 0) return;
+  if (typeof ctx.filter !== 'undefined') {
+    try {
+      ctx.filter = 'brightness(' + brightness + '%) saturate(' + saturation + '%) contrast(' + contrast + '%) hue-rotate(' + hue + 'deg)';
+    } catch (e) {
+      // iOS: ما يدعمش ctx.filter → الفلاتر ما راح تتطبق
+    }
+  }
+}
+
+/* ============================================
+   🎬 Render Frame to Canvas
+   ============================================ */
+function drawPreviewToCanvas(ctx, W, H, currentTime) {
+  // ===== 1. Background =====
+  const bgImg = document.getElementById('bgImage');
+  const hasBg = bgImg && bgImg.src && bgImg.naturalWidth > 0;
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  if (hasBg) {
+    const f = state.bgFilters;
+    if (f.blur > 0) {
+      drawBlurredImage(ctx, bgImg, 0, 0, W, H, f.blur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
+    } else {
+      drawImageWithFilters(ctx, bgImg, 0, 0, W, H, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
+    }
+  }
+
+  // ===== 2. Card measurements =====
+  const previewFrame = document.getElementById('previewFrame');
+  if (!previewFrame) return;
+  const previewRect = previewFrame.getBoundingClientRect();
+  if (previewRect.width === 0) return;
+
+  const pxScale = W / previewRect.width;
+
+  const cardScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 1;
+  const cardOpacity = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-opacity')) || 0.65;
+  const cardRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-radius')) || 26;
+  const coverSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cover-size')) || 68;
+
+  const frameW = previewRect.width;
+  let baseW = frameW * 0.92;
+  if (baseW > 440) baseW = 440;
+  const cardBaseW = baseW * cardScale;
+  const cardBaseH = cardBaseW;
+
+  const cardW = cardBaseW * pxScale;
+  const cardH = cardBaseH * pxScale;
+  const cardX = (W - cardW) / 2;
+  const cardY = (H - cardH) / 2;
+  const radius = cardRadius * pxScale;
+
+  // ===== 3. Glass Effect =====
+  if (hasBg) {
+    ctx.save();
+    roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
+    ctx.clip();
+    const f = state.bgFilters;
+    const glassBlur = Math.max(f.blur, 20);
+    drawBlurredImage(ctx, bgImg, 0, 0, W, H, glassBlur, f.brightness, f.saturation, f.contrast, f.hue, f.opacity);
+    ctx.restore();
+  }
+
+  // ✅ Tint طبقة
+  ctx.save();
+  ctx.fillStyle = 'rgba(15, 15, 15, ' + cardOpacity + ')';
+  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
+  ctx.fill();
+  ctx.restore();
+
+  // ✅ حدود
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1 * pxScale;
+  roundRectPath(ctx, cardX, cardY, cardW, cardH, radius);
+  ctx.stroke();
+  ctx.restore();
+
+  // ===== 4. Padding =====
+  const padX = 22 * pxScale;
+  const padY = 20 * pxScale;
+  const innerX = cardX + padX;
+  const innerY = cardY + padY;
+  const innerW = cardW - padX * 2;
+
+  // ===== 5. Album Art =====
+  const artW = coverSize * pxScale;
+  const artH = artW;
+  const artRadius = 10 * pxScale;
+  const artX = cardX + cardW - padX - artW;
+  const artY = innerY;
+
+  const coverImg = document.getElementById('previewCover');
+  if (coverImg && coverImg.complete && coverImg.naturalWidth > 0) {
+    ctx.save();
+    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
+    ctx.clip();
+    drawCoverFit(ctx, coverImg, artX, artY, artW, artH);
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.fillStyle = '#1a1a24';
+    roundRectPath(ctx, artX, artY, artW, artH, artRadius);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ===== 6. Song + Artist =====
+  const songText = state.songName || '';
+  const artistText = state.artistName || '';
+  const textRightX = artX - 14 * pxScale;
+
+  ctx.save();
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  if (songText) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 ' + (18 * pxScale) + 'px Cairo, Inter, sans-serif';
+    ctx.fillText(songText, textRightX, artY + artH * 0.35);
+  }
+  if (artistText) {
+    ctx.fillStyle = '#b3b3b3';
+    ctx.font = '500 ' + (14 * pxScale) + 'px Cairo, Inter, sans-serif';
+    ctx.fillText(artistText, textRightX, artY + artH * 0.7);
+  }
+  ctx.restore();
+
+  // ===== 7. Divider 1 =====
+  const gap = 16 * pxScale;
+  const div1Y = artY + artH + gap;
+  drawGradientDivider(ctx, innerX, div1Y, innerW, pxScale);
+
+  // ===== 8. Lyrics =====
+  const footerH = 20 * pxScale;
+  const div2Y = cardY + cardH - padY - footerH - gap;
+  const lyricsTop = div1Y + gap;
+  const lyricsBottom = div2Y - gap;
+  const lyricsCenterY = (lyricsTop + lyricsBottom) / 2;
+
+  let activeIdx = -1;
+  for (let i = 0; i < state.lyrics.length; i++) {
+    const l = state.lyrics[i];
+    if (currentTime >= l.start && currentTime < l.start + l.duration) {
+      activeIdx = i;
+      break;
+    }
+  }
+
+  let prevText = '';
+  let currText = '...';
+  let nextText = '';
+
+  if (activeIdx >= 0) {
+    prevText = activeIdx > 0 ? (state.lyrics[activeIdx - 1].text || '') : '';
+    currText = state.lyrics[activeIdx].text || '...';
+    nextText = activeIdx < state.lyrics.length - 1 ? (state.lyrics[activeIdx + 1].text || '') : '';
+  } else if (state.lyrics.length > 0 && state.lyrics[0].text) {
+    currText = state.lyrics[0].text;
+    nextText = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
+  }
+
+  const fontFamily = (state.font.family || 'Cairo') + ', Inter, sans-serif';
+  const lyricSize = (state.font.size || 20) * pxScale;
+  const smallSize = 15 * pxScale;
+
+  if (prevText) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
+    ctx.fillText(prevText, cardX + cardW / 2, lyricsCenterY - lyricSize * 1.4);
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = state.font.color || '#ffffff';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 20 * pxScale;
+  ctx.font = '700 ' + lyricSize + 'px ' + fontFamily;
+  ctx.fillText(currText, cardX + cardW / 2, lyricsCenterY);
+  ctx.restore();
+
+  if (nextText) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 ' + smallSize + 'px ' + fontFamily;
+    ctx.fillText(nextText, cardX + cardW / 2, lyricsCenterY + lyricSize * 1.4);
+    ctx.restore();
+  }
+
+  // ===== 9. Divider 2 =====
+  drawGradientDivider(ctx, innerX, div2Y, innerW, pxScale);
+
+  // ===== 10. Footer (Instagram) =====
+  const footerY = cardY + cardH - padY - footerH / 2;
+  const iconSize = 18 * pxScale;
+  const footerX = cardX + padX;
+
+  ctx.save();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5 * pxScale;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const igX = footerX;
+  const igY = footerY - iconSize / 2;
+  roundRectPath(ctx, igX, igY, iconSize, iconSize, iconSize * 0.28);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(igX + iconSize / 2, footerY, iconSize * 0.22, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(igX + iconSize * 0.72, footerY - iconSize * 0.22, iconSize * 0.06, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '500 ' + (14 * pxScale) + 'px Inter, Cairo, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(state.igName || 'dk.llyric', igX + iconSize + 6 * pxScale, footerY);
+  ctx.restore();
+}
+
+/* ============================================
+   🎬 Export Modal
+   ============================================ */
+let _exportSettings = { quality: 1080, fps: 30 };
+let _audioExportNodes = null;
+
+function openExportModal() {
+  if (!state.audioUrl) {
+    alert('ارفع أغنية أول');
+    return;
+  }
+  const modal = document.getElementById('exportModal');
+  if (modal) modal.classList.add('open');
+
+  const p = document.getElementById('exportProgress');
+  if (p) p.style.display = 'none';
+  const btn = document.getElementById('exportStartBtn');
+  if (btn) btn.disabled = false;
+
+  document.querySelectorAll('#exportQuality .export-opt').forEach(el => {
+    el.onclick = function() {
+      document.querySelectorAll('#exportQuality .export-opt').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      _exportSettings.quality = parseInt(this.dataset.value);
+    };
+  });
+  document.querySelectorAll('#exportFps .export-opt').forEach(el => {
+    el.onclick = function() {
+      document.querySelectorAll('#exportFps .export-opt').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      _exportSettings.fps = parseInt(this.dataset.value);
+    };
+  });
+
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+}
+
+function closeExportModal() {
+  const modal = document.getElementById('exportModal');
+  if (modal) modal.classList.remove('open');
+}
+
+/* ============================================
+   🖼️ ensureImagesLoaded
+   ============================================ */
+function ensureImagesLoaded() {
+  return new Promise((resolve) => {
+    const imgs = [
+      document.getElementById('bgImage'),
+      document.getElementById('previewCover')
+    ].filter(Boolean);
+
+    if (imgs.length === 0) { resolve(); return; }
+
+    let pending = imgs.length;
+    let resolved = false;
+
+    const done = () => {
+      if (resolved) return;
+      pending--;
+      if (pending <= 0) { resolved = true; resolve(); }
+    };
+
+    imgs.forEach(img => {
+      if (img.complete && img.naturalWidth > 0) done();
+      else {
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      }
+    });
+
+    setTimeout(() => { if (!resolved) { resolved = true; resolve(); } }, 3000);
+  });
+}
+
+/* ============================================
+   🎬 Start Video Export
+   ============================================ */
+async function startVideoExport() {
+  if (!state.audioUrl) {
+    alert('ارفع أغنية أول');
+    return;
+  }
+
+  const startBtn = document.getElementById('exportStartBtn');
+  const progress = document.getElementById('exportProgress');
+  const progressFill = document.getElementById('exportProgressFill');
+  const progressText = document.getElementById('exportProgressText');
+
+  if (!startBtn || !progress || !progressFill || !progressText) return;
+
+  startBtn.disabled = true;
+  progress.style.display = 'block';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'جاري التجهيز...';
+
+  try {
+    await ensureImagesLoaded();
+
+    const quality = _exportSettings.quality;
+    const fps = _exportSettings.fps;
+
+    const frame = document.getElementById('previewFrame');
+    const rect = frame.getBoundingClientRect();
+    const ratio = rect.width / rect.height;
+
+    let canvasW, canvasH;
+    if (quality === 1080) {
+      canvasW = 1080;
+      canvasH = Math.round(1080 / ratio);
+    } else {
+      canvasW = 720;
+      canvasH = Math.round(720 / ratio);
+    }
+    canvasW = Math.round(canvasW / 2) * 2;
+    canvasH = Math.round(canvasH / 2) * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    const videoStream = canvas.captureStream(fps);
+
+    // ✅ Audio setup — مرة وحدة فقط
+    const player = document.getElementById('audioPlayer');
+    try {
+      if (!_audioExportNodes) {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(player);
+        const dest = audioCtx.createMediaStreamDestination();
+        source.connect(dest);
+        source.connect(audioCtx.destination); // ✅ باش يبقى الصوت مسموع
+        _audioExportNodes = { ctx: audioCtx, source, dest };
+      }
+      if (_audioExportNodes.ctx.state === 'suspended') {
+        await _audioExportNodes.ctx.resume();
+      }
+      _audioExportNodes.dest.stream.getAudioTracks().forEach(t => videoStream.addTrack(t));
+    } catch (audioErr) {
+      console.warn('Audio setup failed:', audioErr);
+    }
+
+    // MIME
+    let mimeType = 'video/webm';
+    const supported = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm'
+    ];
+    for (const m of supported) {
+      if (MediaRecorder.isTypeSupported(m)) { mimeType = m; break; }
+    }
+
+    const recorder = new MediaRecorder(videoStream, {
+      mimeType: mimeType,
+      videoBitsPerSecond: quality === 1080 ? 8000000 : 4000000
+    });
+
+    const chunks = [];
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+
+    const recorderStopped = new Promise((resolve) => { recorder.onstop = resolve; });
+
+    recorder.start(100);
+
+    // ✅ Seek لـ trimIn (ملف حقيقي، ماشي timeline)
+    player.currentTime = state.audioTrimIn;
+
+    await new Promise(res => {
+      const onSeeked = () => { player.removeEventListener('seeked', onSeeked); res(); };
+      player.addEventListener('seeked', onSeeked);
+      setTimeout(res, 500);
+    });
+
+    try {
+      await player.play();
+    } catch (playErr) {
+      recorder.stop();
+      throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
+    }
+
+    const startTime = performance.now();
+    const totalDuration = state.audioEnd - state.audioStart;
+    const frameDelay = 1000 / fps;
+    let isRendering = true;
+
+    const renderLoop = async () => {
+      if (!isRendering) return;
+
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000;
+
+      if (elapsed >= totalDuration || player.ended) {
+        isRendering = false;
+        if (recorder.state !== 'inactive') recorder.stop();
+        await recorderStopped;
+        downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText);
+        return;
+      }
+
+      const currentTime = state.audioStart + elapsed;
+      drawPreviewToCanvas(ctx, canvasW, canvasH, currentTime);
+
+      const percent = Math.min(100, Math.round((elapsed / totalDuration) * 100));
+      progressFill.style.width = percent + '%';
+      progressText.textContent = 'جاري التصدير: ' + percent + '%';
+
+      const workTime = performance.now() - now;
+      const wait = Math.max(0, frameDelay - workTime);
+      setTimeout(() => requestAnimationFrame(renderLoop), wait);
+    };
+
+    renderLoop();
+
+  } catch (err) {
+    console.error('Export error:', err);
+    alert('خطأ في التصدير: ' + err.message);
+    startBtn.disabled = false;
+    progress.style.display = 'none';
+  }
+}
+
+/* ============================================
+   💾 Download
+   ============================================ */
+function downloadVideo(chunks, mimeType, startBtn, progress, progressFill, progressText) {
+  const blob = new Blob(chunks, { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ext = mimeType.indexOf('webm') !== -1 ? 'webm' : 'mp4';
+  a.href = url;
+  a.download = 'dk.llyric-' + Date.now() + '.' + ext;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+  if (startBtn) startBtn.disabled = false;
+  if (progressFill) progressFill.style.width = '100%';
+  if (progressText) progressText.textContent = '✅ تم التصدير بنجاح!';
+
+  setTimeout(() => {
+    if (progress) progress.style.display = 'none';
+    closeExportModal();
+  }, 1500);
+}
