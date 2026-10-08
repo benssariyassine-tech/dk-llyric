@@ -140,6 +140,17 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 .cm-item svg{width:20px;height:20px;stroke:var(--text-color);fill:none}
 .cm-item.danger svg{stroke:var(--danger)}
 .cm-item.danger span{color:var(--danger)}
+  .confirm-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-modal.open{display:flex}
+.confirm-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.confirm-modal-box{position:relative;width:100%;max-width:360px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-radius:22px;border:1px solid rgba(255,255,255,0.12);padding:24px 22px;animation:confirmPop 0.3s cubic-bezier(0.16,1,0.3,1)}
+@keyframes confirmPop{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-modal-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:10px;text-align:center}
+.confirm-modal-message{font-size:13.5px;color:var(--subtext-color);text-align:center;line-height:1.6;margin-bottom:22px}
+.confirm-modal-actions{display:flex;gap:10px}
+.confirm-modal-btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:800;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.confirm-modal-btn.cancel{background:rgba(255,255,255,0.08);color:#fff}
+.confirm-modal-btn.confirm{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 20px rgba(10,132,255,0.4)}
 .time-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
 .time-modal.open{display:flex}
 .time-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
