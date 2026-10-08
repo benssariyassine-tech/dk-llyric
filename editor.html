@@ -478,13 +478,27 @@ window.addEventListener('load', function() {
     '700 28px Inter','500 28px Inter'
   ];
 
-  function init() {
+function init() {
     try {
       setupCanvas(); bindAudio(); bindSliders(); bindFontButtons();
       bindColorButtons(); bindTextInputs(); bindUploads(); bindAudioSegment();
       setupTimelineClick(); setupPlayheadDrag(); bindExportOptions();
-      renderLyricsList(); renderTimeline(); renderRuler();
+      
+      renderLyricsList();
+      bindDirtyTracking();     // ✅ تتبع التغييرات
+      renderTimeline(); renderRuler();
       updateTimeDisplay(); startRenderLoop();
+      
+      // ✅ استرجاع المسودة المحلية (إلا كان المستخدم جا من مشروع سحابي، ما نسترجعوهاش)
+      var isFromCloud = new URLSearchParams(location.search).get('project');
+      if (!isFromCloud) restoreLocalDraft();
+      
+      // ✅ تشغيل الحفظ التلقائي
+      startAutoSave();
+      
+      // ✅ أول أيقونة
+      updateSaveIcon();
+      
       console.log('dk.llyric loaded');
     } catch (err) {
       console.error('Init error:', err);
