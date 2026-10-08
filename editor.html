@@ -2075,75 +2075,7 @@ async function saveProjectToCloud() {
   }
 }
 
-  var btn = document.querySelector('.etb-btn[onclick="saveProjectToCloud()"]');
-  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
 
-  try {
-    var userId = _fb.user.uid;
-    var projectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-
-    // 1. رفع الأغنية
-    var audioUrl = null;
-    if (state.audioUrl) {
-      var audioBlob = await fetch(state.audioUrl).then(function(r) { return r.blob(); });
-      audioUrl = await uploadToCloudinary(audioBlob, 'video');
-    }
-
-    // 2. رفع الخلفية
-    var bgUrl = null;
-    if (state.bgImg) {
-      var bgCanvas = document.createElement('canvas');
-      bgCanvas.width = state.bgImg.naturalWidth;
-      bgCanvas.height = state.bgImg.naturalHeight;
-      bgCanvas.getContext('2d').drawImage(state.bgImg, 0, 0);
-      var bgBlob = await new Promise(function(res) { bgCanvas.toBlob(res, 'image/jpeg', 0.85); });
-      bgUrl = await uploadToCloudinary(bgBlob, 'image');
-    }
-
-    // 3. رفع الغلاف
-    var coverUrl = null;
-    if (state.coverImg) {
-      var covCanvas = document.createElement('canvas');
-      covCanvas.width = state.coverImg.naturalWidth;
-      covCanvas.height = state.coverImg.naturalHeight;
-      covCanvas.getContext('2d').drawImage(state.coverImg, 0, 0);
-      var covBlob = await new Promise(function(res) { covCanvas.toBlob(res, 'image/jpeg', 0.9); });
-      coverUrl = await uploadToCloudinary(covBlob, 'image');
-    }
-
-    // 4. حفظ metadata
-    await _fb.db.collection('projects').doc(projectId).set({
-      userId: userId,
-      name: projectName,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      audioUrl: audioUrl,
-      bgUrl: bgUrl,
-      coverUrl: coverUrl,
-      data: {
-        songName: state.songName,
-        artistName: state.artistName,
-        igName: state.igName,
-        lyrics: state.lyrics,
-        font: state.font,
-        card: state.card,
-        bgFilters: state.bgFilters,
-        audioStart: state.audioStart,
-        audioEnd: state.audioEnd,
-        trimIn: state.trimIn,
-        trimOut: state.trimOut,
-        duration: state.duration
-      }
-    });
-
-    alert('✅ تم الحفظ: ' + projectName);
-  } catch (err) {
-    console.error(err);
-    alert('خطأ: ' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-  }
-}
 
 /* ============================================================
    📂 تحميل مشروع من URL
