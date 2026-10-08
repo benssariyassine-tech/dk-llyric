@@ -2159,7 +2159,10 @@ function bindExportOptions() {
 }
 
 function openExportModal() {
-  if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
+  if (!state.audioUrl) { 
+    showAlert('ارفع أغنية أول', 'لا يمكن التصدير', 'warning'); 
+    return; 
+  }
   $('exportModal').classList.add('open');
   $('exportProgress').style.display = 'none';
   $('exportStartBtn').disabled = false;
