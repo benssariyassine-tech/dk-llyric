@@ -1911,16 +1911,131 @@ function uploadToCloudinary(blob, resourceType) {
 }
 
 async function saveProjectToCloud() {
+  console.log('🔵 Save called');
+
   if (!state.audioUrl) { alert('ارفع أغنية أول'); return; }
-  if (!_fb.ready || !_fb.user) {
+
+  if (!_fb.ready) {
+    alert('⚠️ Firebase ماشي جاهز. انتظر ثانية وحاول مرة أخرى.');
+    return;
+  }
+
+  if (!_fb.user) {
     if (confirm('سجّل دخولك باش تحفظ المشروع. تروح للصفحة الرئيسية؟')) {
       window.location.href = 'index.html';
     }
     return;
   }
 
-  var projectName = prompt('اسم المشروع:', state.songName || 'مشروعي');
-  if (!projectName) return;
+  console.log('🔵 User:', _fb.user.uid);
+
+  // ✅ بدّل prompt بـ input يدوي
+  var projectName = state.songName || 'مشروعي';
+  var userInput = window.prompt('اسم المشروع:', projectName);
+  
+  // إلا ما رجعش شي (بعض المتصفحات) → استعمل الاسم الافتراضي
+  if (userInput === null) {
+    console.log('⚠️ Prompt cancelled or blocked');
+    projectName = 'مشروع ' + new Date().toLocaleDateString('ar-DZ');
+  } else if (userInput.trim() === '') {
+    projectName = 'مشروع ' + new Date().toLocaleDateString('ar-DZ');
+  } else {
+    projectName = userInput.trim();
+  }
+
+  console.log('🔵 Project name:', projectName);
+
+  var btn = document.querySelector('.etb-btn[onclick="saveProjectToCloud()"]');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+
+  try {
+    var userId = _fb.user.uid;
+    var projectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+
+    // 1. رفع الأغنية
+    console.log('🔵 Uploading audio...');
+    var audioUrl = null;
+    if (state.audioUrl) {
+      try {
+        var audioBlob = await fetch(state.audioUrl).then(function(r) { return r.blob(); });
+        console.log('🔵 Audio blob size:', audioBlob.size);
+        audioUrl = await uploadToCloudinary(audioBlob, 'video');
+        console.log('✅ Audio uploaded:', audioUrl);
+      } catch (e) {
+        console.error('❌ Audio upload failed:', e);
+        throw new Error('فشل رفع الأغنية: ' + e.message);
+      }
+    }
+
+    // 2. رفع الخلفية
+    var bgUrl = null;
+    if (state.bgImg) {
+      console.log('🔵 Uploading bg...');
+      try {
+        var bgCanvas = document.createElement('canvas');
+        bgCanvas.width = state.bgImg.naturalWidth;
+        bgCanvas.height = state.bgImg.naturalHeight;
+        bgCanvas.getContext('2d').drawImage(state.bgImg, 0, 0);
+        var bgBlob = await new Promise(function(res) { bgCanvas.toBlob(res, 'image/jpeg', 0.85); });
+        bgUrl = await uploadToCloudinary(bgBlob, 'image');
+        console.log('✅ BG uploaded:', bgUrl);
+      } catch (e) {
+        console.error('❌ BG upload failed:', e);
+      }
+    }
+
+    // 3. رفع الغلاف
+    var coverUrl = null;
+    if (state.coverImg) {
+      console.log('🔵 Uploading cover...');
+      try {
+        var covCanvas = document.createElement('canvas');
+        covCanvas.width = state.coverImg.naturalWidth;
+        covCanvas.height = state.coverImg.naturalHeight;
+        covCanvas.getContext('2d').drawImage(state.coverImg, 0, 0);
+        var covBlob = await new Promise(function(res) { covCanvas.toBlob(res, 'image/jpeg', 0.9); });
+        coverUrl = await uploadToCloudinary(covBlob, 'image');
+        console.log('✅ Cover uploaded:', coverUrl);
+      } catch (e) {
+        console.error('❌ Cover upload failed:', e);
+      }
+    }
+
+    // 4. حفظ metadata
+    console.log('🔵 Saving to Firestore...');
+    await _fb.db.collection('projects').doc(projectId).set({
+      userId: userId,
+      name: projectName,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      audioUrl: audioUrl,
+      bgUrl: bgUrl,
+      coverUrl: coverUrl,
+      data: {
+        songName: state.songName,
+        artistName: state.artistName,
+        igName: state.igName,
+        lyrics: state.lyrics,
+        font: state.font,
+        card: state.card,
+        bgFilters: state.bgFilters,
+        audioStart: state.audioStart,
+        audioEnd: state.audioEnd,
+        trimIn: state.trimIn,
+        trimOut: state.trimOut,
+        duration: state.duration
+      }
+    });
+
+    console.log('✅ Saved to Firestore!');
+    alert('✅ تم الحفظ: ' + projectName);
+  } catch (err) {
+    console.error('❌ SAVE ERROR:', err);
+    alert('خطأ: ' + err.message + '\n\nCode: ' + (err.code || 'N/A'));
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
 
   var btn = document.querySelector('.etb-btn[onclick="saveProjectToCloud()"]');
   if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
