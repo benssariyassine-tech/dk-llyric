@@ -1579,10 +1579,12 @@ function bindUploads() {
     if (!file) return;
     var url = URL.createObjectURL(file);
     var img = new Image();
-    img.onload = function() {
-      state.bgImg = img;
-      state.bgImgVersion++;
-      invalidateBgCache();
+img.onload = function() {
+  state.bgImg = img;
+  state._cloudBgUrl = null;
+  state.bgImgVersion++;
+  invalidateBgCache();
+  
       $('bgPreview').classList.remove('hidden');
       $('bgPreviewImg').src = url;
       $('bgPreviewName').textContent = file.name;
