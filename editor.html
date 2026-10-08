@@ -2100,8 +2100,7 @@ function applyFont() {
     btn.classList.toggle('active', btn.dataset.color === state.font.color);
   });
   
-  console.log('✅ تم تطبيق الخط:', state.font.family);
-}
+
 async function loadProjectFromCloud(projectId) {
   if (!_fb || !_fb.ready) {
     await new Promise(function(res) {
