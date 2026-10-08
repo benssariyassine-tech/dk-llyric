@@ -718,20 +718,39 @@ function drawFrame(ctx, W, H, t) {
   var footerH = 20 * s;
   var div2Y = cardY + cardH - padY - footerH - gap;
 
-  var idx = findActiveLyric(t);
-  var prev = '', curr = '', next = '';
+var idx = findActiveLyric(t);
+  var prev = '', curr = '♪', next = '';
+
   if (idx >= 0) {
+    // في سطر نشط
     prev = idx > 0 ? (state.lyrics[idx - 1].text || '') : '';
-    curr = state.lyrics[idx].text || '...';
     next = idx < state.lyrics.length - 1 ? (state.lyrics[idx + 1].text || '') : '';
-  } else if (state.lyrics.length > 0) {
-    curr = state.lyrics[0].text || '...';
-    next = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
+
+    var currText = state.lyrics[idx].text || '';
+    if (currText.trim() !== '') {
+      curr = currText;         // النص موجود → يظهر
+    } else {
+      curr = '♪';              // السطر فارغ → رمز موسيقى
+    }
+  } else {
+    // بين سطرين أو قبل/بعد كل السطور — ابحث يدوياً
+    for (var i = 0; i < state.lyrics.length; i++) {
+      var l = state.lyrics[i];
+      // آخر سطر انتهى قبل الوقت الحالي = السطر السابق
+      if (l.start + l.duration <= t) {
+        prev = l.text || '';
+      }
+      // أول سطر لم يبدأ بعد = السطر القادم
+      if (l.start > t && next === '') {
+        next = l.text || '';
+      }
+    }
+    curr = '♪';
   }
 
-// ✅ الأنيميشن مرتبط بوقت الفيديو، ماشي بوقت الحاسوب
-  var animElapsed = 0;
-  if (idx >= 0 && state.lyrics[idx]) {
+// ✅ الأنيميشن فقط للسطور اللي فيها نص حقيقي
+  var animElapsed = 1000; // افتراضي: مكتمل (بلا أنيميشن)
+  if (idx >= 0 && state.lyrics[idx] && state.lyrics[idx].text && state.lyrics[idx].text.trim() !== '') {
     animElapsed = Math.max(0, (t - state.lyrics[idx].start)) * 1000;
   }
   var animP = Math.min(1, animElapsed / LYRIC_ANIM_MS);
