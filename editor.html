@@ -1782,6 +1782,7 @@ function addLyric() {
   var t = round1(state.currentTime);
   state.lyrics.push({ text: '', start: t, duration: 3 });
   renderLyricsList(); renderTimeline(); renderRuler();
+  markDirty();
 }
 var _editingLyricIndex = -1;
 
