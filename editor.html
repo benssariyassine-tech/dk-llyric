@@ -1331,8 +1331,9 @@ function startResize(e, index, side) {
       state.lyrics[index].start = pending.start;
       state.lyrics[index].duration = pending.duration;
     }
-    renderRuler();
+renderRuler();
     renderTimeline();
+    markDirty();
   }
 
   document.addEventListener('mousemove', move);
