@@ -2099,7 +2099,7 @@ function applyFont() {
   document.querySelectorAll('.color-btn').forEach(function(btn) {
     btn.classList.toggle('active', btn.dataset.color === state.font.color);
   });
-  
+}
 
 async function loadProjectFromCloud(projectId) {
   if (!_fb || !_fb.ready) {
