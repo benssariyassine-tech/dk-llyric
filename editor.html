@@ -1385,17 +1385,23 @@ lpTimer = setTimeout(function() {
     }
   }
 
-  function onEnd() {
+function onEnd() {
+    var wasDragging = dragging;
     clearTimeout(lpTimer);
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup', onEnd);
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', onEnd);
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    if (dragging) {
+    if (wasDragging) {
       seg.classList.remove('dragging');
       renderRuler();
       updateTimeDisplay();
+    } else {
+      // ضغطة سريعة = افتح القائمة
+      state.selected = { type: 'audio', index: -1 };
+      showAudioMenu();
+      if (navigator.vibrate) try { navigator.vibrate(10); } catch (err) {}
     }
     dragging = false;
   }
