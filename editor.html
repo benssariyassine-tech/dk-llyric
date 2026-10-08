@@ -1911,6 +1911,12 @@ function uploadToCloudinary(blob, resourceType) {
 }
 
 async function saveProjectToCloud() {
+  console.log('🔵 زر الحفظ تنقر');
+  console.log('audioUrl:', state.audioUrl);
+  console.log('fb.ready:', _fb.ready);
+  console.log('fb.user:', _fb.user ? _fb.user.uid : 'null');
+  
+
   // ✅ عرض كل خطوة على الشاشة
   var log = [];
   function showLog(msg) {
