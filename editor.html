@@ -754,11 +754,12 @@ function drawFrame(ctx, W, H, t) {
     ctx.restore();
   }
 
-  if (curr) {
+if (curr) {
     ctx.save();
-    var slideY = (1 - easeOut) * 10 * s;
-    var scaleAmt = 0.96 + easeOut * 0.04;
-    ctx.globalAlpha = Math.max(0.3, easeOut);
+    var slideY = (1 - easeOut) * 8 * s;
+    var scaleAmt = 0.94 + easeOut * 0.06;
+    // ✅ الشفافية ما تنقصش على 0.85 — باش تبقى واضحة
+    ctx.globalAlpha = Math.max(0.85, easeOut);
     ctx.translate(cx, lyricsCenterY + slideY);
     ctx.scale(scaleAmt, scaleAmt);
     ctx.translate(-cx, -(lyricsCenterY + slideY));
@@ -766,8 +767,11 @@ function drawFrame(ctx, W, H, t) {
     ctx.font = '700 ' + fontSize + 'px ' + font;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-    ctx.shadowBlur = 20 * s;
+    // ✅ ظل أقوى للوضوح
+    ctx.shadowColor = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur = 12 * s;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2 * s;
     ctx.fillText(curr, cx, lyricsCenterY);
     ctx.restore();
   }
