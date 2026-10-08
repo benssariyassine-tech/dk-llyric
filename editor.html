@@ -2165,6 +2165,147 @@ function loadImageCORS(url) {
     img.src = url;
   });
 }
+  /* ============================================================
+   💾 Auto-Save System
+   ============================================================ */
+
+// 1. Toast بسيط
+function showSaveToast(msg, type) {
+  var t = document.getElementById('saveToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'saveToast';
+    t.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;z-index:99999;backdrop-filter:blur(20px);transition:opacity 0.3s;opacity:0;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  var colors = {
+    saving: 'rgba(10,132,255,0.9)',
+    success: 'rgba(50,215,75,0.9)',
+    error: 'rgba(255,69,58,0.9)'
+  };
+  t.style.background = colors[type] || colors.saving;
+  t.textContent = msg;
+  t.style.opacity = '1';
+  
+  clearTimeout(t._timer);
+  if (type !== 'saving') {
+    t._timer = setTimeout(function() { t.style.opacity = '0'; }, 2000);
+  }
+}
+
+// 2. علامة "تغيير غير محفوظ"
+function markDirty() {
+  state._dirty = true;
+}
+
+// 3. حفظ محلي كل 5 ثواني
+function saveLocalDraft() {
+  try {
+    var draft = {
+      songName: state.songName,
+      artistName: state.artistName,
+      igName: state.igName,
+      lyrics: state.lyrics,
+      font: state.font,
+      card: state.card,
+      bgFilters: state.bgFilters,
+      audioStart: state.audioStart,
+      audioEnd: state.audioEnd,
+      trimIn: state.trimIn,
+      trimOut: state.trimOut,
+      duration: state.duration,
+      savedAt: Date.now()
+    };
+    localStorage.setItem('dk_llyric_draft', JSON.stringify(draft));
+  } catch (e) {}
+}
+
+// 4. تشغيل الحفظ التلقائي
+function startAutoSave() {
+  // حفظ محلي كل 5 ثواني
+  setInterval(saveLocalDraft, 5000);
+  
+  // حفظ سحابي كل 60 ثانية (إلا كان تغيير + أغنية)
+  setInterval(function() {
+    if (state._dirty && state.audioUrl && _fb.user && !state._saving) {
+      console.log('☁️ Auto-save...');
+      saveProjectToCloud(false);
+    }
+  }, 60000);
+  
+  // حفظ محلي ملي يخرج من الصفحة
+  window.addEventListener('beforeunload', saveLocalDraft);
+  
+  console.log('✅ Auto-save مفعّل');
+}
+
+// 5. استرجاع المسودة
+function restoreLocalDraft() {
+  try {
+    var raw = localStorage.getItem('dk_llyric_draft');
+    if (!raw) return false;
+    var d = JSON.parse(raw);
+    
+    // ما نسترجعوش إلا كان قديم بزاف (7 أيام)
+    if (Date.now() - (d.savedAt || 0) > 7 * 24 * 60 * 60 * 1000) {
+      localStorage.removeItem('dk_llyric_draft');
+      return false;
+    }
+    
+    state.songName = d.songName || '';
+    state.artistName = d.artistName || '';
+    state.igName = d.igName || 'dk.llyric';
+    state.lyrics = d.lyrics || state.lyrics;
+    state.font = d.font || state.font;
+    state.card = d.card || state.card;
+    state.bgFilters = d.bgFilters || state.bgFilters;
+    state.audioStart = d.audioStart || 0;
+    state.audioEnd = d.audioEnd || 15;
+    state.trimIn = d.trimIn || 0;
+    state.trimOut = d.trimOut || 15;
+    state.duration = d.duration || 0;
+    
+    // حدّث UI
+    if ($('songNameInput')) $('songNameInput').value = state.songName;
+    if ($('artistNameInput')) $('artistNameInput').value = state.artistName;
+    if ($('igNameInput')) $('igNameInput').value = state.igName;
+    
+    renderLyricsList();
+    renderTimeline();
+    renderRuler();
+    updateTimeDisplay();
+    
+    console.log('✅ استرجعنا المسودة:', new Date(d.savedAt).toLocaleString());
+    return true;
+  } catch (e) {
+    console.error('restore draft error:', e);
+    return false;
+  }
+}
+
+// 6. ربط كل الأحداث بـ markDirty
+function bindDirtyTracking() {
+  // الكلمات
+  var origRenderLyrics = renderLyricsList;
+  renderLyricsList = function() {
+    origRenderLyrics.apply(this, arguments);
+    // كل input فـ الكلمات
+    document.querySelectorAll('.lyric-text-input').forEach(function(inp) {
+      inp.addEventListener('input', markDirty);
+    });
+  };
+  
+  // الـ sliders
+  document.querySelectorAll('.slider').forEach(function(s) {
+    s.addEventListener('input', markDirty);
+  });
+  
+  // inputs
+  ['songNameInput','artistNameInput','igNameInput'].forEach(function(id) {
+    var el = $(id);
+    if (el) el.addEventListener('input', markDirty);
+  });
+}
 </script>
 
   <!-- Font Preloader — يجبر المتصفح يحمل كل الخطوط -->
