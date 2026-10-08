@@ -1811,6 +1811,27 @@ function addLyric() {
   renderLyricsList(); renderTimeline(); renderRuler();
   markDirty();
 }
+  /* ===== CONFIRM MODAL ===== */
+var _confirmCallback = null;
+
+function showConfirm(message, onConfirm, title) {
+  $('confirmModalTitle').textContent = title || 'تأكيد';
+  $('confirmModalMessage').textContent = message;
+  _confirmCallback = onConfirm;
+  
+  var okBtn = $('confirmModalOkBtn');
+  okBtn.onclick = function() {
+    closeConfirmModal();
+    if (_confirmCallback) _confirmCallback();
+  };
+  
+  $('confirmModal').classList.add('open');
+}
+
+function closeConfirmModal() {
+  $('confirmModal').classList.remove('open');
+  _confirmCallback = null;
+}
 var _editingLyricIndex = -1;
 
 function editLyricTime(i) {
