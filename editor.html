@@ -1750,8 +1750,9 @@ function cmAction(action) {
       if (t > l.start && t < l.start + l.duration) {
         var first = { text: l.text, start: l.start, duration: round1(t - l.start) };
         var second = { text: l.text, start: round1(t), duration: round1(l.start + l.duration - t) };
-        state.lyrics.splice(i, 1, first, second);
+state.lyrics.splice(i, 1, first, second);
         renderTimeline(); renderLyricsList(); renderRuler();
+        markDirty();
       }
     }
     hideCapcutMenu();
@@ -1764,11 +1765,10 @@ function cmAction(action) {
         start: round1(orig.start + orig.duration),
         duration: orig.duration
       };
-      state.lyrics.splice(i + 1, 0, copy);
-      renderTimeline();
-      renderLyricsList();
-      renderRuler();
-      showSaveToast(' تم النسخ', 'success');
+ state.lyrics.splice(i + 1, 0, copy);
+      renderTimeline(); renderLyricsList(); renderRuler();
+      markDirty();
+      showSaveToast('تم النسخ', 'success');
     }
     hideCapcutMenu();
   } else if (action === 'edit') {
