@@ -1878,6 +1878,36 @@ function addLyric() {
   renderLyricsList(); renderTimeline(); renderRuler();
   markDirty();
 }
+  /* ===== INPUT MODAL ===== */
+var _inputCallback = null;
+
+function showInput(title, label, defaultValue, onSave) {
+  $('inputModalTitle').textContent = title || 'إدخال';
+  $('inputModalLabel').textContent = label || 'القيمة';
+  $('inputModalField').value = defaultValue || '';
+  _inputCallback = onSave;
+  
+  $('inputModal').classList.add('open');
+  
+  // focus + select
+  setTimeout(function() {
+    var f = $('inputModalField');
+    f.focus();
+    f.select();
+  }, 300);
+}
+
+function closeInputModal() {
+  $('inputModal').classList.remove('open');
+  _inputCallback = null;
+}
+
+function saveInputModal() {
+  var value = $('inputModalField').value.trim();
+  var cb = _inputCallback;
+  closeInputModal();
+  if (cb) cb(value);
+}
   /* ===== ALERT MODAL ===== */
 function showAlert(message, title, type) {
   $('alertModalTitle').textContent = title || 'تنبيه';
