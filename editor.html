@@ -1337,7 +1337,7 @@ function bindAudioSegment() {
 
   function onDown(e) {
     if (e.target.classList.contains('seg-handle')) return;
-    e.preventDefault();
+    
     e.stopPropagation();
 
     state.selected = { type: 'audio', index: -1 };
