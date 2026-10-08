@@ -1613,6 +1613,22 @@ function cmAction(action) {
       }
     }
     hideCapcutMenu();
+    } else if (action === 'copy') {
+    if (state.selected.type === 'text' && state.selected.index >= 0) {
+      var i = state.selected.index;
+      var orig = state.lyrics[i];
+      var copy = {
+        text: orig.text || '',
+        start: round1(orig.start + orig.duration),
+        duration: orig.duration
+      };
+      state.lyrics.splice(i + 1, 0, copy);
+      renderTimeline();
+      renderLyricsList();
+      renderRuler();
+      showSaveToast(' تم النسخ', 'success');
+    }
+    hideCapcutMenu();
   } else if (action === 'edit') {
     hideCapcutMenu();
     openTab('text', document.querySelector('[data-tab="text"]'));
