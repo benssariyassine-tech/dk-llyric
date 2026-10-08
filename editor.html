@@ -953,6 +953,7 @@ function openAudioPicker() { $('audioInput').click(); }
 function removeAudio() {
   if (state.audioUrl) URL.revokeObjectURL(state.audioUrl);
   state.audioUrl = null;
+  state._cloudAudioUrl = null;
   state.duration = 0;
   state.audioEnd = 15;
   $('audioPlayer').src = '';
