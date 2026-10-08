@@ -911,6 +911,8 @@ function bindAudio() {
     if (!file) return;
     if (state.audioUrl) URL.revokeObjectURL(state.audioUrl);
     state.audioUrl = URL.createObjectURL(file);
+    state._cloudAudioUrl = null;
+    player.src = state.audioUrl;
     player.src = state.audioUrl;
     player.load();
 
