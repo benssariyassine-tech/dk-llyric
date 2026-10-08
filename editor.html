@@ -729,11 +729,11 @@ function drawFrame(ctx, W, H, t) {
     next = state.lyrics[1] ? (state.lyrics[1].text || '') : '';
   }
 
-  if (idx !== _lyricAnim.lastIdx) {
-    _lyricAnim.lastIdx = idx;
-    _lyricAnim.startTime = performance.now();
+// ✅ الأنيميشن مرتبط بوقت الفيديو، ماشي بوقت الحاسوب
+  var animElapsed = 0;
+  if (idx >= 0 && state.lyrics[idx]) {
+    animElapsed = Math.max(0, (t - state.lyrics[idx].start)) * 1000;
   }
-  var animElapsed = performance.now() - _lyricAnim.startTime;
   var animP = Math.min(1, animElapsed / LYRIC_ANIM_MS);
   var easeOut = 1 - Math.pow(1 - animP, 3);
 
