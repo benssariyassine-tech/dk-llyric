@@ -1911,173 +1911,119 @@ function uploadToCloudinary(blob, resourceType) {
 }
 
 async function saveProjectToCloud() {
-  console.log('🔵 زر الحفظ تنقر');
-  console.log('audioUrl:', state.audioUrl);
-  console.log('fb.ready:', _fb.ready);
-  console.log('fb.user:', _fb.user ? _fb.user.uid : 'null');
-  
-
-  // ✅ عرض كل خطوة على الشاشة
-  var log = [];
-  function showLog(msg) {
-    log.push(msg);
-    console.log(msg);
-  }
-
   try {
-    showLog('1. رفع أغنية...');
-    if (!state.audioUrl) { alert('❌ ارفع أغنية أول'); return; }
-
-    showLog('2. Firebase: ' + (_fb.ready ? 'جاهز' : 'ماشي جاهز'));
-    if (!_fb.ready) { alert('❌ Firebase ماشي جاهز، انتظر وحاول'); return; }
-
-    showLog('3. المستخدم: ' + (_fb.user ? _fb.user.email : 'ماشي مسجل'));
-    if (!_fb.user) { alert('❌ سجل دخول أول'); return; }
-
-    // ✅ اسم المشروع — بلا prompt
-    var projectName = state.songName || 'مشروعي';
-    var userInput = window.prompt('اسم المشروع:', projectName);
-    if (userInput === null || userInput.trim() === '') {
-      projectName = 'مشروع ' + Date.now();
-    } else {
-      projectName = userInput.trim();
-    }
-    showLog('4. اسم المشروع: ' + projectName);
-
+    alert('🟢 1. بدا الحفظ\n\naudioUrl: ' + (state.audioUrl ? 'كاين' : 'ما كاينش') + '\nFirebase: ' + (_fb.ready ? 'جاهز' : 'ماشي جاهز') + '\nUser: ' + (_fb.user ? _fb.user.uid.slice(0,8) : 'null'));
+    
+    if (!state.audioUrl) { alert('❌ 2. ارفع أغنية أول'); return; }
+    if (!_fb.ready) { alert('❌ 2. Firebase ماشي جاهز، انتظر 5 ثواني وحاول'); return; }
+    if (!_fb.user) { alert('❌ 2. ماشي مسجل دخول'); return; }
+    
+    alert('🟢 3. كل شي جاهز، غادي نبدا الرفع');
+    
     var userId = _fb.user.uid;
     var projectId = 'proj_' + Date.now();
-
-    // ===== 1. رفع الأغنية =====
-    showLog('5. رفع الأغنية على Cloudinary...');
+    
+    // رفع الأغنية
+    alert('🟢 4. غادي نرفع الأغنية...');
     var audioUrl = null;
     if (state.audioUrl) {
-      try {
-        var audioBlob = await fetch(state.audioUrl).then(function(r) { return r.blob(); });
-        showLog('   حجم الأغنية: ' + (audioBlob.size / 1024 / 1024).toFixed(1) + ' MB');
-
-        var formData = new FormData();
-        formData.append('file', audioBlob);
-        formData.append('upload_preset', CLOUDINARY_PRESET);
-        formData.append('folder', 'dk-llyric');
-
-        var res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/video/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        var data = await res.json();
-        if (data.error) {
-          throw new Error('Cloudinary: ' + data.error.message);
-        }
-        audioUrl = data.secure_url;
-        showLog('✅ تم رفع الأغنية');
-      } catch (e) {
-        alert('❌ فشل رفع الأغنية:\n\n' + e.message + '\n\n' + log.join('\n'));
+      var audioBlob = await fetch(state.audioUrl).then(function(r) { return r.blob(); });
+      alert('🟢 5. حجم الأغنية: ' + (audioBlob.size / 1024 / 1024).toFixed(2) + ' MB\nغادي نبعثها لـ Cloudinary...');
+      
+      var formData = new FormData();
+      formData.append('file', audioBlob);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      
+      var res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/video/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      var data = await res.json();
+      if (data.error) {
+        alert('❌ 6. Cloudinary رفض:\n' + data.error.message);
         return;
       }
+      audioUrl = data.secure_url;
+      alert('✅ 6. الأغنية ترفعت بنجاح');
     }
-
-    // ===== 2. رفع الخلفية =====
+    
+    // رفع الخلفية
     var bgUrl = null;
     if (state.bgImg) {
-      showLog('6. رفع الخلفية...');
-      try {
-        var bgCanvas = document.createElement('canvas');
-        bgCanvas.width = state.bgImg.naturalWidth;
-        bgCanvas.height = state.bgImg.naturalHeight;
-        bgCanvas.getContext('2d').drawImage(state.bgImg, 0, 0);
-        var bgBlob = await new Promise(function(res) { bgCanvas.toBlob(res, 'image/jpeg', 0.85); });
-
-        var fd1 = new FormData();
-        fd1.append('file', bgBlob);
-        fd1.append('upload_preset', CLOUDINARY_PRESET);
-        fd1.append('folder', 'dk-llyric');
-
-        var r1 = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
-          method: 'POST',
-          body: fd1
-        });
-        var d1 = await r1.json();
-        if (d1.error) throw new Error(d1.error.message);
-        bgUrl = d1.secure_url;
-        showLog('✅ تم رفع الخلفية');
-      } catch (e) {
-        showLog('⚠️ فشل رفع الخلفية (نكمل بلاها): ' + e.message);
-      }
+      alert('🟢 7. غادي نرفع الخلفية...');
+      var bgCanvas = document.createElement('canvas');
+      bgCanvas.width = state.bgImg.naturalWidth;
+      bgCanvas.height = state.bgImg.naturalHeight;
+      bgCanvas.getContext('2d').drawImage(state.bgImg, 0, 0);
+      var bgBlob = await new Promise(function(res) { bgCanvas.toBlob(res, 'image/jpeg', 0.85); });
+      
+      var fd1 = new FormData();
+      fd1.append('file', bgBlob);
+      fd1.append('upload_preset', CLOUDINARY_PRESET);
+      
+      var r1 = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
+        method: 'POST',
+        body: fd1
+      });
+      var d1 = await r1.json();
+      if (!d1.error) bgUrl = d1.secure_url;
     }
-
-    // ===== 3. رفع الغلاف =====
+    
+    // رفع الغلاف
     var coverUrl = null;
     if (state.coverImg) {
-      showLog('7. رفع الغلاف...');
-      try {
-        var covCanvas = document.createElement('canvas');
-        covCanvas.width = state.coverImg.naturalWidth;
-        covCanvas.height = state.coverImg.naturalHeight;
-        covCanvas.getContext('2d').drawImage(state.coverImg, 0, 0);
-        var covBlob = await new Promise(function(res) { covCanvas.toBlob(res, 'image/jpeg', 0.9); });
-
-        var fd2 = new FormData();
-        fd2.append('file', covBlob);
-        fd2.append('upload_preset', CLOUDINARY_PRESET);
-        fd2.append('folder', 'dk-llyric');
-
-        var r2 = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
-          method: 'POST',
-          body: fd2
-        });
-        var d2 = await r2.json();
-        if (d2.error) throw new Error(d2.error.message);
-        coverUrl = d2.secure_url;
-        showLog('✅ تم رفع الغلاف');
-      } catch (e) {
-        showLog('⚠️ فشل رفع الغلاف (نكمل بلاه): ' + e.message);
-      }
-    }
-
-    // ===== 4. حفظ في Firestore =====
-    showLog('8. حفظ في Firestore...');
-    try {
-      await _fb.db.collection('projects').doc(projectId).set({
-        userId: userId,
-        name: projectName,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        audioUrl: audioUrl,
-        bgUrl: bgUrl,
-        coverUrl: coverUrl,
-        data: {
-          songName: state.songName,
-          artistName: state.artistName,
-          igName: state.igName,
-          lyrics: state.lyrics,
-          font: state.font,
-          card: state.card,
-          bgFilters: state.bgFilters,
-          audioStart: state.audioStart,
-          audioEnd: state.audioEnd,
-          trimIn: state.trimIn,
-          trimOut: state.trimOut,
-          duration: state.duration
-        }
+      alert('🟢 8. غادي نرفع الغلاف...');
+      var covCanvas = document.createElement('canvas');
+      covCanvas.width = state.coverImg.naturalWidth;
+      covCanvas.height = state.coverImg.naturalHeight;
+      covCanvas.getContext('2d').drawImage(state.coverImg, 0, 0);
+      var covBlob = await new Promise(function(res) { covCanvas.toBlob(res, 'image/jpeg', 0.9); });
+      
+      var fd2 = new FormData();
+      fd2.append('file', covBlob);
+      fd2.append('upload_preset', CLOUDINARY_PRESET);
+      
+      var r2 = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
+        method: 'POST',
+        body: fd2
       });
-    } catch (fsErr) {
-      alert(
-        '❌ فشل الحفظ في Firestore\n\n' +
-        'الخطأ: ' + fsErr.message + '\n' +
-        'الكود: ' + (fsErr.code || 'N/A') + '\n\n' +
-        'الحل المقترح:\n' +
-        '- روح لـ Firebase → Firestore → Rules\n' +
-        '- تأكد أن Test Mode فعّال ولا زيد قاعدة السماح'
-      );
-      return;
+      var d2 = await r2.json();
+      if (!d2.error) coverUrl = d2.secure_url;
     }
-
-    showLog('✅ تم الحفظ في Firestore');
-    alert('✅ تم الحفظ بنجاح!\n\nاسم: ' + projectName);
-
+    
+    // حفظ في Firestore
+    alert('🟢 9. غادي نحفظ في Firestore...');
+    
+    await _fb.db.collection('projects').doc(projectId).set({
+      userId: userId,
+      name: state.songName || 'مشروعي',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      audioUrl: audioUrl,
+      bgUrl: bgUrl,
+      coverUrl: coverUrl,
+      data: {
+        songName: state.songName,
+        artistName: state.artistName,
+        igName: state.igName,
+        lyrics: state.lyrics,
+        font: state.font,
+        card: state.card,
+        bgFilters: state.bgFilters,
+        audioStart: state.audioStart,
+        audioEnd: state.audioEnd,
+        trimIn: state.trimIn,
+        trimOut: state.trimOut,
+        duration: state.duration
+      }
+    });
+    
+    alert('🎉✅ تم الحفظ بنجاح!\n\n' + (state.songName || 'مشروعي'));
+    
   } catch (err) {
-    alert('❌ خطأ غير متوقع:\n\n' + err.message + '\n\nالخطوات:\n' + log.join('\n'));
+    alert('❌ خطأ:\n\n' + err.message + '\n\n' + (err.code || ''));
+    console.error(err);
   }
 }
 
