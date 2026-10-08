@@ -140,6 +140,17 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 .cm-item svg{width:20px;height:20px;stroke:var(--text-color);fill:none}
 .cm-item.danger svg{stroke:var(--danger)}
 .cm-item.danger span{color:var(--danger)}
+  .alert-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.alert-modal.open{display:flex}
+.alert-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.alert-modal-box{position:relative;width:100%;max-width:340px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-radius:22px;border:1px solid rgba(255,255,255,0.12);padding:26px 22px 22px;animation:confirmPop 0.3s cubic-bezier(0.16,1,0.3,1);text-align:center}
+.alert-modal-icon{width:56px;height:56px;border-radius:50%;background:rgba(10,132,255,0.15);border:1.5px solid rgba(10,132,255,0.35);color:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.alert-modal-icon.success{background:rgba(50,215,75,0.15);border-color:rgba(50,215,75,0.35);color:#32d74b}
+.alert-modal-icon.error{background:rgba(255,69,58,0.15);border-color:rgba(255,69,58,0.35);color:#ff453a}
+.alert-modal-icon.warning{background:rgba(255,214,10,0.15);border-color:rgba(255,214,10,0.35);color:#ffd60a}
+.alert-modal-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:10px}
+.alert-modal-message{font-size:13.5px;color:var(--subtext-color);line-height:1.6;margin-bottom:22px;word-break:break-word}
+.alert-modal-btn{width:100%;padding:13px;border-radius:12px;font-size:14px;font-weight:800;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 20px rgba(10,132,255,0.4)}
   .confirm-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-modal.open{display:flex}
 .confirm-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
