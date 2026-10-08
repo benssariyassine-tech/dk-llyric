@@ -3,131 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>dk.llyric — قوالب جاهزة</title>
+<title>dk.llyric — قوالب فيديو جاهزة</title>
 <meta name="theme-color" content="#07070d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07070d;
-  --text:#fff;
-  --sub:#8e8e93;
-  --accent:#0a84ff;
-  --accent2:#0062d2;
-  --danger:#ff453a;
-  --border:rgba(255,255,255,0.1);
+  --bg:#07070d;--text:#fff;--sub:#8e8e93;--accent:#0a84ff;--accent2:#0062d2;
+  --danger:#ff453a;--border:rgba(255,255,255,0.1);--success:#32d74b;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:Cairo,Inter,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
 a{text-decoration:none;color:inherit}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
-/* ===== AMBIENT ===== */
 .ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.35;animation:float 22s ease-in-out infinite}
-.blob-1{width:360px;height:360px;background:#0a84ff;top:-100px;right:-100px}
-.blob-2{width:320px;height:320px;background:#bf5af2;bottom:-80px;left:-80px;animation-delay:-10s}
-.blob-3{width:240px;height:240px;background:#ff2d92;top:50%;left:20%;animation-delay:-15s}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.4;animation:float 22s ease-in-out infinite}
+.blob-1{width:380px;height:380px;background:#0a84ff;top:-120px;right:-120px}
+.blob-2{width:340px;height:340px;background:#bf5af2;bottom:-100px;left:-100px;animation-delay:-10s}
+.blob-3{width:260px;height:260px;background:#ff2d92;top:45%;left:15%;animation-delay:-15s;opacity:0.25}
 @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-50px)}}
 
-/* ===== PAGE ===== */
-.page{position:relative;z-index:1;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px calc(env(safe-area-inset-bottom,0px) + 40px);max-width:520px;margin:0 auto;display:flex;flex-direction:column}
+.page{position:relative;z-index:1;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px calc(env(safe-area-inset-bottom,0px) + 40px);max-width:560px;margin:0 auto;display:flex;flex-direction:column}
 
-/* ===== TOPBAR ===== */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:10px}
 .logo{display:flex;align-items:baseline;font-family:Inter,sans-serif;font-size:22px;font-weight:900;letter-spacing:-1.2px}
 .logo-dk{color:#fff}
 .logo-dot{color:var(--accent);margin:0 2px}
 .logo-lyric{background:linear-gradient(135deg,#0a84ff,#5ac8fa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 
-.btn-signin{padding:9px 16px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;font-size:13px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px);transition:all 0.2s}
-.btn-signin:active{transform:scale(0.96)}
-.btn-signin svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn-auth{padding:9px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:12px;font-size:12.5px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px);transition:all 0.2s;flex-shrink:0}
+.btn-auth:active{transform:scale(0.96)}
+.btn-auth svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
-.user-chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;background:rgba(255,255,255,0.06 CENT);ERborder:1px solid var(--border);border-radius:ED30px}
-.user-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff}
-.user-name{font-size:12px;font-weight:800;color:#fff;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:30px;flex-shrink:0;transition:all 0.2s}
+.user-chip:active{background:rgba(255,255,255,0.1)}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+.user-name{font-size:12px;font-weight:800;color:#fff;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ===== HERO — ===== */
-.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 0 40px;min-height:60vh;gap:20px}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.3);border-radius:20px;font-size:11px;font-weight:800;color:var(--accent);letter-spacing:0.5px}
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 0 24px;gap:18px}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.28);border-radius:20px;font-size:11.5px;font-weight:800;color:var(--accent)}
 .hero-badge-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
 
-.hero-title{font-size:34px;font-weight:900;line-height:1.2;letter-spacing:-0.8px;margin:0}
+.hero-title{font-size:34px;font-weight:900;line-height:1.2;letter-spacing:-1px;max-width:420px}
 .hero-title .grad{background:linear-gradient(135deg,#0a84ff,#5ac8fa,#bf5af2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:14.5px;line-height:1.65;color:var(--sub);font-weight:500;max-width:360px;margin:0}
+.hero-sub{font-size:14.5px;line-height:1.7;color:var(--sub);font-weight:500;max-width:380px}
 
-/* CTA in center */
-.cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:320px;padding:18px 24px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:18px;font-size:16px;font-weight:900;box-shadow:0 14px 40px rgba(10,132,255,0.45),inset 0 1px 0 rgba(255,255,255,0.2);transition:all 0.2s;margin-top:6px}
-.cta:active{transform:scale(0.97);box-shadow:0 8px 24px rgba(10,132,255,0.35)}
-.cta svg{width:18px;height:18px;fill:#fff}
+.cta-wrap{margin:6px 0 12px;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:11px;width:100%;max-width:340px;padding:19px 28px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:18px;font-size:16px;font-weight:900;box-shadow:0 16px 44px rgba(10,132,255,0.45),inset 0 1px 0 rgba(255,255,255,0.2);transition:all 0.2s;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent 60%);pointer-events:none}
+.cta:active{transform:scale(0.97)}
+.cta svg{width:19px;height:19px;fill:#fff;position:relative;z-index:1}
+.cta span{position:relative;z-index:1}
 
-.cta-hint{font-size:12px;color:var(--sub);font-weight:600;margin-top:-6px}
-.cta-hint-sep{display:inline-block;margin:0 6px;opacity:0.5}
+.cta-hint{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--sub);font-weight:600;flex-wrap:wrap;justify-content:center}
+.cta-hint-item{display:flex;align-items:center;gap:4px}
+.cta-hint-item svg{width:13px;height:13px;stroke:var(--success);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 
-/* ===== SECTIONS ===== */
-.section{margin-bottom:32px}
-.section-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.section-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.15),transparent)}
-.section-title svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-
-/* ===== STATS ===== */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px}
-.stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:16px 8px;text-align:center;backdrop-filter:blur(10px);position:relative;overflow:hidden}
-.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(10,132,255,0.5),transparent)}
-.stat-num{font-size:20px;font-weight:900;color:#fff;line-height:1;margin-bottom:6px;font-family:Inter,sans-serif}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
+.stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(10,132,255,0.6),transparent)}
+.stat-num{font-size:22px;font-weight:900;color:#fff;line-height:1;margin-bottom:6px;font-family:Inter,sans-serif}
 .stat-num .unit{font-size:12px;color:var(--accent);font-weight:700;margin-right:2px}
-.stat-label{font-size:10.5px;color:var(--sub);font-weight:700;letter-spacing:0.3px}
+.stat-label{font-size:10.5px;color:var(--sub);font-weight:700}
 
-/* ===== FEATURES ===== */
+.section{margin-bottom:32px}
+.section-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.section-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.15),transparent)}
+.section-title svg{width:17px;height:17px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.section-count{font-size:11px;font-weight:800;color:var(--sub);background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:8px}
+
+.templates{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.template{aspect-ratio:9/16;border-radius:16px;background:linear-gradient(160deg,rgba(10,132,255,0.18),rgba(191,90,242,0.12));border:1px solid var(--border);position:relative;overflow:hidden;display:flex;flex-direction:column;transition:all 0.25s;cursor:pointer}
+.template:active{transform:scale(0.97)}
+.template::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,0.06),transparent 50%);pointer-events:none}
+.template-content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px;position:relative;z-index:1}
+.template-icon{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.template-icon svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.template-name{font-size:12px;font-weight:900;color:#fff;text-align:center}
+.template-desc{font-size:10px;color:rgba(255,255,255,0.55);font-weight:700;text-align:center;line-height:1.4}
+.template-tag{position:absolute;top:10px;right:10px;padding:4px 10px;background:rgba(50,215,75,0.2);backdrop-filter:blur(10px);border-radius:8px;font-size:9px;font-weight:900;color:var(--success);z-index:1}
+.template-tag.soon{background:rgba(255,159,10,0.2);color:#ff9f0a}
+
+.projects-guest{background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15);border-radius:16px;padding:26px 18px;text-align:center;backdrop-filter:blur(10px)}
+.projects-guest-icon{width:48px;height:48px;margin:0 auto 14px;border-radius:14px;background:linear-gradient(135deg,rgba(10,132,255,0.2),rgba(10,132,255,0.05));border:1px solid rgba(10,132,255,0.3);display:flex;align-items:center;justify-content:center}
+.projects-guest-icon svg{width:24px;height:24px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.projects-guest-title{font-size:15px;font-weight:900;color:#fff;margin-bottom:6px}
+.projects-guest-desc{font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:16px;max-width:300px;margin-left:auto;margin-right:auto}
+.btn-outline{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.35);border-radius:12px;color:var(--accent);font-size:13px;font-weight:800;transition:all 0.2s}
+.btn-outline:active{transform:scale(0.96);background:rgba(10,132,255,0.18)}
+.btn-outline svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.projects-list{display:flex;flex-direction:column;gap:9px}
+.project-item{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:11px;display:flex;align-items:center;gap:11px;backdrop-filter:blur(10px);transition:all 0.2s;cursor:pointer}
+.project-item:active{background:rgba(255,255,255,0.08);transform:scale(0.99)}
+.project-thumb{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,rgba(10,132,255,0.25),rgba(191,90,242,0.25));display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.project-thumb svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.project-thumb img{width:100%;height:100%;object-fit:cover}
+.project-info{flex:1;min-width:0}
+.project-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.project-meta{font-size:10.5px;color:var(--sub);margin-top:4px;display:flex;align-items:center;gap:6px}
+.project-meta svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.project-more{padding:8px;background:transparent;border:none;color:var(--sub);font-size:18px;font-weight:900;flex-shrink:0;line-height:1}
+.project-more:active{color:var(--accent)}
+
+.projects-empty{text-align:center;padding:28px 18px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px}
+.projects-empty-icon{width:44px;height:44px;margin:0 auto 12px;opacity:0.6}
+.projects-empty-icon svg{width:100%;height:100%;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.projects-empty-text{font-size:12px;color:var(--sub);line-height:1.6}
+
+.projects-loading{text-align:center;padding:26px;font-size:12px;color:var(--sub);display:flex;align-items:center;justify-content:center;gap:8px}
+
 .features{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.feature{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;backdrop-filter:blur(10px);transition:all 0.2s}
-.feature:active{background:rgba(255,255,255,0.06)}
+.feature{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;backdrop-filter:blur(10px)}
 .feature-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(10,132,255,0.25),rgba(10,132,255,0.05));border:1px solid rgba(10,132,255,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .feature-icon svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .feature-title{font-size:13px;font-weight:900;color:#fff}
 .feature-desc{font-size:11px;color:var(--sub);line-height:1.5}
 
-/* ===== TEMPLATES ===== */
-.templates{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.template{aspect-ratio:9/16;border-radius:14px;background:linear-gradient(160deg,rgba(10,132,255,0.15),rgba(191,90,242,0.15));border:1px solid var(--border);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.template:active{transform:scale(0.98)}
-.template-content{text-align:center;padding:12px}
-.template-icon{width:36px;height:36px;margin:0 auto 8px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-.template-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.template-name{font-size:11px;font-weight:800;color:#fff;letter-spacing:0.3px}
-.template-tag{font-size:9px;color:var(--sub);margin-top:3px;font-weight:700}
-
-/* ===== PROJECTS ===== */
-.projects-guest{background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15);border-radius:16px;padding:24px 16px;text-align:center}
-.projects-guest-icon{width:44px;height:44px;margin:0 auto 12px;border-radius:12px;background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.25);display:flex;align-items:center;justify-content:center}
-.projects-guest-icon svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.projects-guest-title{font-size:14px;font-weight:900;color:#fff;margin-bottom:6px}
-.projects-guest-desc{font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:16px}
-.btn-outline{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.35);border-radius:12px;color:var(--accent);font-size:12.5px;font-weight:800;transition:all 0.2s}
-.btn-outline:active{transform:scale(0.96)}
-.btn-outline svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-
-.projects-list{display:flex;flex-direction:column;gap:8px}
-.project-item{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px);transition:all 0.2s}
-.project-item:active{background:rgba(255,255,255,0.07)}
-.project-thumb{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(10,132,255,0.25),rgba(191,90,242,0.25));display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-.project-thumb svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.project-thumb img{width:100%;height:100%;object-fit:cover}
-.project-info{flex:1;min-width:0}
-.project-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.project-meta{font-size:10.5px;color:var(--sub);margin-top:3px}
-.project-action{padding:7px 12px;background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);border-radius:9px;color:var(--accent);font-size:11px;font-weight:800}
-
-.projects-empty{text-align:center;padding:24px 16px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px}
-.projects-empty-icon{width:40px;height:40px;margin:0 auto 10px;opacity:0.5}
-.projects-empty-icon svg{width:100%;height:100%;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.projects-empty-text{font-size:12px;color:var(--sub);line-height:1.55}
-
-.projects-loading{text-align:center;padding:24px;font-size:12px;color:var(--sub)}
-
-/* ===== HOW ===== */
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:14px;backdrop-filter:blur(10px)}
 .step-num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(10,132,255,0.35);font-family:Inter,sans-serif}
@@ -135,48 +130,55 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .step-title{font-size:13px;font-weight:900;color:#fff;margin-bottom:3px}
 .step-desc{font-size:11.5px;color:var(--sub);line-height:1.55}
 
-/* ===== FOOTER ===== */
-.footer{text-align:center;margin-top:auto;padding-top:32px;border-top:1px solid var(--border)}
+.footer{text-align:center;margin-top:auto;padding-top:36px;border-top:1px solid var(--border)}
 .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:14px;flex-wrap:wrap}
 .footer-link{font-size:12px;color:var(--sub);font-weight:700;transition:color 0.2s}
 .footer-link:active{color:var(--accent)}
 .footer-copy{font-size:11px;color:var(--sub)}
 .footer-copy strong{color:var(--accent);font-weight:800}
 
-/* ===== MODAL ===== */
 .modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
 .modal.open{display:flex}
 .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.modal-box{position:relative;width:100%;max-width:480px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.12);padding:24px 22px calc(30px + env(safe-area-inset-bottom,0px));animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1)}
+.modal-box{position:relative;width:100%;max-width:480px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.12);padding:24px 22px calc(30px + env(safe-area-inset-bottom,0px));animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1);max-height:90vh;overflow-y:auto}
 @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-close{position:absolute;top:14px;left:14px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;padding:0}
 .modal-close svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round}
 .modal-title{font-size:20px;font-weight:900;color:#fff;text-align:center;margin-bottom:6px}
-.modal-subtitle{font-size:12px;color:var(--sub);text-align:center;margin-bottom:24px;line-height:1.5}
+.modal-subtitle{font-size:12.5px;color:var(--sub);text-align:center;margin-bottom:22px;line-height:1.5}
 
-.auth-input{width:100%;padding:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:12px}
+.auth-input{width:100%;padding:14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
 .auth-input:focus{border-color:var(--accent)}
+.auth-input::placeholder{color:rgba(255,255,255,0.35)}
 
-.auth-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:900;margin-top:6px;box-shadow:0 10px 28px rgba(10,132,255,0.4)}
+.auth-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:900;margin-top:6px;box-shadow:0 10px 28px rgba(10,132,255,0.4);transition:all 0.2s}
 .auth-btn:active{transform:scale(0.98)}
 .auth-btn:disabled{opacity:0.5}
 
 .auth-switch{text-align:center;font-size:12.5px;color:var(--sub);margin-top:16px}
 .auth-switch button{color:var(--accent);font-weight:800;text-decoration:underline;padding:4px 6px}
 
-.auth-error{background:rgba(255,69,58,0.12);border:1px solid rgba(255,69,58,0.3);color:#ff453a;font-size:12px;padding:10px;border-radius:10px;text-align:center;margin-bottom:12px;display:none}
+.auth-error{background:rgba(255,69,58,0.12);border:1px solid rgba(255,69,58,0.3);color:var(--danger);font-size:12px;padding:11px;border-radius:10px;text-align:center;margin-bottom:12px;display:none;line-height:1.4}
 .auth-error.show{display:block}
 
 .auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0}
 .auth-divider .line{flex:1;height:1px;background:var(--border)}
 .auth-divider span{font-size:11px;color:var(--sub);font-weight:700}
 
-.btn-google{width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:14px;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google{width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:14px;color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s}
 .btn-google:active{background:rgba(255,255,255,0.1)}
+.btn-google:disabled{opacity:0.5}
 .btn-google svg{width:18px;height:18px}
 
-.loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.project-menu{position:fixed;z-index:9998;background:rgba(30,30,38,0.98);border:1px solid var(--border);border-radius:14px;padding:6px;min-width:150px;backdrop-filter:blur(30px);box-shadow:0 20px 50px rgba(0,0,0,0.6);animation:menuIn 0.15s ease}
+@keyframes menuIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.project-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;font-size:13px;font-weight:700;border-radius:9px;text-align:right;font-family:inherit}
+.project-menu button:active{background:rgba(255,255,255,0.06)}
+.project-menu button.danger{color:var(--danger)}
+.project-menu button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -194,35 +196,48 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     <div class="logo">
       <span class="logo-dk">dk</span><span class="logo-dot">.</span><span class="logo-lyric">llyric</span>
     </div>
-    <button class="btn-signin" id="authBtn" onclick="openAuthModal()">
+    <button class="btn-auth" id="authBtn" onclick="handleAuthClick()">
       <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
       <span>تسجيل الدخول</span>
     </button>
   </div>
 
-  <!-- ===== HERO (CENTERED) ===== -->
+  <!-- ===== HERO ===== -->
   <div class="hero">
     <div class="hero-badge">
       <span class="hero-badge-dot"></span>
-      <span>قوالب جاهزة للتصميم</span>
+      <span>قوالب فيديو جاهزة للتصميم</span>
     </div>
 
     <h1 class="hero-title">
-      صمّم <span class="grad">فيديوهات</span><br>
+      أنشئ <span class="grad">فيديوهات</span><br>
       احترافية في دقائق
     </h1>
 
     <p class="hero-sub">
-      اختر قالب جاهز، خصّصه كما تحب، وصدّر الفيديو بجودة عالية. بدون خبرة في التصميم.
+      اختر قالب جاهز، خصّصه كما تحب، وصدّر الفيديو بجودة عالية — بدون أي خبرة في التصميم.
     </p>
+  </div>
 
+  <!-- ===== CTA ===== -->
+  <div class="cta-wrap">
     <a href="editor.html" class="cta">
       <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       <span>ابدأ التصميم مجاناً</span>
     </a>
-
     <div class="cta-hint">
-      بلا تسجيل<span class="cta-hint-sep">•</span>بلا علامة مائية
+      <div class="cta-hint-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>بلا علامة مائية</span>
+      </div>
+      <div class="cta-hint-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>حفظ سحابي</span>
+      </div>
+      <div class="cta-hint-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>مجاني</span>
+      </div>
     </div>
   </div>
 
@@ -251,21 +266,23 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     </div>
     <div class="templates">
       <div class="template" onclick="window.location.href='editor.html'">
-        <div class="template-content">
-          <div class="template-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          </div>
-          <div class="template-name">بطاقة</div>
-          <div class="template-tag">قريباً</div>
-        </div>
-      </div>
-      <div class="template" onclick="window.location.href='editor.html'">
+        <div class="template-tag">متوفر</div>
         <div class="template-content">
           <div class="template-icon">
             <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="13" y2="14"/></svg>
           </div>
-          <div class="template-name">نص</div>
-          <div class="template-tag">قريباً</div>
+          <div class="template-name">بطاقة الكلمات</div>
+          <div class="template-desc">كلمات متزامنة مع الصوت</div>
+        </div>
+      </div>
+      <div class="template">
+        <div class="template-tag soon">قريباً</div>
+        <div class="template-content">
+          <div class="template-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="template-name">صورة + نص</div>
+          <div class="template-desc">تصاميم بسيطة وأنيقة</div>
         </div>
       </div>
     </div>
@@ -276,11 +293,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     <div class="section-title">
       <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       <span>مشاريعي</span>
+      <span class="section-count" id="projectsCount" style="display:none;">0</span>
       <div class="line"></div>
     </div>
-    <div id="projectsContainer">
-      <!-- يتعمر بالـ JS -->
-    </div>
+    <div id="projectsContainer"></div>
   </div>
 
   <!-- ===== FEATURES ===== -->
@@ -322,7 +338,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     </div>
   </div>
 
-  <!-- ===== HOW ===== -->
+  <!-- ===== HOW (STEP 1) ===== -->
   <div class="section">
     <div class="section-title">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
@@ -343,11 +359,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
           <div class="step-title">أضف محتواك</div>
           <div class="step-desc">ارفع الوسائط واكتب النصوص</div>
         </div>
-     24  </24div>
+      </div>
       <div class="step">
-        <div class"><="step-num">3</div>
-        <divline class="step-content">
-          <div class=" xstep-title">خصّص التصميم</div>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">خصّص التصميم</div>
           <div class="step-desc">الخطوط والألوان والتأثيرات</div>
         </div>
       </div>
@@ -365,12 +381,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <div class="footer">
     <div class="footer-links">
       <a class="footer-link" href="editor.html">المحرر</a>
-      <a class="footer-link" href="javascript:void(0)" onclick="openAuthModal()">حسابي</a>
+      <a class="footer-link" href="javascript:void(0)" onclick="handleAuthClick()">حسابي</a>
       <a class="footer-link" href="https://instagram.com/dk.llyric" target="_blank">Instagram</a>
     </div>
-    <div class="footer-copy">
-      صُنع بواسطة <strong>dk.llyric</strong> — 2026
-    </div>
+    <div class="footer-copy">صُنع بواسطة <strong>dk.llyric</strong> — 2026</div>
   </div>
 
 </div>
@@ -380,33 +394,26 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <div class="modal-backdrop" onclick="closeAuthModal()"></div>
   <div class="modal-box">
     <button class="modal-close" onclick="closeAuthModal()">
-      <svg viewBox="0 0 1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-
     <h3 class="modal-title" id="authTitle">مرحباً بك</h3>
-    <p class="modal-subtitle" id="authSubtitle">سجّل دخولك لحفظ مشاريعك</p>
-
+    <p class="modal-subtitle" id="authSubtitle">سجّل دخولك لحفظ مشاريعك في السحابة</p>
     <div class="auth-error" id="authError"></div>
-
     <input type="email" class="auth-input" id="authEmail" placeholder="البريد الإلكتروني" autocomplete="email" inputmode="email">
     <input type="password" class="auth-input" id="authPassword" placeholder="كلمة المرور (6 أحرف على الأقل)" autocomplete="current-password">
     <input type="password" class="auth-input" id="authPassword2" placeholder="تأكيد كلمة المرور" autocomplete="new-password" style="display:none;">
-
     <button class="auth-btn" id="authSubmitBtn" onclick="submitAuth()">
       <span id="authSubmitText">تسجيل الدخول</span>
     </button>
-
     <div class="auth-switch">
       <span id="authSwitchText">ما عندكش حساب؟</span>
       <button id="authSwitchBtn" onclick="toggleAuthMode()">إنشاء حساب</button>
     </div>
-
     <div class="auth-divider">
       <div class="line"></div>
       <span>أو</span>
       <div class="line"></div>
     </div>
-
     <button class="btn-google" onclick="signInWithGoogle()">
       <svg viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -423,6 +430,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* ============================================================
+   dk.llyric — Home with Firebase
+   ============================================================ */
 
 var firebaseConfig = {
   apiKey: "AIzaSyC_yjHpXcygeUcuMKqqr-FH_35p32TZQbE",
@@ -459,15 +471,18 @@ function updateAuthUI() {
   if (_fb.user) {
     var name = _fb.user.displayName || _fb.user.email || 'حسابي';
     var initial = name.charAt(0).toUpperCase();
+    var photo = _fb.user.photoURL;
+    var avatarContent = photo ? '<img src="' + photo + '" alt="">' : initial;
+
     btn.outerHTML =
-      '<div class="user-chip" id="authBtn" onclick="openAuthModal()">' +
-        '<div class="user-avatar">' + initial + '</div>' +
-        '<div class="user-name">' + name.split('@')[0] + '</div>' +
-      '</div>';
+      '<button class="user-chip" id="authBtn" onclick="handleAuthClick()">' +
+        '<div class="user-avatar">' + avatarContent + '</div>' +
+        '<div class="user-name">' + escapeHtml(name.split('@')[0]) + '</div>' +
+      '</button>';
   } else {
     if (btn.classList.contains('user-chip')) {
       btn.outerHTML =
-        '<button class="btn-signin" id="authBtn" onclick="openAuthModal()">' +
+        '<button class="btn-auth" id="authBtn" onclick="handleAuthClick()">' +
           '<svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>' +
           '<span>تسجيل الدخول</span>' +
         '</button>';
@@ -475,16 +490,29 @@ function updateAuthUI() {
   }
 }
 
+function handleAuthClick() {
+  if (_fb.user) {
+    var name = _fb.user.displayName || _fb.user.email || 'حسابي';
+    if (confirm('تسجيل الخروج من: ' + name + '؟')) {
+      firebase.auth().signOut().then(function() { loadMyProjects(); });
+    }
+    return;
+  }
+  openAuthModal();
+}
+
 function renderProjectsGuest() {
   var c = document.getElementById('projectsContainer');
+  var count = document.getElementById('projectsCount');
+  if (count) count.style.display = 'none';
   if (!c) return;
   c.innerHTML =
     '<div class="projects-guest">' +
       '<div class="projects-guest-icon">' +
         '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' +
       '</div>' +
-      '<div class="projects-guest-title">ما كاينش مشاريع محفوظة</div>' +
-      '<div class="projects-guest-desc">سجّل دخولك باش تحفظ مشاريعك وترجع ليهم من أي جهاز</div>' +
+      '<div class="projects-guest-title">احفظ مشاريعك في السحابة</div>' +
+      '<div class="projects-guest-desc">سجّل دخولك باش تحفظ مشاريعك وترجع ليهم من أي جهاز، أي وقت</div>' +
       '<button class="btn-outline" onclick="openAuthModal()">' +
         '<svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>' +
         '<span>سجّل الدخول</span>' +
@@ -495,7 +523,7 @@ function renderProjectsGuest() {
 function renderProjectsLoading() {
   var c = document.getElementById('projectsContainer');
   if (!c) return;
-  c.innerHTML = '<div class="projects-loading">جاري تحميل المشاريع...<span class="loader"></span></div>';
+  c.innerHTML = '<div class="projects-loading">جاري التحميل<span class="loader"></span></div>';
 }
 
 async function loadMyProjects() {
@@ -505,7 +533,7 @@ async function loadMyProjects() {
   try {
     var snap = await _fb.db.collection('projects')
       .where('userId', '==', _fb.user.uid)
-      .limit(20)
+      .limit(30)
       .get();
 
     var docs = [];
@@ -515,7 +543,10 @@ async function loadMyProjects() {
     });
 
     var c = document.getElementById('projectsContainer');
+    var count = document.getElementById('projectsCount');
+
     if (docs.length === 0) {
+      if (count) count.style.display = 'none';
       c.innerHTML =
         '<div class="projects-empty">' +
           '<div class="projects-empty-icon">' +
@@ -526,21 +557,30 @@ async function loadMyProjects() {
       return;
     }
 
+    if (count) {
+      count.style.display = 'inline-block';
+      count.textContent = docs.length;
+    }
+
     var html = '<div class="projects-list">';
     docs.forEach(function(item) {
       var d = item.data;
-      var date = new Date(d.updatedAt || d.createdAt).toLocaleDateString('ar-DZ');
+      var date = formatDate(d.updatedAt || d.createdAt);
       var thumb = d.coverUrl
         ? '<img src="' + d.coverUrl + '" alt="">'
         : '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="13" y2="14"/></svg>';
+
       html +=
-        '<div class="project-item" onclick="openProject(\'' + item.id + '\')">' +
+        '<div class="project-item" data-id="' + item.id + '" onclick="openProject(\'' + item.id + '\')">' +
           '<div class="project-thumb">' + thumb + '</div>' +
           '<div class="project-info">' +
             '<div class="project-name">' + escapeHtml(d.name || 'مشروع بدون اسم') + '</div>' +
-            '<div class="project-meta">' + date + '</div>' +
+            '<div class="project-meta">' +
+              '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+              '<span>' + date + '</span>' +
+            '</div>' +
           '</div>' +
-          '<div class="project-action">فتح</div>' +
+          '<button class="project-more" onclick="event.stopPropagation(); showProjectMenu(event, \'' + item.id + '\', \'' + escapeHtml(d.name || 'مشروع').replace(/'/g, "\\'") + '\')">⋯</button>' +
         '</div>';
     });
     html += '</div>';
@@ -553,8 +593,81 @@ async function loadMyProjects() {
   }
 }
 
+function formatDate(ts) {
+  if (!ts) return '';
+  var d = new Date(ts);
+  var now = new Date();
+  var diff = now - d;
+  var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (days === 0) return 'اليوم';
+  if (days === 1) return 'أمس';
+  if (days < 7) return days + ' أيام';
+  return d.toLocaleDateString('ar-DZ', { day: 'numeric', month: 'short' });
+}
+
 function openProject(projectId) {
   window.location.href = 'editor.html?project=' + projectId;
+}
+
+function showProjectMenu(event, projectId, projectName) {
+  event.stopPropagation();
+  closeProjectMenu();
+
+  var menu = document.createElement('div');
+  menu.className = 'project-menu';
+  menu.id = 'projectMenu';
+  menu.innerHTML =
+    '<button onclick="openProject(\'' + projectId + '\')">' +
+      '<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+      '<span>فتح</span>' +
+    '</button>' +
+    '<button class="danger" onclick="deleteProject(\'' + projectId + '\', \'' + projectName + '\')">' +
+      '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>' +
+      '<span>حذف</span>' +
+    '</button>';
+
+  document.body.appendChild(menu);
+
+  var rect = event.target.getBoundingClientRect();
+  var menuRect = menu.getBoundingClientRect();
+  var left = rect.left - menuRect.width + rect.width;
+  var top = rect.bottom + 6;
+
+  if (top + menuRect.height > window.innerHeight - 20) {
+    top = rect.top - menuRect.height - 6;
+  }
+  if (left < 10) left = 10;
+  if (left + menuRect.width > window.innerWidth - 10) {
+    left = window.innerWidth - menuRect.width - 10;
+  }
+
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+
+  setTimeout(function() {
+    document.addEventListener('click', closeProjectMenuOnce);
+  }, 10);
+}
+
+function closeProjectMenuOnce() {
+  closeProjectMenu();
+  document.removeEventListener('click', closeProjectMenuOnce);
+}
+
+function closeProjectMenu() {
+  var m = document.getElementById('projectMenu');
+  if (m) m.remove();
+}
+
+async function deleteProject(projectId, projectName) {
+  if (!confirm('حذف "' + projectName + '"؟ ما تقدرش ترجع.')) return;
+  try {
+    await _fb.db.collection('projects').doc(projectId).delete();
+    loadMyProjects();
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
 }
 
 function escapeHtml(s) {
@@ -565,12 +678,6 @@ function escapeHtml(s) {
 }
 
 function openAuthModal() {
-  if (_fb.user) {
-    if (confirm('تسجيل الخروج؟')) {
-      firebase.auth().signOut().then(function() { loadMyProjects(); });
-    }
-    return;
-  }
   document.getElementById('authModal').classList.add('open');
   _authMode = 'signin';
   updateAuthModalUI();
@@ -651,7 +758,6 @@ function submitAuth() {
 
   promise.then(function() {
     closeAuthModal();
-    loadMyProjects();
   }).catch(function(err) {
     btn.disabled = false;
     txt.textContent = originalText;
@@ -662,6 +768,7 @@ function submitAuth() {
     else if (err.code === 'auth/weak-password') msg = 'كلمة المرور ضعيفة بزاف';
     else if (err.code === 'auth/invalid-email') msg = 'بريد إلكتروني غير صحيح';
     else if (err.code === 'auth/network-request-failed') msg = 'مشكل في الاتصال بالإنترنت';
+    else if (err.code === 'auth/operation-not-allowed') msg = 'هاد الطريقة ماشي مفعّلة في Firebase';
     showAuthError(msg);
   });
 }
@@ -672,11 +779,19 @@ function signInWithGoogle() {
   if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
 
   firebase.auth().signInWithPopup(provider)
-    .then(function() { closeAuthModal(); loadMyProjects(); })
+    .then(function() {
+      closeAuthModal();
+    })
     .catch(function(err) {
       if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
       if (err.code === 'auth/popup-closed-by-user') return;
-      showAuthError('تعذر تسجيل الدخول بـ Google');
+      if (err.code === 'auth/operation-not-allowed') {
+        showAuthError('Google Sign-in ماشي مفعّل في Firebase');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        showAuthError('هاد الدومين ماشي مسموح — زيدو في Firebase Auth Settings');
+      } else {
+        showAuthError('تعذر تسجيل الدخول بـ Google');
+      }
     });
 }
 
