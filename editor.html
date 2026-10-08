@@ -2549,6 +2549,7 @@ function showSaveToast(msg, type) {
 function markDirty() {
   state._dirty = true;
   updateSaveIcon();
+  pushHistory();
 }
 
 // 3. حفظ محلي كل 5 ثواني
