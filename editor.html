@@ -140,6 +140,20 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
 .cm-item svg{width:20px;height:20px;stroke:var(--text-color);fill:none}
 .cm-item.danger svg{stroke:var(--danger)}
 .cm-item.danger span{color:var(--danger)}
+  .input-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
+.input-modal.open{display:flex}
+.input-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.input-modal-box{position:relative;width:100%;max-width:480px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.12);padding:20px 22px calc(24px + env(safe-area-inset-bottom,0px));animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1)}
+.input-modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.25);border-radius:4px;margin:0 auto 18px}
+.input-modal-title{font-size:16px;font-weight:900;color:#fff;margin-bottom:18px;text-align:center}
+.input-modal-group{margin-bottom:14px}
+.input-modal-label{display:block;font-size:11px;font-weight:800;color:var(--subtext-color);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.input-modal-input{padding:14px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border-color);border-radius:12px;color:#fff;font-size:15px;font-weight:600;outline:none;width:100%;font-family:inherit;-webkit-user-select:text;user-select:text}
+.input-modal-input:focus{border-color:var(--accent);background:rgba(10,132,255,0.08)}
+.input-modal-actions{display:flex;gap:10px;margin-top:20px}
+.input-modal-btn{flex:1;padding:14px;border-radius:12px;font-size:14px;font-weight:800;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.input-modal-btn.cancel{background:rgba(255,255,255,0.08);color:#fff}
+.input-modal-btn.confirm{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 20px rgba(10,132,255,0.4)}
   .alert-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
 .alert-modal.open{display:flex}
 .alert-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
