@@ -2374,7 +2374,11 @@ async function saveProjectToCloud(manual) {
   state._saving = true;
   
   try {
-    if (!state.audioUrl) { if (manual) alert('ارفع أغنية أول'); state._saving = false; return; }
+if (!state.audioUrl) { 
+  if (manual) showAlert('ارفع أغنية أول', 'تنبيه', 'warning'); 
+  state._saving = false; 
+  return; 
+}
     if (!_fb.ready || !_fb.user) { if (manual) alert('Firebase ماشي جاهز'); state._saving = false; return; }
     
     showSaveToast('⏳ جاري الحفظ...', 'saving');
