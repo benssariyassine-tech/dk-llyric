@@ -437,6 +437,20 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
     <span>حذف</span>
   </button>
 </div>
+  <div id="confirmModal" class="confirm-modal">
+  <div class="confirm-modal-backdrop" onclick="closeConfirmModal()"></div>
+  <div class="confirm-modal-box">
+    <h3 class="confirm-modal-title" id="confirmModalTitle">تأكيد</h3>
+    <p class="confirm-modal-message" id="confirmModalMessage">واش متأكد؟</p>
+    <div class="confirm-modal-actions">
+      <button class="confirm-modal-btn cancel" onclick="closeConfirmModal()">إلغاء</button>
+      <button class="confirm-modal-btn confirm" id="confirmModalOkBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>تأكيد</span>
+      </button>
+    </div>
+  </div>
+</div>
 <div id="timeModal" class="time-modal">
   <div class="time-modal-backdrop" onclick="closeTimeModal()"></div>
   <div class="time-modal-box">
