@@ -1399,9 +1399,19 @@ lpTimer = setTimeout(function() {
     }
     dragging = false;
   }
-
-  seg.addEventListener('mousedown', onDown);
+seg.addEventListener('mousedown', onDown);
   seg.addEventListener('touchstart', onDown, { passive: false });
+
+  // ✅ ضغطة وحدة = قائمة الأغنية
+  seg.addEventListener('click', function(e) {
+    if (e.target.classList.contains('seg-handle')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    state.selected = { type: 'audio', index: -1 };
+    seg.classList.add('selected');
+    showAudioMenu();
+    if (navigator.vibrate) try { navigator.vibrate(10); } catch (err) {}
+  });
 
   var hL = document.createElement('div');
   hL.className = 'seg-handle handle-left';
