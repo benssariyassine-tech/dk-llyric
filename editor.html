@@ -1600,8 +1600,9 @@ img.onload = function() {
     var url = URL.createObjectURL(file);
     var img = new Image();
     img.onload = function() {
-      state.coverImg = img;
-      $('coverPreview').classList.remove('hidden');
+  state.coverImg = img;
+  state._cloudCoverUrl = null;
+  $('coverPreview').classList.remove('hidden');
       $('coverPreviewImg').src = url;
       $('coverPreviewName').textContent = file.name;
       $('coverUploadBtn').classList.add('hidden');
