@@ -1657,9 +1657,19 @@ function renderLyricsList() {
     row.className = 'lyric-row';
 
     // عدد السطر + الوقت
-    var meta = document.createElement('div');
+var meta = document.createElement('div');
     meta.className = 'lyric-meta';
-    meta.textContent = (i + 1) + '. ' + round1(l.start) + 's → ' + round1(l.start + l.duration) + 's';
+    meta.style.cursor = 'pointer';
+    meta.style.padding = '4px 6px';
+    meta.style.borderRadius = '6px';
+    meta.style.background = 'rgba(255,255,255,0.04)';
+    meta.style.display = 'flex';
+    meta.style.alignItems = 'center';
+    meta.style.gap = '6px';
+    meta.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>' + (i + 1) + '. ' + round1(l.start) + 's → ' + round1(l.start + l.duration) + 's</span>';
+    meta.onclick = (function(idx) {
+      return function() { editLyricTime(idx); };
+    })(i);
 
     var inp = document.createElement('input');
     inp.type = 'text';
