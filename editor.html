@@ -2224,6 +2224,7 @@ function showSaveToast(msg, type) {
 // 2. علامة "تغيير غير محفوظ"
 function markDirty() {
   state._dirty = true;
+  updateSaveIcon();
 }
 
 // 3. حفظ محلي كل 5 ثواني
