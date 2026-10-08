@@ -1679,34 +1679,38 @@ function addLyric() {
   state.lyrics.push({ text: '', start: t, duration: 3 });
   renderLyricsList(); renderTimeline(); renderRuler();
 }
+var _editingLyricIndex = -1;
+
 function editLyricTime(i) {
+  _editingLyricIndex = i;
   var l = state.lyrics[i];
-  var startInput = prompt(
-    'وقت البداية (بالثواني):\n(الحالي: ' + round1(l.start) + 's)',
-    round1(l.start)
-  );
-  if (startInput === null) return;
+  $('timeStartInput').value = round1(l.start);
+  $('timeDurationInput').value = round1(l.duration);
+  $('timeModal').classList.add('open');
+}
+
+function closeTimeModal() {
+  $('timeModal').classList.remove('open');
+  _editingLyricIndex = -1;
+}
+
+function saveTimeModal() {
+  if (_editingLyricIndex < 0) return;
   
-  var durationInput = prompt(
-    'المدة (بالثواني):\n(الحالية: ' + round1(l.duration) + 's)',
-    round1(l.duration)
-  );
-  if (durationInput === null) return;
-  
-  var newStart = parseFloat(startInput);
-  var newDuration = parseFloat(durationInput);
+  var newStart = parseFloat($('timeStartInput').value);
+  var newDuration = parseFloat($('timeDurationInput').value);
   
   if (isNaN(newStart) || newStart < 0) {
-    alert('وقت البداية غير صحيح');
+    showSaveToast('وقت البداية غير صحيح', 'error');
     return;
   }
   if (isNaN(newDuration) || newDuration < 0.5) {
-    alert('المدة خاصها تكون 0.5 على الأقل');
+    showSaveToast('المدة خاصها تكون 0.5 على الأقل', 'error');
     return;
   }
   
-  state.lyrics[i].start = round1(newStart);
-  state.lyrics[i].duration = round1(newDuration);
+  state.lyrics[_editingLyricIndex].start = round1(newStart);
+  state.lyrics[_editingLyricIndex].duration = round1(newDuration);
   
   renderLyricsList();
   renderTimeline();
@@ -1714,6 +1718,7 @@ function editLyricTime(i) {
   updateTimeDisplay();
   markDirty();
   showSaveToast('تم التعديل', 'success');
+  closeTimeModal();
 }
 function removeLyricAt(i) {
   if (state.lyrics.length <= 1) return;
