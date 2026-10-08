@@ -1825,10 +1825,11 @@ function showConfirm(message, onConfirm, title) {
   $('confirmModalMessage').textContent = message;
   _confirmCallback = onConfirm;
   
-  var okBtn = $('confirmModalOkBtn');
+var okBtn = $('confirmModalOkBtn');
   okBtn.onclick = function() {
+    var cb = _confirmCallback;
     closeConfirmModal();
-    if (_confirmCallback) _confirmCallback();
+    if (cb) cb();
   };
   
   $('confirmModal').classList.add('open');
