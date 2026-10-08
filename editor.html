@@ -1697,10 +1697,11 @@ function audioAction(action) {
     if (t > state.audioStart + 0.5 && t < state.audioEnd - 0.5) {
       // الجزء الأول
       var newEnd = round1(t);
-      state.audioEnd = newEnd;
+state.audioEnd = newEnd;
       state.trimOut = round1(state.trimIn + (newEnd - state.audioStart));
       renderRuler();
       updateAudioSegmentUI();
+      markDirty();
       hideAudioMenu();
       clearSelection();
       showSaveToast('تم القص', 'success');
@@ -1738,6 +1739,7 @@ function cmAction(action) {
       if (state.lyrics.length <= 1) return;
       state.lyrics.splice(state.selected.index, 1);
       renderTimeline(); renderLyricsList(); renderRuler();
+      markDirty();
     } else if (state.selected.type === 'audio') {
       removeAudio();
     }
