@@ -2240,7 +2240,9 @@ async function startExport() {
 
 /* ===== MISC ===== */
 function closeEditor() {
-  if (confirm('إغلاق المشروع؟')) location.href = 'index.html';
+  showConfirm('واش متأكد من إغلاق المشروع؟ التعديلات غير المحفوظة غادي تضيع.', function() {
+    location.href = 'index.html';
+  }, 'إغلاق المشروع');
 }
 
 document.addEventListener('click', function(e) {
