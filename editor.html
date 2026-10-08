@@ -655,8 +655,11 @@ function init() {
       // ✅ تشغيل الحفظ التلقائي
       startAutoSave();
       
-      // ✅ أول أيقونة
+    // ✅ أول أيقونة
       updateSaveIcon();
+      
+      // ✅ أول snapshot فـ التاريخ
+      pushHistory();
       
       console.log('dk.llyric loaded');
     } catch (err) {
