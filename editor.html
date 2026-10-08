@@ -2153,7 +2153,14 @@ async function loadProjectFromCloud(projectId) {
         setTimeout(finish, 4000);
       });
       state.audioUrl = full.audioUrl;
+state.audioUrl = full.audioUrl;
       state.duration = audioEl.duration || d.duration || 15;
+
+      state._projectId = projectId;
+      state._cloudAudioUrl = full.audioUrl || null;
+      state._cloudBgUrl = full.bgUrl || null;
+      state._cloudCoverUrl = full.coverUrl || null;
+      state._createdAt = full.createdAt || Date.now();
 
       $('audioUploadBtn').classList.add('hidden');
       $('audioPreview').classList.remove('hidden');
