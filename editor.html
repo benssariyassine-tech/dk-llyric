@@ -1654,6 +1654,12 @@ function renderLyricsList() {
   state.lyrics.forEach(function(l, i) {
     var row = document.createElement('div');
     row.className = 'lyric-row';
+
+    // عدد السطر + الوقت
+    var meta = document.createElement('div');
+    meta.className = 'lyric-meta';
+    meta.textContent = (i + 1) + '. ' + round1(l.start) + 's → ' + round1(l.start + l.duration) + 's';
+
     var inp = document.createElement('input');
     inp.type = 'text';
     inp.className = 'lyric-text-input';
@@ -1663,11 +1669,21 @@ function renderLyricsList() {
       state.lyrics[i].text = inp.value;
       renderTimeline();
     });
+
     var btn = document.createElement('button');
     btn.className = 'lyric-remove-btn';
-    btn.textContent = 'x';
+    btn.textContent = '×';
     btn.onclick = function() { removeLyricAt(i); };
-    row.appendChild(inp); row.appendChild(btn);
+
+    var wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.gap = '4px';
+    wrapper.appendChild(meta);
+    wrapper.appendChild(inp);
+
+    row.appendChild(wrapper);
+    row.appendChild(btn);
     c.appendChild(row);
   });
 }
