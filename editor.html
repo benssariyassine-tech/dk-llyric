@@ -1858,8 +1858,123 @@ document.addEventListener('click', function(e) {
   if (e.target.closest('.playhead')) return;
   clearSelection();
 }, true);
+/* ============================================================
+   📂 تحميل مشروع من URL
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  var projectId = params.get('project');
+  if (projectId) {
+    // انتظر حتى يجهز Firebase والـ Canvas
+    setTimeout(function() {
+      loadProjectFromCloud(projectId);
+    }, 1500);
+  }
+});
 
+async function loadProjectFromCloud(projectId) {
+  if (!_fb || !_fb.ready) {
+    await new Promise(function(res) {
+      var t = setInterval(function() {
+        if (_fb && _fb.ready) { clearInterval(t); res(); }
+      }, 100);
+      setTimeout(function() { clearInterval(t); res(); }, 5000);
+    });
+  }
+
+  if (!_fb || !_fb.user) {
+    alert('خاصك تسجل دخول أول');
+    return;
+  }
+
+  try {
+    var doc = await _fb.db.collection('projects').doc(projectId).get();
+    if (!doc.exists) { alert('المشروع ما كاينش'); return; }
+    var full = doc.data();
+    var d = full.data || {};
+
+    // حمّل الصور
+    if (full.bgUrl) {
+      state.bgImg = await loadImageCORS(full.bgUrl);
+      state.bgImgVersion++;
+      invalidateBgCache();
+      $('bgPreview').classList.remove('hidden');
+      $('bgPreviewImg').src = full.bgUrl;
+      $('bgPreviewName').textContent = 'خلفية محملة';
+      $('جbgUploadBtn').classList.add('hiddenّ');
+      $('bgFiltersBox').style.display = 'block';
+ع    }
+
+    if (full.coverUrl) ال {
+      state.coverImg = await loadImageCORS(fullـ.coverUrl);
+      $('coverPreview').classList state.remove('hidden');
+      $('coverPreviewImg').src = full.coverUrl;
+      $('coverPreviewName').textContent = 'غلاف محمل';
+      $('coverUploadBtn').classList.add('hidden');
+    }
+
+    // حمّل الأغنية
+    if (full.audioUrl) {
+      var audioEl = $('audioPlayer');
+      audioEl.src = full.audioUrl;
+      audioEl.crossOrigin = 'anonymous';
+      await new Promise(function(res) {
+        var done = false;
+        var finish = function() { if (!done) { done = true; res(); } };
+        audioEl.onloadedmetadata = finish;
+        setTimeout(finish, 4000);
+      });
+      state.audioUrl = full.audioUrl;
+      state.duration = audioEl.duration || d.duration || 15;
+
+      $('audioUploadBtn').classList.add('hidden');
+      $('audioPreview').classList.remove('hidden');
+      $('audioPreviewName').textContent = 'أغنية محملة';
+      $('audioPreviewMeta').textContent = '';
+    }
+
+    // ر
+    state.songName = d.songName || '';
+    state.artistName = d.artistName || '';
+    state.igName = d.igName || 'dk.llyric';
+    state.lyrics = d.lyrics || state.lyrics;
+    state.font = d.font || state.font;
+    state.card = d.card || state.card;
+    state.bgFilters = d.bgFilters || state.bgFilters;
+    state.audioStart = d.audioStart || 0;
+    state.audioEnd = d.audioEnd || (state.duration || 15);
+    state.trimIn = d.trimIn || 0;
+    state.trimOut = d.trimOut || (state.duration || 15);
+
+    // حدّث UI
+    $('songNameInput').value = state.songName;
+    $('artistNameInput').value = state.artistName;
+    $('igNameInput').value = state.igName;
+    renderLyricsList();
+    renderTimeline();
+    renderRuler();
+    updateAudioSegmentUI();
+    updateTimeDisplay();
+    applyFont();
+
+    console.log('✅ تم تحميل المشروع:', full.name);
+  } catch (err) {
+    console.error('Load error:', err);
+    alert('خطأ في التحميل: ' + err.message);
+  }
+}
+
+function loadImageCORS(url) {
+  return new Promise(function(resolve, reject) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() { resolve(img); };
+    img.onerror = function() { reject(new Error('فشل تحميل الصورة')); };
+    img.src = url;
+  });
+}
 </script>
+
   <!-- Font Preloader — يجبر المتصفح يحمل كل الخطوط -->
 <div style="position:fixed;left:-9999px;top:-9999px;visibility:hidden;font-size:1px;line-height:1;pointer-events:none;">
   <span style="font-family:'Cairo';font-weight:700">أ</span>
