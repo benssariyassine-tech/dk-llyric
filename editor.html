@@ -1642,7 +1642,42 @@ function addLyric() {
   state.lyrics.push({ text: '', start: t, duration: 3 });
   renderLyricsList(); renderTimeline(); renderRuler();
 }
-
+function editLyricTime(i) {
+  var l = state.lyrics[i];
+  var startInput = prompt(
+    'وقت البداية (بالثواني):\n(الحالي: ' + round1(l.start) + 's)',
+    round1(l.start)
+  );
+  if (startInput === null) return;
+  
+  var durationInput = prompt(
+    'المدة (بالثواني):\n(الحالية: ' + round1(l.duration) + 's)',
+    round1(l.duration)
+  );
+  if (durationInput === null) return;
+  
+  var newStart = parseFloat(startInput);
+  var newDuration = parseFloat(durationInput);
+  
+  if (isNaN(newStart) || newStart < 0) {
+    alert('وقت البداية غير صحيح');
+    return;
+  }
+  if (isNaN(newDuration) || newDuration < 0.5) {
+    alert('المدة خاصها تكون 0.5 على الأقل');
+    return;
+  }
+  
+  state.lyrics[i].start = round1(newStart);
+  state.lyrics[i].duration = round1(newDuration);
+  
+  renderLyricsList();
+  renderTimeline();
+  renderRuler();
+  updateTimeDisplay();
+  markDirty();
+  showSaveToast('تم التعديل', 'success');
+}
 function removeLyricAt(i) {
   if (state.lyrics.length <= 1) return;
   state.lyrics.splice(i, 1);
