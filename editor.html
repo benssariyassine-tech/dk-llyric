@@ -1350,10 +1350,10 @@ function bindAudioSegment() {
     dragging = false;
 
 lpTimer = setTimeout(function() {
+      dragging = true;
       seg.classList.add('dragging');
       if (navigator.vibrate) try { navigator.vibrate(15); } catch (err) {}
       state.selected = { type: 'audio', index: -1 };
-      showAudioMenu();
     }, LONG_PRESS_MS);
 
     document.addEventListener('mousemove', onMove);
