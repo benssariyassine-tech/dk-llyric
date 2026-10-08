@@ -1828,6 +1828,7 @@ function removeLyricAt(i) {
   if (state.lyrics.length <= 1) return;
   state.lyrics.splice(i, 1);
   renderLyricsList(); renderTimeline(); renderRuler();
+  markDirty();
 }
 
 function renderLyricsList() {
