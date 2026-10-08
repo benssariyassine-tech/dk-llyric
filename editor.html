@@ -1348,10 +1348,13 @@ function bindAudioSegment() {
     snapWidth = state.audioEnd - state.audioStart;
     dragging = false;
 
-    lpTimer = setTimeout(function() {
+lpTimer = setTimeout(function() {
       dragging = true;
       seg.classList.add('dragging');
       if (navigator.vibrate) try { navigator.vibrate(15); } catch (err) {}
+      // ✅ زيد هاد السطرين
+      state.selected = { type: 'audio', index: -1 };
+      showAudioMenu();
     }, LONG_PRESS_MS);
 
     document.addEventListener('mousemove', onMove);
