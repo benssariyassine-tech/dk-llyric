@@ -1516,7 +1516,58 @@ function hideCapcutMenu() {
   $('capcutMenu').classList.remove('open');
   document.body.classList.remove('menu-open');
 }
+function audioAction(action) {
+  if (action === 'change') {
+    hideCapcutMenu();
+    hideAudioMenu();
+    openAudioPicker();
+    
+  } else if (action === 'delete') {
+    hideAudioMenu();
+    removeAudio();
+    clearSelection();
+    
+  } else if (action === 'trim') {
+    // قص الأغنية من موضع playhead
+    var t = state.currentTime;
+    if (t > state.audioStart + 0.5 && t < state.audioEnd - 0.5) {
+      // الجزء الأول
+      var newEnd = round1(t);
+      state.audioEnd = newEnd;
+      state.trimOut = round1(state.trimIn + (newEnd - state.audioStart));
+      renderRuler();
+      updateAudioSegmentUI();
+      hideAudioMenu();
+      clearSelection();
+      showSaveToast('تم القص', 'success');
+    } else {
+      alert('حدد موضع داخل الأغنية (ماشي فـ البداية ولا النهاية)');
+    }
+    
+  } else if (action === 'copy') {
+    if (state._cloudAudioUrl) {
+      navigator.clipboard.writeText(state._cloudAudioUrl).then(function() {
+        showSaveToast('تم نسخ الرابط', 'success');
+      }).catch(function() {
+        showSaveToast(' فشل النسخ', 'error');
+      });
+    } else {
+      showSaveToast(' الأغنية ماشي مرفوعة للسحابة', 'error');
+    }
+    hideAudioMenu();
+  }
+}
 
+function showAudioMenu() {
+  var m = document.getElementById('audioMenu');
+  if (m) m.classList.add('open');
+  document.body.classList.add('menu-open');
+}
+function hideAudioMenu() {
+  var m = document.getElementById('audioMenu');
+  if (m) m.classList.remove('open');
+  document.body.classList.remove('menu-open');
+}
 function cmAction(action) {
   if (action === 'delete') {
     if (state.selected.type === 'text' && state.selected.index >= 0) {
