@@ -531,7 +531,95 @@ var renderRAF = null;
 var _lpTimer = null;
 var _bgCache = { key: '', imgVersion: -1, canvas: null };
 
+/* ===== UNDO / REDO ===== */
+var _history = [];
+var _historyIndex = -1;
+var _historyLimit = 30;
+var _isRestoring = false;
 
+function captureState() {
+  if (_isRestoring) return;
+  return JSON.stringify({
+    lyrics: state.lyrics,
+    songName: state.songName,
+    artistName: state.artistName,
+    igName: state.igName,
+    font: state.font,
+    card: state.card,
+    bgFilters: state.bgFilters,
+    audioStart: state.audioStart,
+    audioEnd: state.audioEnd,
+    trimIn: state.trimIn,
+    trimOut: state.trimOut
+  });
+}
+
+function pushHistory() {
+  if (_isRestoring) return;
+  var snap = captureState();
+  if (_history[_historyIndex] === snap) return;
+  _history = _history.slice(0, _historyIndex + 1);
+  _history.push(snap);
+  if (_history.length > _historyLimit) _history.shift();
+  _historyIndex = _history.length - 1;
+  updateHistoryButtons();
+}
+
+function undo() {
+  if (_historyIndex <= 0) return;
+  _historyIndex--;
+  restoreSnapshot(_history[_historyIndex]);
+  showSaveToast('رجوع', 'success');
+}
+
+function redo() {
+  if (_historyIndex >= _history.length - 1) return;
+  _historyIndex++;
+  restoreSnapshot(_history[_historyIndex]);
+  showSaveToast('إعادة', 'success');
+}
+
+function restoreSnapshot(snap) {
+  _isRestoring = true;
+  try {
+    var d = JSON.parse(snap);
+    state.lyrics = d.lyrics || state.lyrics;
+    state.songName = d.songName || '';
+    state.artistName = d.artistName || '';
+    state.igName = d.igName || 'dk.llyric';
+    state.font = d.font || state.font;
+    state.card = d.card || state.card;
+    state.bgFilters = d.bgFilters || state.bgFilters;
+    state.audioStart = d.audioStart || 0;
+    state.audioEnd = d.audioEnd || 15;
+    state.trimIn = d.trimIn || 0;
+    state.trimOut = d.trimOut || 15;
+    
+    if ($('songNameInput')) $('songNameInput').value = state.songName;
+    if ($('artistNameInput')) $('artistNameInput').value = state.artistName;
+    if ($('igNameInput')) $('igNameInput').value = state.igName;
+    
+    renderLyricsList();
+    renderTimeline();
+    renderRuler();
+    updateAudioSegmentUI();
+    updateTimeDisplay();
+    invalidateBgCache();
+    markDirty();
+  } catch (e) {
+    console.error('restore error:', e);
+  } finally {
+    _isRestoring = false;
+    updateHistoryButtons();
+  }
+}
+
+function updateHistoryButtons() {
+  var u = $('undoBtn');
+  var r = $('redoBtn');
+  if (u) u.disabled = _historyIndex <= 0;
+  if (r) r.disabled = _historyIndex >= _history.length - 1;
+}
 function $(id) { return document.getElementById(id); }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function round1(v) { return Math.round(v * 10) / 10; }
