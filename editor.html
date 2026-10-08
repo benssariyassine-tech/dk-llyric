@@ -2037,7 +2037,7 @@ async function saveProjectToCloud(manual) {
     
     showSaveToast(' تم الحفظ', 'success');
     localStorage.removeItem('dk_llyric_draft');
-    
+    updateSaveIcon();
   } catch (err) {
     console.error(err);
     showSaveToast('❌ فشل: ' + err.message, 'error');
