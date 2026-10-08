@@ -1626,6 +1626,7 @@ function removeBackground() {
 
 function removeCover() {
   state.coverImg = null;
+  state._cloudCoverUrl = null;
   $('coverPreview').classList.add('hidden');
   $('coverUploadBtn').classList.remove('hidden');
   $('coverInput').value = '';
