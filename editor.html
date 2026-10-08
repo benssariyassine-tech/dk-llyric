@@ -404,6 +404,16 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
       <button class="upload-preview-remove" onclick="removeBackground()">x</button>
     </div>
     <div id="bgFiltersBox" style="display:none;margin-top:20px;">
+      <div class="font-group">
+  <label class="font-label">حجم الخلفية</label>
+  <div class="bg-fit-grid">
+    <button class="bg-fit-btn active" data-fit="cover" onclick="setBgFit('cover', this)">تلقائي</button>
+    <button class="bg-fit-btn" data-fit="1:1" onclick="setBgFit('1:1', this)">1:1</button>
+    <button class="bg-fit-btn" data-fit="9:16" onclick="setBgFit('9:16', this)">9:16</button>
+    <button class="bg-fit-btn" data-fit="16:9" onclick="setBgFit('16:9', this)">16:9</button>
+    <button class="bg-fit-btn" data-fit="contain" onclick="setBgFit('contain', this)">احتواء</button>
+  </div>
+</div>
       <div class="font-group"><label class="font-label">الضبابية: <span id="bgBlurVal">0</span>px</label><input type="range" id="bgBlurRange" min="0" max="30" value="0" class="slider"></div>
       <div class="font-group"><label class="font-label">السطوع: <span id="bgBrightVal">100</span>%</label><input type="range" id="bgBrightRange" min="20" max="200" value="100" class="slider"></div>
       <div class="font-group"><label class="font-label">التشبع: <span id="bgSatVal">100</span>%</label><input type="range" id="bgSatRange" min="0" max="200" value="100" class="slider"></div>
