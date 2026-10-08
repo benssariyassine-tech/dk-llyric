@@ -448,6 +448,24 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
     <span>حذف</span>
   </button>
 </div>
+  <div id="alertModal" class="alert-modal">
+  <div class="alert-modal-backdrop" onclick="closeAlertModal()"></div>
+  <div class="alert-modal-box">
+    <div class="alert-modal-icon" id="alertModalIcon">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <h3 class="alert-modal-title" id="alertModalTitle">تنبيه</h3>
+    <p class="alert-modal-message" id="alertModalMessage"></p>
+    <button class="alert-modal-btn" onclick="closeAlertModal()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>حسناً</span>
+    </button>
+  </div>
+</div>
   <div id="confirmModal" class="confirm-modal">
   <div class="confirm-modal-backdrop" onclick="closeConfirmModal()"></div>
   <div class="confirm-modal-box">
