@@ -1613,6 +1613,7 @@ img.onload = function() {
 
 function removeBackground() {
   state.bgImg = null;
+  state._cloudBgUrl = null;
   state.bgImgVersion++;
   invalidateBgCache();
   $('bgPreview').classList.add('hidden');
