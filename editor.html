@@ -2036,11 +2036,12 @@ function startAudioResize(e, side) {
       state.audioEnd = pending.audioEnd;
     }
 renderRuler();
-      renderTimeline();
-      markDirty();
-    }
-    document.addEventListener('mousemove', move);
-    document.addEventListener('mouseup', end);
+    updateTimeDisplay();
+    markDirty();
+  }
+
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', end);
   document.addEventListener('touchmove', move, { passive: false });
   document.addEventListener('touchend', end);
 }
