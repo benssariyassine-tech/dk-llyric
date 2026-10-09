@@ -1140,11 +1140,44 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function drawCover(ctx, img, dx, dy, dw, dh) {
   if (!img || !img.naturalWidth || !img.naturalHeight) return;
+  
+  var fit = state.bgFit || 'cover';
   var ir = img.naturalWidth / img.naturalHeight;
   var cr = dw / dh;
   var w, h, x, y;
-  if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
-  else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+  
+  if (fit === 'cover') {
+    // ملء الشاشة (الحالي)
+    if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+    else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+    
+  } else if (fit === 'contain') {
+    // احتواء (كيبان كامل)
+    if (ir > cr) { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+    else { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+    
+  } else {
+    // نسب ثابتة (1:1, 9:16, 16:9)
+    var parts = fit.split(':');
+    var targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+    
+    if (targetRatio > cr) {
+      w = dw;
+      h = dw / targetRatio;
+    } else {
+      h = dh;
+      w = dh * targetRatio;
+    }
+    x = dx + (dw - w) / 2;
+    y = dy + (dh - h) / 2;
+  }
+  
+  // ملي يكون contain ولا نسب ثابتة، نمسحو الخلفية الأولى
+  if (fit !== 'cover') {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(dx, dy, dw, dh);
+  }
+  
   ctx.drawImage(img, x, y, w, h);
 }
 
