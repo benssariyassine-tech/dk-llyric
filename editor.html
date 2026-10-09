@@ -2170,7 +2170,77 @@ img.onload = function() {
     img.src = url;
   });
 }
+/* ===== BACKGROUND VIDEO ===== */
+function bindBgVideo() {
+  var input = $('bgVideoInput');
+  if (!input) return;
+  
+  input.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    
+    if (state.bgVideoUrl) URL.revokeObjectURL(state.bgVideoUrl);
+    state.bgVideoUrl = URL.createObjectURL(file);
+    state._cloudBgVideoUrl = null;
+    
+    var v = $('bgVideoEl');
+    v.src = state.bgVideoUrl;
+    v.load();
+    v.muted = true;
+    
+    v.onloadedmetadata = function() {
+      state.bgVideoReady = true;
+      state.bgImg = null;  // نحيّد الصورة
+      state.bgImgVersion++;
+      invalidateBgCache();
+      
+      $('bgVideoUploadBtn').classList.add('hidden');
+      $('bgVideoPreview').classList.remove('hidden');
+      $('bgVideoPreviewPlayer').src = state.bgVideoUrl;
+      $('bgVideoPreviewName').textContent = file.name;
+      
+      // نخبي زر رفع الصورة
+      $('bgUploadBtn').classList.add('hidden');
+      $('bgPreview').classList.add('hidden');
+      $('bgFiltersBox').style.display = 'block';
+      
+      markDirty();
+      showSaveToast('تم رفع الفيديو', 'success');
+    };
+  });
+}
 
+function removeBackgroundVideo() {
+  if (state.bgVideoUrl) URL.revokeObjectURL(state.bgVideoUrl);
+  state.bgVideoUrl = null;
+  state.bgVideoReady = false;
+  state._cloudBgVideoUrl = null;
+  
+  var v = $('bgVideoEl');
+  v.pause();
+  v.src = '';
+  
+  $('bgVideoUploadBtn').classList.remove('hidden');
+  $('bgVideoPreview').classList.add('hidden');
+  $('bgVideoInput').value = '';
+  $('bgUploadBtn').classList.remove('hidden');
+  $('bgFiltersBox').style.display = 'none';
+  
+  invalidateBgCache();
+  markDirty();
+}
+
+function syncBgVideo(time) {
+  if (!state.bgVideoReady) return;
+  var v = $('bgVideoEl');
+  if (!v || !v.duration) return;
+  
+  // وقت الفيديو = وقت الأغنية (looped)
+  var videoTime = time % v.duration;
+  if (Math.abs(v.currentTime - videoTime) > 0.3) {
+    v.currentTime = videoTime;
+  }
+}
 function removeBackground() {
   state.bgImg = null;
   state._cloudBgUrl = null;
