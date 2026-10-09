@@ -421,8 +421,9 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
       <button class="upload-preview-remove" onclick="removeBackground()">x</button>
     </div>
     <div id="bgFiltersBox" style="display:none;margin-top:20px;">
-      <div class="font-group">
+<div class="font-group">
   <label class="font-label">حجم الخلفية</label>
+  <p class="sheet-hint">اسحب الخلفية بصباع واحد للتحريك، و استعمل زوج صوابع للتكبير والتصغير</p>
   <div class="bg-fit-grid">
     <button class="bg-fit-btn active" data-fit="cover" onclick="setBgFit('cover', this)">تلقائي</button>
     <button class="bg-fit-btn" data-fit="1:1" onclick="setBgFit('1:1', this)">1:1</button>
@@ -1244,6 +1245,14 @@ if (curr) {
   ctx.textBaseline = 'middle';
   ctx.fillText(state.igName, igX + iconSize + 6 * s, footerY);
   ctx.restore();
+}
+  function resetBgPosition() {
+  state.bgOffsetX = 0;
+  state.bgOffsetY = 0;
+  state.bgScale = 1;
+  invalidateBgCache();
+  markDirty();
+  showSaveToast('تم إعادة الضبط', 'success');
 }
 function setBgFit(fit, btn) {
   state.bgFit = fit;
