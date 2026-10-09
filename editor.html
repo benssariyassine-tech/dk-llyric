@@ -1329,9 +1329,10 @@ function playLoop() {
   if (state.audioUrl && el && !el.paused) {
     var fileT = el.currentTime;
     state.currentTime = state.audioStart + (fileT - state.trimIn);
-    if (fileT >= state.trimOut) {
+if (fileT >= state.trimOut) {
       state.currentTime = state.audioEnd;
       el.pause();
+      pauseBgVideo();
       state.isPlaying = false;
       updatePlayIcon();
       seekPlayhead(state.audioEnd);
