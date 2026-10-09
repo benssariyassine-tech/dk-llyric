@@ -1053,7 +1053,9 @@ function drawFrame(ctx, W, H, t) {
     if (filtered) ctx.drawImage(filtered, 0, 0, W, H);
   }
 
-  var cardW = 320 * s * state.card.scale;
+// البطاقة تتأقلم مع أصغر بعد
+  var maxCard = Math.min(W, H) * 0.92;
+  var cardW = Math.min(320 * s * state.card.scale, maxCard);
   var cardH = cardW;
   var cardX = (W - cardW) / 2;
   var cardY = (H - cardH) / 2;
