@@ -956,7 +956,17 @@ function drawFrame(ctx, W, H, t) {
   var cardY = (H - cardH) / 2;
   var radius = state.card.radius * s;
 
-  if (state.bgImg) {
+if (state.bgVideoReady) {
+    var v2 = $('bgVideoEl');
+    if (v2 && v2.readyState >= 2) {
+      ctx.save();
+      roundRect(ctx, cardX, cardY, cardW, cardH, radius);
+      ctx.clip();
+      ctx.globalAlpha = 0.6;
+      drawVideoCover(ctx, v2, 0, 0, W, H);
+      ctx.restore();
+    }
+  } else if (state.bgImg) {
     var filtered2 = getFilteredBg(W, H);
     if (filtered2) {
       ctx.save();
