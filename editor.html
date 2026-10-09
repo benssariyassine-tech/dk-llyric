@@ -2584,8 +2584,9 @@ if (!state.audioUrl) {
           return { text: l.text || '', start: l.start || 0, duration: l.duration || 3 };
         }),
         font: state.font,
-        card: state.card,
+ card: state.card,
         bgFilters: state.bgFilters,
+        bgFit: state.bgFit || 'cover',
         audioStart: state.audioStart || 0,
         audioEnd: state.audioEnd || 15,
         trimIn: state.trimIn || 0,
