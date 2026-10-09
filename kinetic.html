@@ -37,8 +37,6 @@ button{font-family:inherit;cursor:pointer}
 .k-pc svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2}
 .k-pc svg polygon{fill:currentColor;stroke:none}
 .k-time{flex:1;text-align:center;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
-
-/* ===== TIMELINE ===== */
 .k-timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.85);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:6px 0 calc(100px + env(safe-area-inset-bottom,0px));min-height:230px;display:flex;flex-direction:column}
 .k-timeline-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;touch-action:pan-x;-webkit-overflow-scrolling:touch}
 .k-timeline-scroll::-webkit-scrollbar{display:none}
@@ -67,16 +65,12 @@ button{font-family:inherit;cursor:pointer}
 .k-handle-r{right:-2px;border-radius:0 6px 6px 0}
 .k-playhead{position:absolute;top:0;bottom:0;left:20px;width:2px;background:#ff453a;z-index:30;box-shadow:0 0 12px rgba(255,69,58,0.9);pointer-events:none;will-change:transform}
 .k-playhead-cap{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:22px;height:10px;background:#ff453a;border-radius:5px;pointer-events:auto;cursor:ew-resize;box-shadow:0 2px 6px rgba(0,0,0,0.4)}
-
-/* ===== NAV ===== */
 .k-nav{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;gap:2px;padding:8px 6px;background:rgba(28,28,34,0.85);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:30px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:100;width:calc(100% - 24px);max-width:460px;transition:transform 0.3s,opacity 0.25s;overflow-x:auto;scrollbar-width:none}
 .k-nav::-webkit-scrollbar{display:none}
 body.menu-open .k-nav{transform:translateX(-50%) translateY(120%);opacity:0;pointer-events:none}
 .k-nav-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;min-width:52px;height:50px;background:none;border:none;border-radius:22px;color:rgba(255,255,255,0.55);font-size:9px;font-weight:800;transition:all 0.25s}
 .k-nav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2}
 .k-nav-btn.active{color:#fff;background:linear-gradient(135deg,#bf5af2,#0a84ff);box-shadow:0 6px 18px rgba(191,90,242,0.5)}
-
-/* ===== SHEETS ===== */
 .k-back{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:200;opacity:0;visibility:hidden;transition:all 0.3s}
 .k-back.open{opacity:1;visibility:visible}
 .k-sheet{position:fixed;bottom:0;left:0;right:0;background:rgba(20,20,28,0.92);backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.1);padding:12px 20px calc(100px + env(safe-area-inset-bottom,0px));max-height:72vh;overflow-y:auto;z-index:300;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1)}
@@ -120,8 +114,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
 .preset-icon{width:30px;height:30px;border-radius:50%;margin:0 auto 6px}
 .k-preset{padding:11px 6px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:14px;color:#fff;font-size:11px;font-weight:800;font-family:inherit;text-align:center}
 .k-preset.active{border-color:#bf5af2;background:rgba(191,90,242,0.15)}
-
-/* ===== CAPCUT ===== */
 .k-capcut{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:12px;right:12px;max-width:420px;margin:0 auto;background:rgba(28,28,34,0.85);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:24px;display:flex;overflow-x:auto;gap:4px;padding:10px 12px;transform:translateY(150%);opacity:0;transition:transform 0.3s,opacity 0.25s;z-index:90;box-shadow:0 20px 60px rgba(0,0,0,0.6);scrollbar-width:none}
 .k-capcut::-webkit-scrollbar{display:none}
 .k-capcut.open{transform:translateY(0);opacity:1}
@@ -129,8 +121,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
 .k-cm-item svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .k-cm-item.danger svg{stroke:#ff453a}
 .k-cm-item.danger span{color:#ff453a}
-
-/* ===== INPUT MODAL ===== */
 .k-imodal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
 .k-imodal.open{display:flex}
 .k-imodal-back{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
@@ -229,7 +219,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
 <div class="k-sheet" id="kSheet">
   <div class="k-handle-bar"></div>
 
-  <!-- ===== WORDS ===== -->
   <div class="k-sheet-body" data-sheet="words">
     <h3 class="k-h">الكلمات</h3>
     <div class="k-group">
@@ -263,7 +252,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </button>
   </div>
 
-  <!-- ===== STYLE ===== -->
   <div class="k-sheet-body" data-sheet="style">
     <h3 class="k-h">ستايل Kinetic</h3>
     <div class="k-group">
@@ -298,8 +286,8 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
       </div>
     </div>
     <div class="k-group">
-      <label class="k-label">حجم الخط: <span id="kFontVal">48</span>px</label>
-      <input type="range" id="kFontSize" min="24" max="120" value="48" class="k-slider">
+      <label class="k-label">حجم الخط: <span id="kFontVal">36</span>px</label>
+      <input type="range" id="kFontSize" min="16" max="120" value="36" class="k-slider">
     </div>
     <div class="k-group">
       <label class="k-label">توهج النص: <span id="kGlowVal">40</span>%</label>
@@ -334,7 +322,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </div>
   </div>
 
-  <!-- ===== ANIM ===== -->
   <div class="k-sheet-body" data-sheet="anim">
     <h3 class="k-h">حركة الكلمات</h3>
     <div class="k-group">
@@ -381,7 +368,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </div>
   </div>
 
-  <!-- ===== LAYOUT ===== -->
   <div class="k-sheet-body" data-sheet="layout">
     <h3 class="k-h">التخطيط</h3>
     <div class="k-group">
@@ -421,7 +407,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </div>
   </div>
 
-  <!-- ===== BEAT ===== -->
   <div class="k-sheet-body" data-sheet="beat">
     <h3 class="k-h">الإيقاع</h3>
     <div class="k-group">
@@ -438,7 +423,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </div>
   </div>
 
-  <!-- ===== AUDIO ===== -->
   <div class="k-sheet-body" data-sheet="audio">
     <h3 class="k-h">الأغنية</h3>
     <div class="k-group">
@@ -460,7 +444,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     </div>
   </div>
 
-  <!-- ===== BG ===== -->
   <div class="k-sheet-body" data-sheet="bg">
     <h3 class="k-h">الخلفية</h3>
     <div class="k-group">
@@ -498,7 +481,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
   </div>
 </div>
 
-<!-- CapCut Word Menu -->
 <div class="k-capcut" id="kCapcut">
   <button class="k-cm-item" onclick="kWordAction('edit')">
     <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -522,7 +504,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
   </button>
 </div>
 
-<!-- CapCut Audio Menu -->
 <div class="k-capcut" id="kAudioMenu">
   <button class="k-cm-item" onclick="kAudioAction('change')">
     <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -546,7 +527,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
   </button>
 </div>
 
-<!-- Input Modal -->
 <div class="k-imodal" id="kIModal">
   <div class="k-imodal-back" onclick="kCloseInput()"></div>
   <div class="k-imodal-box">
@@ -562,7 +542,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
   </div>
 </div>
 
-<!-- Export Modal -->
 <div class="k-modal" id="kExportModal">
   <div class="k-modal-back" onclick="kExportClose()"></div>
   <div class="k-modal-box">
@@ -599,10 +578,12 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
 
 <script>
 /* ============================================================
-   dk.llyric — Kinetic Editor FULL v2
+   dk.llyric — Kinetic Editor FULL v3 (FIXED)
    ============================================================ */
 var W = 360, H = 640;
 var PX = 50;
+var TEXT_DRAG_THRESHOLD = 0.008;
+var TEXT_CLAMP_LIMIT = 0.42;
 var _particles = [];
 var _kAudioCtx = null, _kAudioSrc = null, _kAudioDest = null;
 var _selectedWordIdx = -1;
@@ -625,7 +606,7 @@ var state = {
   songName:'',
   words: [],
   split:'words',
-  font:{ family:'Cairo', size:48, color:'#0a84ff', glow:40, opacity:1, style:'glow' },
+  font:{ family:'Cairo', size:36, color:'#0a84ff', glow:40, opacity:1, style:'glow' },
   anim:{ in:'fade', out:'fade', inDur:300, outDur:200, special:'none' },
   bpm: 116, kick: 50, shake: 6, particles: 50,
   beatEnabled: true,
@@ -660,7 +641,6 @@ function showToast(msg,type){
   if(type!=='saving'){_toastTimer=setTimeout(function(){t.style.opacity='0';},2000);}
 }
 
-/* ===== UNDO / REDO ===== */
 var _history = [], _histIdx = -1, _histLimit = 30, _restoring = false;
 function snapshot(){
   if(_restoring) return null;
@@ -771,9 +751,8 @@ function updateHistoryButtons(){
   if(r) r.disabled = _histIdx >= _history.length - 1;
 }
 
-/* ===== INIT ===== */
 window.addEventListener('load', function(){
-  var fonts = ['700 48px Cairo','700 48px Tajawal','700 48px Almarai','700 48px "Reem Kufi"','700 48px "IBM Plex Sans Arabic"','700 48px Inter','700 48px Poppins'];
+  var fonts = ['700 36px Cairo','700 36px Tajawal','700 36px Almarai','700 36px "Reem Kufi"','700 36px "IBM Plex Sans Arabic"','700 36px Inter','700 36px Poppins'];
   Promise.all(fonts.map(function(f){ return document.fonts.load(f).catch(function(){}); }))
     .then(initKinetic).catch(initKinetic);
   setTimeout(function(){ if(!ctx) initKinetic(); }, 3000);
@@ -811,7 +790,6 @@ function setupCanvasSize(){
   ctx.scale(dpr, dpr);
 }
 
-/* ===== BIND ===== */
 function bindAll(){
   $('kAudio').addEventListener('change', function(e){
     var f = e.target.files[0]; if(!f) return;
@@ -924,7 +902,6 @@ function bindAll(){
   });
 }
 
-/* ===== PLAYBACK ===== */
 function kToggle(){
   var el = $('kAudioEl');
   if(state.isPlaying){
@@ -990,7 +967,6 @@ function updateTime(){
   $('kTime').textContent = fmt(state.currentTime) + ' / ' + fmt(state.audioEnd || state.duration);
 }
 
-/* ===== TIMELINE ===== */
 function renderRuler(){
   var r = $('kRuler');
   r.innerHTML = '';
@@ -1087,7 +1063,6 @@ function clearSelection(){
   kHideCapcut(); hideAudioMenu();
 }
 
-/* ===== DRAG WORDS ===== */
 function kStartLongPress(e, index, el){
   var startX = e.touches ? e.touches[0].clientX : e.clientX;
   var cancelled = false;
@@ -1185,7 +1160,6 @@ function kResizeStart(e, index, side){
   document.addEventListener('touchend', end);
 }
 
-/* ===== PLAYHEAD ===== */
 function seekPlayhead(sec){
   var ph = $('kPlayhead');
   if(ph) ph.style.transform = 'translateX(' + (sec * PX) + 'px)';
@@ -1241,7 +1215,6 @@ function setupTimelineTap(){
   });
 }
 
-/* ===== AUDIO SEGMENT ===== */
 function bindAudioSegment(){
   var seg = $('kAudioSeg');
   if(!seg) return;
@@ -1356,7 +1329,7 @@ function startAudioResize(e, side){
   document.addEventListener('touchend', end);
 }
 
-/* ===== PREVIEW GESTURES ===== */
+/* ===== PREVIEW GESTURES (FIXED) ===== */
 function setupPreviewGestures(){
   var c = $('kCanvas');
   if(!c) return;
@@ -1364,6 +1337,7 @@ function setupPreviewGestures(){
   var startX = 0, startY = 0, startOffX = 0, startOffY = 0;
   var initDist = 0, initScale = 1;
   var isOnText = false;
+  var moved = false;
 
   function getDistance(t1, t2){
     var dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
@@ -1381,6 +1355,7 @@ function setupPreviewGestures(){
   }
 
   c.addEventListener('touchstart', function(e){
+    moved = false;
     if(e.touches.length === 1){
       var t = e.touches[0];
       isOnText = pointOnText(t.clientX, t.clientY);
@@ -1407,24 +1382,31 @@ function setupPreviewGestures(){
     } else if(mode === 'text' && e.touches.length === 1){
       var dx = (e.touches[0].clientX - startX) / r.width;
       var dy = (e.touches[0].clientY - startY) / r.height;
-      state.textOffsetX = startOffX + dx;
-      state.textOffsetY = startOffY + dy;
+      if(!moved && Math.abs(dx) < TEXT_DRAG_THRESHOLD && Math.abs(dy) < TEXT_DRAG_THRESHOLD) return;
+      moved = true;
+      state.textOffsetX = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, startOffX + dx));
+      state.textOffsetY = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, startOffY + dy));
       e.preventDefault();
     } else if(mode === 'bg' && e.touches.length === 1){
       var dx2 = (e.touches[0].clientX - startX) / r.width;
       var dy2 = (e.touches[0].clientY - startY) / r.height;
-      state.bgOffsetX = startOffX + dx2;
-      state.bgOffsetY = startOffY + dy2;
+      if(!moved && Math.abs(dx2) < TEXT_DRAG_THRESHOLD && Math.abs(dy2) < TEXT_DRAG_THRESHOLD) return;
+      moved = true;
+      state.bgOffsetX = Math.max(-1.5, Math.min(1.5, startOffX + dx2));
+      state.bgOffsetY = Math.max(-1.5, Math.min(1.5, startOffY + dy2));
       e.preventDefault();
     }
   }, {passive: false});
 
-  c.addEventListener('touchend', function(){ mode = null; state._dirty = true; }, {passive: true});
+  c.addEventListener('touchend', function(){
+    mode = null;
+    if(moved) state._dirty = true;
+    moved = false;
+  }, {passive: true});
 
-  // Mouse for desktop
-  var mDown = false;
+  var mDown = false, mMoved = false;
   c.addEventListener('mousedown', function(e){
-    mDown = true;
+    mDown = true; mMoved = false;
     isOnText = pointOnText(e.clientX, e.clientY);
     startX = e.clientX; startY = e.clientY;
     startOffX = isOnText ? state.textOffsetX : state.bgOffsetX;
@@ -1435,24 +1417,25 @@ function setupPreviewGestures(){
     var r = c.getBoundingClientRect();
     var dx = (e.clientX - startX) / r.width;
     var dy = (e.clientY - startY) / r.height;
+    if(!mMoved && Math.abs(dx) < TEXT_DRAG_THRESHOLD && Math.abs(dy) < TEXT_DRAG_THRESHOLD) return;
+    mMoved = true;
     if(isOnText){
-      state.textOffsetX = startOffX + dx;
-      state.textOffsetY = startOffY + dy;
+      state.textOffsetX = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, startOffX + dx));
+      state.textOffsetY = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, startOffY + dy));
     } else {
-      state.bgOffsetX = startOffX + dx;
-      state.bgOffsetY = startOffY + dy;
+      state.bgOffsetX = Math.max(-1.5, Math.min(1.5, startOffX + dx));
+      state.bgOffsetY = Math.max(-1.5, Math.min(1.5, startOffY + dy));
     }
   });
   c.addEventListener('mouseup', function(){ mDown = false; });
   c.addEventListener('wheel', function(e){
     e.preventDefault();
-    state.textScale = Math.max(0.3, Math.min(4, state.textScale - e.deltaY * 0.001));
+    state.textScale = Math.max(0.3, Math.min(4, state.textScale - e.deltaY * 0.0008));
     $('kTextScale').value = state.textScale;
     $('kTextScaleVal').textContent = state.textScale.toFixed(2);
   }, {passive: false});
 }
 
-/* ===== WORDS ===== */
 function kSetSplit(type, btn){
   state.split = type;
   document.querySelectorAll('#kSplitWords, #kSplitLines').forEach(function(b){b.classList.remove('active');});
@@ -1501,7 +1484,6 @@ function kClearWords(){
   showToast('تم المسح','success');
 }
 
-/* ===== CAPCUT ===== */
 function kShowCapcut(){
   $('kCapcut').classList.add('open');
   $('kAudioMenu').classList.remove('open');
@@ -1590,7 +1572,6 @@ function kAudioAction(action){
   }
 }
 
-/* ===== TOGGLES ===== */
 function kToggleBeat(btn){
   state.beatEnabled = !state.beatEnabled;
   btn.classList.toggle('on', state.beatEnabled);
@@ -1610,7 +1591,6 @@ function kToggleWordPulse(btn){
   state._dirty = true;
 }
 
-/* ===== TEXT STYLE ===== */
 function kTextStyle(style, btn){
   state.font.style = style;
   document.querySelectorAll('[data-style]').forEach(function(b){b.classList.toggle('active', b.dataset.style === style);});
@@ -1641,10 +1621,18 @@ function kRatio(ratio, btn){
 }
 
 function kResetTextPos(){
-  state.textOffsetX = 0; state.textOffsetY = 0; state.textScale = 1; state.textY = 0.5;
-  $('kTextScale').value = 1; $('kTextScaleVal').textContent = '1.00';
-  $('kTextY').value = 50; $('kTextYVal').textContent = '50';
-  showToast('تم إعادة الضبط','success');
+  state.textOffsetX = 0;
+  state.textOffsetY = 0;
+  state.textScale = 1;
+  state.textY = 0.5;
+  state.font.size = 36;
+  if($('kTextScale')) $('kTextScale').value = 1;
+  if($('kTextScaleVal')) $('kTextScaleVal').textContent = '1.00';
+  if($('kTextY')) $('kTextY').value = 50;
+  if($('kTextYVal')) $('kTextYVal').textContent = '50';
+  if($('kFontSize')) $('kFontSize').value = 36;
+  if($('kFontVal')) $('kFontVal').textContent = '36';
+  showToast('تم إعادة النص للوسط','success');
   state._dirty = true;
 }
 function kResetBgPos(){
@@ -1653,7 +1641,6 @@ function kResetBgPos(){
   state._dirty = true;
 }
 
-/* ===== INPUT MODAL ===== */
 function kShowInput(title, label, defaultValue, onSave){
   $('kIModalTitle').textContent = title || 'تعديل';
   $('kIModalField').value = defaultValue || '';
@@ -1668,7 +1655,6 @@ function kShowInput(title, label, defaultValue, onSave){
 function kCloseInput(){ $('kIModal').classList.remove('open'); _inputCallback = null; }
 function kSaveInput(){ var v = $('kIModalField').value.trim(); var cb = _inputCallback; kCloseInput(); if(cb) cb(v); }
 
-/* ===== PRESETS ===== */
 function kPreset(name, btn){
   var p = _presets[name]; if(!p) return;
   state.preset = name;
@@ -1701,7 +1687,6 @@ function kAnim(type, val, btn){
   showToast((type==='in'?'ظهور: ':'اختفاء: ') + val,'success');
 }
 
-/* ===== TAP TEMPO ===== */
 var _taps = [];
 function kTapTempo(){
   var now = Date.now();
@@ -1719,7 +1704,6 @@ function kTapTempo(){
   state._dirty = true; pushHistory();
 }
 
-/* ===== SHEET ===== */
 function kTab(name, btn){
   var sheet = $('kSheet');
   var isOpen = sheet.classList.contains('open');
@@ -1740,7 +1724,6 @@ function kSheetClose(){
   $('kSheet').classList.remove('open');
 }
 
-/* ===== REMOVE ===== */
 function kRemoveBgVideo(){
   if(state.bgVideoUrl) URL.revokeObjectURL(state.bgVideoUrl);
   state.bgVideoUrl = null; state.bgVideoReady = false; state._cloudBgVideoUrl = null;
@@ -1771,7 +1754,6 @@ function kRemoveAudio(){
 }
 function openAudioPicker(){ $('kAudio').click(); }
 
-/* ===== RENDER ===== */
 function loop(){
   if(state._exporting) return;
   if(ctx) render(ctx, state.currentTime);
@@ -1825,7 +1807,7 @@ function renderWords2(ctx, t, pulse){
     var w = state.words[i];
     if(t >= w.start && t < w.start + w.duration){ idx = i; break; }
   }
-  if(idx < 0) return; // ✅ الفراغ
+  if(idx < 0) return;
   var word = state.words[idx].text || '';
   if(!word) return;
 
@@ -1869,8 +1851,11 @@ function renderWords2(ctx, t, pulse){
 
   var finalAlpha = Math.min(alphaIn, alphaOut) * state.font.opacity;
   var finalScale = scaleAmt * scaleOut * state.textScale;
-  var finalY = translateY + tyOut + state.textOffsetY * H;
-  var finalX = state.textOffsetX * W;
+  // ✅ CLAMP باش النص ما يخرجش
+  var clampedOffsetY = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, state.textOffsetY));
+  var clampedOffsetX = Math.max(-TEXT_CLAMP_LIMIT, Math.min(TEXT_CLAMP_LIMIT, state.textOffsetX));
+  var finalY = translateY + tyOut + clampedOffsetY * H;
+  var finalX = clampedOffsetX * W;
   var finalBlur = blurAmt + blurOut;
 
   if(state.anim.special === 'spotify'){
@@ -1994,7 +1979,6 @@ function hexToRgba(hex, a){
   return 'rgba('+parseInt(hex.substr(0,2),16)+','+parseInt(hex.substr(2,2),16)+','+parseInt(hex.substr(4,2),16)+','+a+')';
 }
 
-/* ===== EXPORT ===== */
 function kExportOpen(){
   if(!state.audioUrl){ showToast('ارفع أغنية أول','error'); return; }
   if(!state.duration || state.duration <= 0){ showToast('الأغنية ما تحملتش كاملة','error'); return; }
@@ -2138,7 +2122,6 @@ async function kStartExport(){
   }
 }
 
-/* ===== SAVE ===== */
 var firebaseConfig = {
   apiKey: "AIzaSyC_yjHpXcygeUcuMKqqr-FH_35p32TZQbE",
   authDomain: "dk-llyric.firebaseapp.com",
@@ -2259,7 +2242,6 @@ function kUpload(blob, type){
   });
 }
 
-/* ===== LOAD TEMPLATE ===== */
 document.addEventListener('DOMContentLoaded', function(){
   var p = new URLSearchParams(location.search);
   var t = p.get('template');
@@ -2368,7 +2350,6 @@ function kClose(){
   location.href = 'index.html';
 }
 
-/* ===== Outside click ===== */
 document.addEventListener('click', function(e){
   if(e.target.closest('.k-capcut')) return;
   if(e.target.closest('.k-imodal')) return;
