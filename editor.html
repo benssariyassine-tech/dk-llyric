@@ -3179,6 +3179,86 @@ function applyFont() {
     btn.classList.toggle('active', btn.dataset.color === state.font.color);
   });
 }
+async function loadTemplateFromCloud(templateId) {
+  try {
+    var doc = await _fb.db.collection('projects').doc(templateId).get();
+    if (!doc.exists) { alert('القالب ما كاينش'); return; }
+    var full = doc.data();
+    var d = full.data || {};
+    
+    if (full.bgVideoUrl) {
+      var v = $('bgVideoEl');
+      v.crossOrigin = 'anonymous';
+      v.src = full.bgVideoUrl;
+      v.muted = true;
+      v.loop = true;
+      v.load();
+      await new Promise(function(res) {
+        var done = false;
+        var f = function() { if (!done) { done = true; res(); } };
+        v.onloadedmetadata = f;
+        setTimeout(f, 4000);
+      });
+      state.bgVideoUrl = full.bgVideoUrl;
+      state.bgVideoReady = true;
+    }
+    
+    if (full.bgUrl) {
+      state.bgImg = await loadImageCORS(full.bgUrl);
+      state.bgImgVersion++;
+      invalidateBgCache();
+    }
+    
+    if (full.coverUrl) {
+      state.coverImg = await loadImageCORS(full.coverUrl);
+    }
+    
+    state.songName = d.songName || '';
+    state.artistName = d.artistName || '';
+    state.igName = d.igName || 'dk.llyric';
+    state.lyrics = d.lyrics || state.lyrics;
+    state.font = d.font || state.font;
+    if (d.card) state.card = d.card;
+    if (d.cardWidth) state.card.width = d.cardWidth;
+    if (d.cardHeight) state.card.height = d.cardHeight;
+    if (d.cardOffsetX !== undefined) state.card.offsetX = d.cardOffsetX;
+    if (d.cardOffsetY !== undefined) state.card.offsetY = d.cardOffsetY;
+    state.bgFilters = d.bgFilters || state.bgFilters;
+    state.bgFit = d.bgFit || 'cover';
+    state._projectId = null;
+    
+    if (d.canvasRatio) {
+      var p = d.canvasRatio.split(':');
+      var rw = parseFloat(p[0]);
+      var rh = parseFloat(p[1]);
+      DESIGN_W = 360;
+      DESIGN_H = Math.round(360 * rh / rw);
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      previewCanvas.width = DESIGN_W * dpr;
+      previewCanvas.height = DESIGN_H * dpr;
+      previewCtx = previewCanvas.getContext('2d');
+      previewCtx.scale(dpr, dpr);
+      document.getElementById('previewFrame').style.aspectRatio = rw + ' / ' + rh;
+      state.canvasRatio = d.canvasRatio;
+    }
+    
+    state.bgOffsetX = d.bgOffsetX || 0;
+    state.bgOffsetY = d.bgOffsetY || 0;
+    state.bgScale = d.bgScale || 1;
+    
+    $('songNameInput').value = state.songName;
+    $('artistNameInput').value = state.artistName;
+    $('igNameInput').value = state.igName;
+    renderLyricsList();
+    renderTimeline();
+    renderRuler();
+    updateTimeDisplay();
+    applyFont();
+    showSaveToast('تم تحميل القالب', 'success');
+  } catch (err) {
+    alert('خطأ: ' + err.message);
+  }
+}
 
 async function loadProjectFromCloud(projectId) {
   if (!_fb || !_fb.ready) {
