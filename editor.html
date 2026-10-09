@@ -1259,6 +1259,45 @@ if (curr) {
   markDirty();
   showSaveToast('تم إعادة الضبط', 'success');
 }
+  function setCanvasRatio(ratio, btn) {
+  state.canvasRatio = ratio;
+  
+  // حساب الأبعاد
+  var parts = ratio.split(':');
+  var rw = parseFloat(parts[0]);
+  var rh = parseFloat(parts[1]);
+  
+  // العرض ثابت = 360
+  var newW = 360;
+  var newH = Math.round(360 * rh / rw);
+  
+  // تحديث المتغيرات العامة
+  DESIGN_W = newW;
+  DESIGN_H = newH;
+  
+  // تحديث canvas
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  previewCanvas.width = DESIGN_W * dpr;
+  previewCanvas.height = DESIGN_H * dpr;
+  previewCtx = previewCanvas.getContext('2d');
+  previewCtx.scale(dpr, dpr);
+  
+  // تحديث الـ preview-frame
+  var frame = document.getElementById('previewFrame');
+  frame.style.aspectRatio = rw + ' / ' + rh;
+  frame.style.maxWidth = (rw > rh ? '320px' : '240px');
+  
+  // تحديث الأزرار
+  document.querySelectorAll('[data-canvas]').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+  
+  // إعادة الرسم
+  invalidateBgCache();
+  markDirty();
+  showSaveToast('حجم Canvas: ' + ratio, 'success');
+}
 function setBgFit(fit, btn) {
   state.bgFit = fit;
   document.querySelectorAll('.bg-fit-btn').forEach(function(b) { b.classList.remove('active'); });
