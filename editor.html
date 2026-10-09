@@ -1309,7 +1309,7 @@ if (curr) {
 }
 function setBgFit(fit, btn) {
   state.bgFit = fit;
-  document.querySelectorAll('.bg-fit-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('[data-fit]').forEach(function(b) { b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   invalidateBgCache();
   markDirty();
