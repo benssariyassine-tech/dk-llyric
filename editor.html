@@ -2555,6 +2555,8 @@ function bindSliders() {
       if (v) v.textContent = fmt ? fmt(val) : val;
     });
   }
+  bind('cardWidthRange', 'cardWidthVal', function(v) { state.card.width = v; }, function(v) { return Math.round(v); });
+  bind('cardHeightRange', 'cardHeightVal', function(v) { state.card.height = v; }, function(v) { return Math.round(v); });
   bind('cardScaleRange', 'cardScaleVal', function(v) { state.card.scale = v; }, function(v) { return v.toFixed(2); });
   bind('cardOpRange', 'cardOpVal', function(v) { state.card.opacity = v / 100; });
   bind('cardRadRange', 'cardRadVal', function(v) { state.card.radius = v; });
