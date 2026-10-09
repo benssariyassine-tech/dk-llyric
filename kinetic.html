@@ -207,6 +207,22 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
       <input type="range" id="kKick" min="0" max="100" value="50" class="k-slider">
     </div>
   </div>
+<div class="k-sheet-body" data-sheet="audio">
+  <h3 class="k-h">الصوت</h3>
+  <div class="k-group">
+    <label class="k-label">الأغنية</label>
+    <label for="kAudio" class="k-btn-ghost" id="kAudioBtn">اختر أغنية</label>
+    <input type="file" id="kAudio" accept="audio/*" hidden>
+    <div id="kAudioInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
+      <span id="kAudioName">أغنية.mp3</span>
+      <button onclick="kRemoveAudio()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
+    </div>
+  </div>
+  <div class="k-group">
+    <label class="k-label">اسم الأغنية</label>
+    <input type="text" class="k-input" id="kSongNameInput" placeholder="اسم الأغنية">
+  </div>
+</div>
 
   <div class="k-sheet-body" data-sheet="bg">
     <h3 class="k-h">الخلفية</h3>
