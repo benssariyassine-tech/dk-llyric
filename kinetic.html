@@ -31,13 +31,64 @@ button{font-family:inherit;cursor:pointer}
 .k-pc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2}
 .k-pc svg polygon{fill:currentColor;stroke:none}
 .k-time{flex:1;text-align:center;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
-.k-timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.75);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
-.k-ruler{position:relative;height:16px;margin:4px 0 2px;padding-right:20px;overflow:hidden}
-.k-tick{position:absolute;top:0;font-size:9px;color:var(--sub);transform:translateX(-50%)}
-.k-words-line{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:4px 0 8px;touch-action:pan-x}
+
+/* ====== TIMELINE (TALLER) ====== */
+.k-timeline-wrap{
+  flex-shrink:0;
+  background:rgba(7,7,13,0.85);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:10px 0 calc(100px + env(safe-area-inset-bottom,0px));
+  min-height:210px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.k-ruler{
+  position:relative;
+  height:22px;
+  margin:4px 0 6px;
+  padding-right:20px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.k-tick{position:absolute;top:0;font-size:10px;color:var(--sub);transform:translateX(-50%)}
+.k-words-line{
+  position:relative;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  padding:14px 0 16px;
+  touch-action:pan-x;
+  height:90px;
+  flex-shrink:0;
+}
 .k-words-line::-webkit-scrollbar{display:none}
-.k-words-inner{position:relative;min-width:max-content;padding-right:40px;padding-left:20px}
-.k-word{position:absolute;top:0;height:34px;border-radius:8px;background:linear-gradient(135deg,rgba(10,132,255,0.7),rgba(191,90,242,0.7));border:1px solid rgba(255,255,255,0.15);padding:0 10px;display:flex;align-items:center;font-size:12px;font-weight:800;color:#fff;white-space:nowrap;cursor:pointer;transition:box-shadow 0.15s;will-change:left,width}
+.k-words-inner{
+  position:relative;
+  min-width:max-content;
+  padding-right:40px;
+  padding-left:20px;
+  height:56px;
+}
+.k-word{
+  position:absolute;
+  top:0;
+  height:56px;
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(10,132,255,0.7),rgba(191,90,242,0.7));
+  border:1px solid rgba(255,255,255,0.15);
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  font-size:13px;
+  font-weight:800;
+  color:#fff;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:box-shadow 0.15s;
+  will-change:left,width;
+}
 .k-word.active{box-shadow:0 0 0 2px #ffd60a,0 0 20px rgba(255,214,10,0.5);z-index:5}
 .k-word.playing{background:linear-gradient(135deg,#ffd60a,#ff9500);color:#000;box-shadow:0 0 20px rgba(255,214,10,0.8)}
 .k-handle{position:absolute;top:0;bottom:0;width:16px;background:linear-gradient(180deg,#ffd60a,#ffb800);border-radius:6px;display:none;z-index:6;align-items:center;justify-content:center}
@@ -45,9 +96,11 @@ button{font-family:inherit;cursor:pointer}
 .k-handle-l{left:-2px;border-radius:6px 0 0 6px}
 .k-handle-r{right:-2px;border-radius:0 6px 6px 0}
 .k-playhead{position:absolute;top:0;bottom:0;left:20px;width:2px;background:#ff453a;z-index:30;pointer-events:none;box-shadow:0 0 12px rgba(255,69,58,0.9)}
-.k-nav{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;gap:2px;padding:8px 8px;background:rgba(28,28,34,0.8);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:30px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:100;width:calc(100% - 32px);max-width:420px}
-.k-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;min-width:56px;height:52px;background:none;border:none;border-radius:22px;color:rgba(255,255,255,0.55);font-size:9px;font-weight:800;transition:all 0.25s}
-.k-nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
+
+/* ====== NAV ====== */
+.k-nav{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;gap:2px;padding:8px 8px;background:rgba(28,28,34,0.85);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:30px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:100;width:calc(100% - 32px);max-width:440px}
+.k-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;min-width:0;height:52px;background:none;border:none;border-radius:22px;color:rgba(255,255,255,0.55);font-size:9px;font-weight:800;transition:all 0.25s}
+.k-nav-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.2}
 .k-nav-btn.active{color:#fff;background:linear-gradient(135deg,#bf5af2,#0a84ff);box-shadow:0 6px 18px rgba(191,90,242,0.5)}
 .k-back{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:200;opacity:0;visibility:hidden;transition:all 0.3s}
 .k-back.open{opacity:1;visibility:visible}
@@ -119,13 +172,28 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
   <div class="k-words-line" id="kWrap"><div class="k-words-inner" id="kInner"></div></div>
 </div>
 
+<!-- ===== NAV (5 buttons, no duplicate) ===== -->
 <nav class="k-nav">
-  <button class="k-nav-btn" data-tab="words" onclick="kTab('words', this)"><svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span>الكلمات</span></button>
-  <button class="k-nav-btn" data-tab="style" onclick="kTab('style', this)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>الستايل</span></button>
-  <button class="k-nav-btn" data-tab="beat" onclick="kTab('beat', this)"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>الإيقاع</span></button>
-  <button class="k-nav-btn" data-tab="audio" onclick="kTab('audio', this)"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>صوت</span></button>
-<button class="k-nav-btn" data-tab="bg" onclick="kTab('bg', this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>الخلفية</span></button>
-  <button class="k-nav-btn" data-tab="bg" onclick="kTab('bg', this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>الخلفية</span></button>
+  <button class="k-nav-btn" data-tab="words" onclick="kTab('words', this)">
+    <svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+    <span>الكلمات</span>
+  </button>
+  <button class="k-nav-btn" data-tab="style" onclick="kTab('style', this)">
+    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <span>الستايل</span>
+  </button>
+  <button class="k-nav-btn" data-tab="beat" onclick="kTab('beat', this)">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <span>الإيقاع</span>
+  </button>
+  <button class="k-nav-btn" data-tab="audio" onclick="kTab('audio', this)">
+    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <span>الأغنية</span>
+  </button>
+  <button class="k-nav-btn" data-tab="bg" onclick="kTab('bg', this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    <span>الخلفية</span>
+  </button>
 </nav>
 
 <div class="k-back" id="kBack" onclick="kSheetClose()"></div>
@@ -207,11 +275,27 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
       <input type="range" id="kKick" min="0" max="100" value="50" class="k-slider">
     </div>
   </div>
-<div class="k-sheet-body" data-sheet="audio">
-  <h3 class="k-h">الصوت</h3>
-  <div class="k-group">
- 
 
+  <!-- ===== NEW: Audio sheet ===== -->
+  <div class="k-sheet-body" data-sheet="audio">
+    <h3 class="k-h">الأغنية</h3>
+    <div class="k-group">
+      <label class="k-label">اختر ملف الأغنية</label>
+      <label for="kAudio" class="k-btn-ghost" id="kAudioBtn">🎵 اختر أغنية</label>
+      <input type="file" id="kAudio" accept="audio/*" hidden>
+      <div id="kAudioInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
+        <span id="kAudioName">أغنية.mp3</span>
+        <button onclick="kRemoveAudio()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
+      </div>
+    </div>
+    <div class="k-group" style="background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.2);border-radius:12px;padding:12px">
+      <div style="font-size:12px;color:var(--sub);line-height:1.7">
+        💡 <b style="color:#fff">ملاحظة:</b> بعد رفع الأغنية، دخل لتبويب <b style="color:var(--accent)">الكلمات</b> باش توزع النص عليها.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Bg sheet (audio removed) ===== -->
   <div class="k-sheet-body" data-sheet="bg">
     <h3 class="k-h">الخلفية</h3>
     <div class="k-group">
@@ -239,15 +323,6 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
     <div class="k-group">
       <label class="k-label">ضبابية: <span id="kBgBlurVal">0</span>px</label>
       <input type="range" id="kBgBlur" min="0" max="30" value="0" class="k-slider">
-    </div>
-    <div class="k-group">
-      <label class="k-label">الأغنية</label>
-      <label for="kAudio" class="k-btn-ghost" id="kAudioBtn">اختر أغنية</label>
-      <input type="file" id="kAudio" accept="audio/*" hidden>
-      <div id="kAudioInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
-        <span id="kAudioName">أغنية.mp3</span>
-        <button onclick="kRemoveAudio()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
-      </div>
     </div>
   </div>
 </div>
@@ -288,7 +363,7 @@ video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opac
 
 <script>
 /* ============================================================
-   dk.llyric — Kinetic Editor (Fixed)
+   dk.llyric — Kinetic Editor (Fixed Layout)
    ============================================================ */
 var W = 360, H = 640;
 var PX = 50;
@@ -424,10 +499,7 @@ function bindAll(){
     };
     img.src = url;
   });
-$('kSongNameInput').addEventListener('input', function(){
-  state.songName = this.value;
-  state._dirty = true;
-});
+
   $('kLyricsText').addEventListener('input', function(){ state._dirty = true; });
 
   function sl(id, valId, key){
@@ -559,7 +631,7 @@ function renderWords(){
     var el = document.createElement('div');
     el.className = 'k-word';
     el.style.left = (20 + w.start * PX) + 'px';
-    el.style.width = Math.max(30, w.duration * PX) + 'px';
+    el.style.width = Math.max(40, w.duration * PX) + 'px';
     el.textContent = w.text;
 
     var hL = document.createElement('div');
@@ -612,7 +684,7 @@ function kResizeStart(e, index, side){
       state.words[index].duration = Math.max(0.15, oDur - diff);
     }
     el.style.left = (20 + state.words[index].start * PX) + 'px';
-    el.style.width = Math.max(30, state.words[index].duration * PX) + 'px';
+    el.style.width = Math.max(40, state.words[index].duration * PX) + 'px';
   }
   function end(){
     document.removeEventListener('mousemove', move);
@@ -962,7 +1034,7 @@ function hexToRgba(hex, a){
   return 'rgba('+r+','+g+','+b+','+a+')';
 }
 
-/* ===== EXPORT (FIXED) ===== */
+/* ===== EXPORT ===== */
 function kExportOpen(){
   if(!state.audioUrl){ showToast('ارفع أغنية أول','error'); return; }
   if(!state.duration || state.duration <= 0){
@@ -983,7 +1055,6 @@ async function kStartExport(){
   var fill = $('kProgFill'), txt = $('kProgText');
   fill.style.width = '0%'; txt.textContent = 'جاري التحضير...';
 
-  // ✅ وقف preview loop + نظّف الجزيئات
   state._exporting = true;
   if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
   _particles = [];
