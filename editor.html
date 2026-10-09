@@ -2430,7 +2430,19 @@ function bindBgVideo() {
     v.load();
     v.muted = true;
     
-    v.onloadedmetadata = function() {
+  v.onloadedmetadata = function() {
+      console.log('🎬 info:', {
+        w: v.videoWidth,
+        h: v.videoHeight,
+        dur: v.duration,
+        canPlay: v.canPlayType('video/mp4; codecs="avc1.42E01E"')
+      });
+      
+      if (!v.videoWidth || !v.videoHeight) {
+        showAlert('الفيديو ماشي مدعوم. جرب MP4 H.264', 'خطأ في الفيديو', 'error');
+        return;
+      }
+      
       state.bgVideoReady = true;
       state.bgImg = null;  // نحيّد الصورة
       state.bgImgVersion++;
