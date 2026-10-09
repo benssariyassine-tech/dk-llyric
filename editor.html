@@ -3077,8 +3077,12 @@ if (!state.audioUrl) {
     }
     
     // 4. حفظ في Firestore
+    var ADMIN_EMAIL = 'benssariyassine@gmail.com';
+    var isAdmin = (_fb.user.email === ADMIN_EMAIL);
     await _fb.db.collection('projects').doc(projectId).set({
-      userId: userId,
+    userId: userId,
+      userEmail: _fb.user.email || '',
+      isPublic: isAdmin ? true : false,
       name: state.songName || 'مشروعي',
       createdAt: state._createdAt || Date.now(),
       updatedAt: Date.now(),
