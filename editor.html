@@ -1311,7 +1311,8 @@ function togglePlay() {
     if (p && p.catch) p.catch(function(err) { console.error('Play failed:', err); });
   }
 
-  state.isPlaying = true;
+state.isPlaying = true;
+  playBgVideo();
   updatePlayIcon();
   playLoop();
 }
