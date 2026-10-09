@@ -1348,8 +1348,9 @@ if (fileT >= state.trimOut) {
       updatePlayIcon();
     }
   }
-  seekPlayhead(state.currentTime);
+seekPlayhead(state.currentTime);
   updateTimeDisplay();
+  syncBgVideo(state.currentTime);
   requestAnimationFrame(playLoop);
 }
 
