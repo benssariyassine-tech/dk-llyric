@@ -2596,7 +2596,31 @@ function setFontFilter(filter, btn) {
 /* ===== EXPORT ===== */
 var exportSettings = { quality: 1080, fps: 30 };
 var _audioCtx = null, _audioSource = null, _audioDest = null;
-
+function bindExportButton() {
+  var btn = document.getElementById('exportTopBtn');
+  if (!btn) {
+    console.warn('زر التصدير ماشي موجود');
+    return;
+  }
+  btn.removeAttribute('onclick');
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      if (!state.audioUrl) {
+        showAlert('ارفع أغنية أول', 'لا يمكن التصدير', 'warning');
+        return;
+      }
+      $('exportModal').classList.add('open');
+      $('exportProgress').style.display = 'none';
+      $('exportStartBtn').disabled = false;
+    } catch (err) {
+      console.error('Export click error:', err);
+      showAlert('خطأ: ' + err.message, 'فشل', 'error');
+    }
+  }, false);
+  console.log('✅ زر التصدير مربوط');
+}
 function bindExportOptions() {
   document.querySelectorAll('#exportQuality .export-opt').forEach(function(b) {
     b.onclick = function() {
