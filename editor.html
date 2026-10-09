@@ -3150,6 +3150,7 @@ function updateSaveIcon() {
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
   var params = new URLSearchParams(window.location.search);
+  var templateId = params.get('template');
   var projectId = params.get('project');
   if (projectId) {
     setTimeout(function() {
