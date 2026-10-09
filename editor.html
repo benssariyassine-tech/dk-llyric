@@ -1061,13 +1061,14 @@ function drawFrame(ctx, W, H, t) {
     var filtered = getFilteredBg(W, H);
     if (filtered) ctx.drawImage(filtered, 0, 0, W, H);
   }
-
-// البطاقة تتأقلم مع أصغر بعد
-  var maxCard = Math.min(W, H) * 0.92;
-  var cardW = Math.min(320 * s * state.card.scale, maxCard);
-  var cardH = cardW;
-  var cardX = (W - cardW) / 2;
-  var cardY = (H - cardH) / 2;
+ 
+// ✅ البطاقة بعرض وطول مستقلين + إزاحة
+  var maxW = W * 0.95;
+  var maxH = H * 0.95;
+  var cardW = Math.min((state.card.width || 320) * s * state.card.scale, maxW);
+  var cardH = Math.min((state.card.height || 320) * s * state.card.scale, maxH);
+  var cardX = (W - cardW) / 2 + (state.card.offsetX || 0) * W;
+  var cardY = (H - cardH) / 2 + (state.card.offsetY || 0) * H;
   var radius = state.card.radius * s;
 
 if (state.bgVideoReady) {
