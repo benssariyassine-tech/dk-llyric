@@ -2597,15 +2597,14 @@ function setFontFilter(filter, btn) {
 var exportSettings = { quality: 1080, fps: 30 };
 var _audioCtx = null, _audioSource = null, _audioDest = null;
 function bindExportButton() {
-  var btn = document.getElementById('exportTopBtn');
-  if (!btn) {
-    console.warn('زر التصدير ماشي موجود');
-    return;
-  }
-  btn.removeAttribute('onclick');
-  btn.addEventListener('click', function(e) {
+  // ✅ Event Delegation على document — كيخدم مع أي زر حتى لو تحمل متأخر
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('#exportTopBtn');
+    if (!btn) return;
+    
     e.preventDefault();
     e.stopPropagation();
+    
     try {
       if (!state.audioUrl) {
         showAlert('ارفع أغنية أول', 'لا يمكن التصدير', 'warning');
@@ -2619,7 +2618,17 @@ function bindExportButton() {
       showAlert('خطأ: ' + err.message, 'فشل', 'error');
     }
   }, false);
-  console.log('✅ زر التصدير مربوط');
+  
+  // ✅ إضافي: touchstart كـ fallback
+  document.addEventListener('touchstart', function(e) {
+    var btn = e.target.closest('#exportTopBtn');
+    if (!btn) return;
+    
+    // ما نديروش preventDefault هنا حيت ممكن يأثر على click
+    console.log('📱 touchstart على زر التصدير');
+  }, { passive: true });
+  
+  console.log('✅ زر التصدير مربوط بـ delegation');
 }
 function bindExportOptions() {
   document.querySelectorAll('#exportQuality .export-opt').forEach(function(b) {
