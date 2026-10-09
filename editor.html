@@ -939,7 +939,13 @@ function drawFrame(ctx, W, H, t) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
 
-  if (state.bgImg) {
+// ✅ الأولوية: فيديو خلفية
+  if (state.bgVideoReady) {
+    var v = $('bgVideoEl');
+    if (v && v.readyState >= 2) {
+      drawVideoCover(ctx, v, 0, 0, W, H);
+    }
+  } else if (state.bgImg) {
     var filtered = getFilteredBg(W, H);
     if (filtered) ctx.drawImage(filtered, 0, 0, W, H);
   }
