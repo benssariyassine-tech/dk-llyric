@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Kinetic — dk.llyric</title>
+<meta name="theme-color" content="#07070d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;700;900&family=Almarai:wght@400;700;800&family=Reem+Kufi:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#07070d;--card:rgba(255,255,255,0.055);--text:#fff;--sub:#8e8e93;--accent:#0a84ff;--accent2:#0062d2;--danger:#ff453a;--border:rgba(255,255,255,0.1)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+html,body{background:var(--bg);color:var(--text);font-family:Cairo,sans-serif;overflow:hidden;height:100dvh}
+button{font-family:inherit;cursor:pointer}
+.k-body{display:flex;flex-direction:column;height:100dvh;overflow:hidden;background:radial-gradient(circle at 50% 30%, #0a0a18 0%, #07070d 70%)}
+.k-top{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:rgba(7,7,13,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);z-index:10}
+.k-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.k-btn svg{width:16px;height:16px}
+.k-title{flex:1;text-align:center;font-size:14px;font-weight:900}
+.k-title span{background:linear-gradient(135deg,#0a84ff,#bf5af2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.k-export{padding:8px 16px;background:linear-gradient(135deg,#bf5af2,#0a84ff);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:900;box-shadow:0 6px 20px rgba(191,90,242,0.4)}
+.k-preview-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 12px;min-height:0;overflow:hidden;position:relative}
+.k-frame{position:relative;width:100%;max-width:220px;aspect-ratio:9/16;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(191,90,242,0.25),0 0 0 1px rgba(255,255,255,0.08)}
+.k-frame canvas{display:block;width:100%;height:100%}
+.k-play{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;flex-shrink:0;gap:8px;min-height:46px}
+.k-pc{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:#fff;display:flex;align-items:center;justify-content:center;padding:0}
+.k-pc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2}
+.k-pc svg polygon{fill:currentColor;stroke:none}
+.k-time{flex:1;text-align:center;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
+.k-timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.75);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.k-ruler{position:relative;height:16px;margin:4px 0 2px;padding-right:20px;overflow:hidden}
+.k-tick{position:absolute;top:0;font-size:9px;color:var(--sub);transform:translateX(-50%)}
+.k-words-line{position:relative;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:4px 0 8px;touch-action:pan-x}
+.k-words-line::-webkit-scrollbar{display:none}
+.k-words-inner{position:relative;min-width:max-content;padding-right:40px;padding-left:20px}
+.k-word{position:absolute;top:0;height:34px;border-radius:8px;background:linear-gradient(135deg,rgba(10,132,255,0.7),rgba(191,90,242,0.7));border:1px solid rgba(255,255,255,0.15);padding:0 10px;display:flex;align-items:center;font-size:12px;font-weight:800;color:#fff;white-space:nowrap;cursor:pointer;transition:box-shadow 0.15s;will-change:left,width}
+.k-word.active{box-shadow:0 0 0 2px #ffd60a,0 0 20px rgba(255,214,10,0.5);z-index:5}
+.k-word.playing{background:linear-gradient(135deg,#ffd60a,#ff9500);color:#000;box-shadow:0 0 20px rgba(255,214,10,0.8)}
+.k-handle{position:absolute;top:0;bottom:0;width:16px;background:linear-gradient(180deg,#ffd60a,#ffb800);border-radius:6px;display:none;z-index:6;align-items:center;justify-content:center}
+.k-word.active .k-handle{display:flex}
+.k-handle-l{left:-2px;border-radius:6px 0 0 6px}
+.k-handle-r{right:-2px;border-radius:0 6px 6px 0}
+.k-playhead{position:absolute;top:0;bottom:0;left:20px;width:2px;background:#ff453a;z-index:30;pointer-events:none;box-shadow:0 0 12px rgba(255,69,58,0.9)}
+.k-nav{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;gap:2px;padding:8px 8px;background:rgba(28,28,34,0.8);backdrop-filter:blur(40px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:30px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:100;width:calc(100% - 32px);max-width:420px}
+.k-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;min-width:56px;height:52px;background:none;border:none;border-radius:22px;color:rgba(255,255,255,0.55);font-size:9px;font-weight:800;transition:all 0.25s}
+.k-nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2}
+.k-nav-btn.active{color:#fff;background:linear-gradient(135deg,#bf5af2,#0a84ff);box-shadow:0 6px 18px rgba(191,90,242,0.5)}
+.k-back{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);z-index:200;opacity:0;visibility:hidden;transition:all 0.3s}
+.k-back.open{opacity:1;visibility:visible}
+.k-sheet{position:fixed;bottom:0;left:0;right:0;background:rgba(20,20,28,0.92);backdrop-filter:blur(40px) saturate(180%);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.1);padding:12px 20px calc(100px + env(safe-area-inset-bottom,0px));max-height:70vh;overflow-y:auto;z-index:300;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1)}
+.k-sheet.open{transform:translateY(0)}
+.k-handle-bar{width:40px;height:4px;background:rgba(255,255,255,0.25);border-radius:4px;margin:0 auto 18px}
+.k-sheet-body{display:none}
+.k-sheet-body.active{display:block}
+.k-h{font-size:16px;font-weight:900;margin-bottom:14px}
+.k-group{margin-bottom:16px}
+.k-label{display:block;font-size:11px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.k-label span{color:var(--accent)}
+.k-input{width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:14px;outline:none;font-family:inherit}
+.k-input:focus{border-color:var(--accent)}
+.k-textarea{width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:14px;outline:none;font-family:inherit;min-height:140px;resize:vertical;line-height:1.8}
+.k-textarea:focus{border-color:var(--accent)}
+.k-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.k-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.k-opt{padding:12px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:12px;color:#fff;font-size:12px;font-weight:700;font-family:inherit}
+.k-opt.active{background:rgba(10,132,255,0.18);border-color:var(--accent);color:var(--accent)}
+.k-slider{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;outline:none;-webkit-appearance:none}
+.k-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#bf5af2,#0a84ff);box-shadow:0 4px 12px rgba(191,90,242,0.5)}
+.k-btn-lg{width:100%;padding:14px;background:linear-gradient(135deg,#bf5af2,#0a84ff);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:900;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
+.k-btn-ghost{width:100%;padding:12px;background:rgba(255,255,255,0.04);border:1.5px dashed var(--border);border-radius:12px;color:var(--accent);font-size:13px;font-weight:700;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
+.k-toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;z-index:99999;backdrop-filter:blur(20px);transition:opacity 0.3s;opacity:0;pointer-events:none}
+.k-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
+.k-modal.open{display:flex}
+.k-modal-back{position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
+.k-modal-box{position:relative;width:100%;max-width:480px;background:rgba(20,20,28,0.95);backdrop-filter:blur(40px);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid rgba(255,255,255,0.12);padding:24px 22px calc(30px + env(safe-area-inset-bottom,0px));animation:k-slide 0.35s cubic-bezier(0.16,1,0.3,1)}
+@keyframes k-slide{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.k-modal-title{font-size:20px;font-weight:900;text-align:center;margin-bottom:4px}
+.k-modal-sub{font-size:12px;color:var(--sub);text-align:center;margin-bottom:20px}
+.k-progress{height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.k-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#bf5af2,#0a84ff);transition:width 0.3s}
+.k-progress-text{text-align:center;font-size:12px;font-weight:800;color:#bf5af2;margin-bottom:20px}
+audio{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0.01}
+video#bgVid{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0.01}
+.preset-icon{width:32px;height:32px;border-radius:50%;margin:0 auto 6px}
+.k-preset{padding:12px 6px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:14px;color:#fff;font-size:11px;font-weight:800;font-family:inherit;text-align:center}
+.k-preset.active{border-color:#bf5af2;background:rgba(191,90,242,0.15)}
+</style>
+</head>
+<body class="k-body">
+
+<header class="k-top">
+  <button class="k-btn" onclick="kClose()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="k-title">Kinetic <span>◆</span> dk.llyric</div>
+  <button class="k-btn" onclick="kSave(true)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+  </button>
+  <button class="k-export" onclick="kExportOpen()">تصدير</button>
+</header>
+
+<div class="k-preview-wrap">
+  <div class="k-frame" id="kFrame"><canvas id="kCanvas"></canvas></div>
+</div>
+
+<div class="k-play">
+  <button class="k-pc" onclick="kSeek(-5)"><svg viewBox="0 0 24 24" stroke-linecap="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg></button>
+  <button class="k-pc" id="kPlayBtn" onclick="kToggle()"><svg id="kPlayIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+  <div class="k-time" id="kTime">00:00 / 00:00</div>
+  <button class="k-pc" onclick="kSeek(5)"><svg viewBox="0 0 24 24" stroke-linecap="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg></button>
+</div>
+
+<div class="k-timeline-wrap">
+  <div class="k-ruler" id="kRuler"></div>
+  <div class="k-words-line" id="kWrap"><div class="k-words-inner" id="kInner"></div></div>
+</div>
+
+<nav class="k-nav">
+  <button class="k-nav-btn" data-tab="words" onclick="kTab('words', this)"><svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span>الكلمات</span></button>
+  <button class="k-nav-btn" data-tab="style" onclick="kTab('style', this)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>الستايل</span></button>
+  <button class="k-nav-btn" data-tab="beat" onclick="kTab('beat', this)"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>الإيقاع</span></button>
+  <button class="k-nav-btn" data-tab="bg" onclick="kTab('bg', this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>الخلفية</span></button>
+</nav>
+
+<div class="k-back" id="kBack" onclick="kSheetClose()"></div>
+
+<div class="k-sheet" id="kSheet">
+  <div class="k-handle-bar"></div>
+
+  <div class="k-sheet-body" data-sheet="words">
+    <h3 class="k-h">الكلمات</h3>
+    <div class="k-group">
+      <label class="k-label">ألصق النص كامل</label>
+      <textarea class="k-textarea" id="kLyricsText" placeholder="كلمات الأغنية هنا...&#10;كل جملة فـ سطر"></textarea>
+    </div>
+    <div class="k-group">
+      <label class="k-label">طريقة التوزيع</label>
+      <div class="k-grid-2">
+        <button class="k-opt active" id="kSplitWords" onclick="kSetSplit('words', this)">كلمة كلمة</button>
+        <button class="k-opt" id="kSplitLines" onclick="kSetSplit('lines', this)">سطر سطر</button>
+      </div>
+    </div>
+    <button class="k-btn-lg" onclick="kApplyLyrics()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>توزيع تلقائي على الأغنية</span>
+    </button>
+  </div>
+
+  <div class="k-sheet-body" data-sheet="style">
+    <h3 class="k-h">ستايل Kinetic</h3>
+    <div class="k-group">
+      <label class="k-label">قوالب جاهزة</label>
+      <div class="k-grid-3">
+        <button class="k-preset active" data-preset="neon" onclick="kPreset('neon', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#0a84ff,#00d4ff)"></div>نيون</button>
+        <button class="k-preset" data-preset="gold" onclick="kPreset('gold', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#ffd60a,#ff9500)"></div>ذهبي</button>
+        <button class="k-preset" data-preset="romantic" onclick="kPreset('romantic', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#ff2d92,#bf5af2)"></div>رومانسي</button>
+        <button class="k-preset" data-preset="cinema" onclick="kPreset('cinema', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#bf5af2,#2c2c3e)"></div>سينمائي</button>
+        <button class="k-preset" data-preset="minimal" onclick="kPreset('minimal', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#fff,#888)"></div>بسيط</button>
+        <button class="k-preset" data-preset="fire" onclick="kPreset('fire', this)"><div class="preset-icon" style="background:linear-gradient(135deg,#ff453a,#ff9500)"></div>نار</button>
+      </div>
+    </div>
+    <div class="k-group">
+      <label class="k-label">الخط</label>
+      <div class="k-grid-2">
+        <button class="k-opt active" data-font="Cairo" onclick="kFont('Cairo', this)" style="font-family:Cairo">Cairo</button>
+        <button class="k-opt" data-font="Tajawal" onclick="kFont('Tajawal', this)" style="font-family:Tajawal">Tajawal</button>
+        <button class="k-opt" data-font="Almarai" onclick="kFont('Almarai', this)" style="font-family:Almarai">Almarai</button>
+        <button class="k-opt" data-font="Reem Kufi" onclick="kFont('Reem Kufi', this)" style="font-family:'Reem Kufi'">Reem Kufi</button>
+      </div>
+    </div>
+    <div class="k-group">
+      <label class="k-label">حجم الخط: <span id="kFontVal">48</span>px</label>
+      <input type="range" id="kFontSize" min="24" max="90" value="48" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">توهج النص: <span id="kGlowVal">30</span>%</label>
+      <input type="range" id="kGlow" min="0" max="100" value="30" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">قوة الاهتزاز: <span id="kShakeVal">5</span>%</label>
+      <input type="range" id="kShake" min="0" max="20" value="5" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">كثافة الجزيئات: <span id="kParticlesVal">50</span>%</label>
+      <input type="range" id="kParticles" min="0" max="100" value="50" class="k-slider">
+    </div>
+  </div>
+
+  <div class="k-sheet-body" data-sheet="beat">
+    <h3 class="k-h">الإيقاع</h3>
+    <div class="k-group">
+      <label class="k-label">BPM: <span id="kBpmVal">116</span></label>
+      <input type="range" id="kBpm" min="60" max="180" value="116" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">اضغط مع كل نبضة لاكتشاف BPM</label>
+      <button class="k-btn-lg" id="kTapBtn" onclick="kTapTempo()" style="background:linear-gradient(135deg,#ffd60a,#ff9500);color:#000"><span id="kTapText">اضغط هنا</span></button>
+    </div>
+    <div class="k-group">
+      <label class="k-label">قوة نبضة الكيك: <span id="kKickVal">50</span>%</label>
+      <input type="range" id="kKick" min="0" max="100" value="50" class="k-slider">
+    </div>
+  </div>
+
+  <div class="k-sheet-body" data-sheet="bg">
+    <h3 class="k-h">الخلفية</h3>
+    <div class="k-group">
+      <label class="k-label">فيديو خلفية (اختياري)</label>
+      <label for="kBgVideo" class="k-btn-ghost" id="kBgVideoBtn">اختر فيديو</label>
+      <input type="file" id="kBgVideo" accept="video/*" hidden>
+      <div id="kBgVideoInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
+        <span id="kBgVideoName">فيديو.mp4</span>
+        <button onclick="kRemoveBgVideo()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
+      </div>
+    </div>
+    <div class="k-group">
+      <label class="k-label">صورة خلفية (اختياري)</label>
+      <label for="kBgImage" class="k-btn-ghost" id="kBgImageBtn">اختر صورة</label>
+      <input type="file" id="kBgImage" accept="image/*" hidden>
+      <div id="kBgImageInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
+        <span id="kBgImageName">صورة.jpg</span>
+        <button onclick="kRemoveBgImage()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
+      </div>
+    </div>
+    <div class="k-group">
+      <label class="k-label">عتامة الخلفية: <span id="kBgOpVal">40</span>%</label>
+      <input type="range" id="kBgOp" min="0" max="100" value="40" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">ضبابية: <span id="kBgBlurVal">0</span>px</label>
+      <input type="range" id="kBgBlur" min="0" max="30" value="0" class="k-slider">
+    </div>
+    <div class="k-group">
+      <label class="k-label">الأغنية</label>
+      <label for="kAudio" class="k-btn-ghost" id="kAudioBtn">اختر أغنية</label>
+      <input type="file" id="kAudio" accept="audio/*" hidden>
+      <div id="kAudioInfo" style="display:none;margin-top:10px;padding:10px;background:rgba(255,255,255,0.05);border-radius:12px;font-size:12px;justify-content:space-between;align-items:center">
+        <span id="kAudioName">أغنية.mp3</span>
+        <button onclick="kRemoveAudio()" style="background:rgba(255,69,58,0.15);border:none;color:#ff453a;width:28px;height:28px;border-radius:50%;font-size:16px">×</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="k-modal" id="kExportModal">
+  <div class="k-modal-back" onclick="kExportClose()"></div>
+  <div class="k-modal-box">
+    <h3 class="k-modal-title">تصدير الفيديو</h3>
+    <p class="k-modal-sub">MP4 على iPhone — WebM على Android</p>
+    <div class="k-group">
+      <label class="k-label">الجودة</label>
+      <div class="k-grid-2" id="kQuality">
+        <button class="k-opt" data-value="720">720p</button>
+        <button class="k-opt active" data-value="1080">1080p</button>
+      </div>
+    </div>
+    <div class="k-group">
+      <label class="k-label">FPS</label>
+      <div class="k-grid-3" id="kFps">
+        <button class="k-opt" data-value="24">24</button>
+        <button class="k-opt active" data-value="30">30</button>
+        <button class="k-opt" data-value="60">60</button>
+      </div>
+    </div>
+    <div id="kProgWrap" style="display:none">
+      <div class="k-progress"><div class="k-progress-fill" id="kProgFill"></div></div>
+      <div class="k-progress-text" id="kProgText">0%</div>
+    </div>
+    <button class="k-btn-lg" id="kExportBtn" onclick="kStartExport()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>حمّل الفيديو</span>
+    </button>
+  </div>
+</div>
+
+<audio id="kAudioEl" playsinline preload="auto"></audio>
+<video id="bgVid" playsinline muted loop preload="auto"></video>
+
+<script>
+/* ============================================================
+   dk.llyric — Kinetic Editor (Fixed)
+   ============================================================ */
+var W = 360, H = 640;
+var PX = 50;
+var _particles = [];
+var _kAudioCtx = null, _kAudioSrc = null, _kAudioDest = null;
+var _presets = {
+  neon:    { color:'#0a84ff', glow:40, font:'Cairo', shake:6, kick:60 },
+  gold:    { color:'#ffd60a', glow:50, font:'Tajawal', shake:5, kick:55 },
+  romantic:{ color:'#ff2d92', glow:45, font:'Cairo', shake:4, kick:50 },
+  cinema:  { color:'#bf5af2', glow:35, font:'Reem Kufi', shake:3, kick:45 },
+  minimal: { color:'#ffffff', glow:15, font:'Inter', shake:2, kick:30 },
+  fire:    { color:'#ff453a', glow:55, font:'Almarai', shake:7, kick:70 }
+};
+
+var state = {
+  audioUrl:null, duration:0,
+  currentTime:0, isPlaying:false, _exporting:false,
+  songName:'',
+  words: [],
+  split:'words',
+  font:{ family:'Cairo', size:48, color:'#0a84ff', glow:40 },
+  bpm: 116,
+  kick: 50,
+  shake: 6,
+  particles: 50,
+  bgVideoUrl:null, bgVideoReady:false,
+  bgImg:null,
+  bgOp: 40, bgBlur: 0,
+  preset:'neon',
+  _cloudAudioUrl:null, _cloudBgVideoUrl:null, _cloudBgImgUrl:null,
+  _projectId:null, _createdAt:null, _dirty:false, _saving:false
+};
+
+var cvs, ctx, rafId;
+var _toastTimer = null;
+
+function $(id){return document.getElementById(id);}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function r1(v){return Math.round(v*10)/10;}
+function fmt(s){s=Math.max(0,Math.floor(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function showToast(msg,type){
+  var t=$('kToast');
+  if(!t){t=document.createElement('div');t.className='k-toast';t.id='kToast';document.body.appendChild(t);}
+  var colors={saving:'rgba(10,132,255,0.9)',success:'rgba(50,215,75,0.9)',error:'rgba(255,69,58,0.9)'};
+  t.style.background=colors[type]||colors.saving;
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(_toastTimer);
+  if(type!=='saving'){_toastTimer=setTimeout(function(){t.style.opacity='0';},2000);}
+}
+
+/* ===== INIT ===== */
+window.addEventListener('load', function(){
+  var fonts = ['700 48px Cairo','700 48px Tajawal','700 48px Almarai','700 48px "Reem Kufi"','700 48px Inter'];
+  Promise.all(fonts.map(function(f){ return document.fonts.load(f).catch(function(){}); }))
+    .then(initKinetic).catch(initKinetic);
+  setTimeout(function(){ if(!ctx) initKinetic(); }, 3000);
+});
+
+function initKinetic(){
+  if(ctx) return;
+  cvs = $('kCanvas');
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  cvs.width = W * dpr; cvs.height = H * dpr;
+  ctx = cvs.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  document.body.addEventListener('touchstart', function unlock(){
+    try {
+      if(!_kAudioCtx){
+        _kAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(_kAudioCtx.state === 'suspended') _kAudioCtx.resume();
+    } catch(e){}
+  }, { once: true, passive: true });
+
+  bindAll();
+  renderRuler();
+  renderWords();
+  updateTime();
+  loop();
+  console.log('✅ Kinetic loaded');
+}
+
+/* ===== BIND ===== */
+function bindAll(){
+  $('kAudio').addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
+    state.audioUrl = URL.createObjectURL(f);
+    state._cloudAudioUrl = null;
+    var el = $('kAudioEl');
+    el.src = state.audioUrl;
+    el.load();
+    el.onloadedmetadata = function(){
+      state.duration = el.duration;
+      renderRuler(); renderWords(); updateTime();
+    };
+    $('kAudioBtn').style.display='none';
+    $('kAudioInfo').style.display='flex';
+    $('kAudioName').textContent = f.name;
+    showToast('تم رفع الأغنية','success');
+  });
+
+  $('kBgVideo').addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    if(state.bgVideoUrl) URL.revokeObjectURL(state.bgVideoUrl);
+    state.bgVideoUrl = URL.createObjectURL(f);
+    state._cloudBgVideoUrl = null;
+    var v = $('bgVid');
+    v.src = state.bgVideoUrl;
+    v.muted = true; v.loop = true;
+    v.load();
+    v.onloadedmetadata = function(){
+      state.bgVideoReady = true;
+      $('kBgVideoBtn').style.display='none';
+      $('kBgVideoInfo').style.display='flex';
+      $('kBgVideoName').textContent = f.name;
+      showToast('تم رفع الفيديو','success');
+    };
+  });
+
+  $('kBgImage').addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function(){
+      state.bgImg = img;
+      state._cloudBgImgUrl = null;
+      $('kBgImageBtn').style.display='none';
+      $('kBgImageInfo').style.display='flex';
+      $('kBgImageName').textContent = f.name;
+      showToast('تم رفع الصورة','success');
+    };
+    img.src = url;
+  });
+
+  $('kLyricsText').addEventListener('input', function(){ state._dirty = true; });
+
+  function sl(id, valId, key){
+    $(id).addEventListener('input', function(){
+      var v = parseFloat(this.value);
+      if(key.indexOf('.') > -1){
+        var parts = key.split('.');
+        state[parts[0]][parts[1]] = v;
+      } else { state[key] = v; }
+      if(valId) $(valId).textContent = v;
+      state._dirty = true;
+    });
+  }
+  sl('kFontSize','kFontVal','font.size');
+  sl('kGlow','kGlowVal','font.glow');
+  sl('kShake','kShakeVal','shake');
+  sl('kParticles','kParticlesVal','particles');
+  sl('kBpm','kBpmVal','bpm');
+  sl('kKick','kKickVal','kick');
+  sl('kBgOp','kBgOpVal','bgOp');
+  sl('kBgBlur','kBgBlurVal','bgBlur');
+
+  document.querySelectorAll('#kQuality .k-opt').forEach(function(b){
+    b.onclick = function(){
+      document.querySelectorAll('#kQuality .k-opt').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+    };
+  });
+  document.querySelectorAll('#kFps .k-opt').forEach(function(b){
+    b.onclick = function(){
+      document.querySelectorAll('#kFps .k-opt').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+    };
+  });
+}
+
+/* ===== PLAYBACK ===== */
+function kToggle(){
+  var el = $('kAudioEl');
+  if(state.isPlaying){
+    el.pause(); pauseVideo();
+    state.isPlaying = false; updatePlayIcon(); return;
+  }
+  if(!state.audioUrl){ showToast('ارفع أغنية أول','error'); return; }
+  if(state.currentTime >= state.duration - 0.1) state.currentTime = 0;
+  el.currentTime = state.currentTime;
+  el.play().catch(function(e){ console.error(e); });
+  playVideo();
+  state.isPlaying = true;
+  updatePlayIcon();
+  playLoop();
+}
+
+function updatePlayIcon(){
+  $('kPlayIcon').innerHTML = state.isPlaying
+    ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+    : '<polygon points="5 3 19 12 5 21 5 3"/>';
+}
+
+function playLoop(){
+  if(!state.isPlaying) return;
+  var el = $('kAudioEl');
+  if(el && !el.paused){
+    state.currentTime = el.currentTime;
+    if(state.currentTime >= state.duration){
+      el.pause(); pauseVideo();
+      state.isPlaying = false; updatePlayIcon();
+      return;
+    }
+  }
+  seekPlayhead(state.currentTime);
+  updateTime();
+  if(state.bgVideoReady){
+    var v = $('bgVid');
+    if(v && v.duration){
+      var vt = state.currentTime % v.duration;
+      if(Math.abs(v.currentTime - vt) > 0.3) v.currentTime = vt;
+    }
+  }
+  requestAnimationFrame(playLoop);
+}
+
+function playVideo(){
+  if(!state.bgVideoReady) return;
+  var v = $('bgVid');
+  if(v && v.paused) v.play().catch(function(){});
+}
+function pauseVideo(){
+  if(!state.bgVideoReady) return;
+  var v = $('bgVid');
+  if(v && !v.paused) v.pause();
+}
+
+function kSeek(d){
+  var t = clamp(state.currentTime + d, 0, state.duration);
+  state.currentTime = t;
+  $('kAudioEl').currentTime = t;
+  seekPlayhead(t);
+  updateTime();
+}
+
+function updateTime(){
+  $('kTime').textContent = fmt(state.currentTime) + ' / ' + fmt(state.duration);
+}
+
+/* ===== TIMELINE ===== */
+function renderRuler(){
+  var r = $('kRuler');
+  r.innerHTML = '';
+  var total = Math.max(state.duration, 10);
+  r.style.width = (total * PX + 40) + 'px';
+  for(var s = 0; s <= total; s++){
+    if(s % 2 !== 0 && s > 5) continue;
+    var t = document.createElement('div');
+    t.className = 'k-tick';
+    t.style.left = (20 + s * PX) + 'px';
+    t.textContent = s + 's';
+    r.appendChild(t);
+  }
+}
+
+function renderWords(){
+  var inner = $('kInner');
+  inner.innerHTML = '';
+  var total = Math.max(state.duration, 10);
+  inner.style.width = (total * PX + 60) + 'px';
+
+  state.words.forEach(function(w, i){
+    var el = document.createElement('div');
+    el.className = 'k-word';
+    el.style.left = (20 + w.start * PX) + 'px';
+    el.style.width = Math.max(30, w.duration * PX) + 'px';
+    el.textContent = w.text;
+
+    var hL = document.createElement('div');
+    hL.className = 'k-handle k-handle-l';
+    hL.addEventListener('touchstart', function(e){ e.stopPropagation(); kResizeStart(e, i, 'left'); }, {passive:false});
+    hL.addEventListener('mousedown', function(e){ e.stopPropagation(); kResizeStart(e, i, 'left'); });
+    el.appendChild(hL);
+
+    var hR = document.createElement('div');
+    hR.className = 'k-handle k-handle-r';
+    hR.addEventListener('touchstart', function(e){ e.stopPropagation(); kResizeStart(e, i, 'right'); }, {passive:false});
+    hR.addEventListener('mousedown', function(e){ e.stopPropagation(); kResizeStart(e, i, 'right'); });
+    el.appendChild(hR);
+
+    el.addEventListener('click', function(){
+      if(!el.classList.contains('active')){
+        document.querySelectorAll('.k-word').forEach(function(x){x.classList.remove('active');});
+        el.classList.add('active');
+      }
+    });
+
+    inner.appendChild(el);
+  });
+
+  var ph = document.createElement('div');
+  ph.className = 'k-playhead';
+  ph.id = 'kPlayhead';
+  inner.appendChild(ph);
+}
+
+function kResizeStart(e, index, side){
+  var el = document.querySelectorAll('.k-word')[index];
+  if(!el) return;
+  e.preventDefault();
+  el.classList.add('active');
+  var startX = e.touches ? e.touches[0].clientX : e.clientX;
+  var oStart = state.words[index].start;
+  var oDur = state.words[index].duration;
+
+  function move(ev){
+    ev.preventDefault();
+    var cx = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    var dx = (cx - startX) / PX;
+    if(side === 'right'){
+      state.words[index].duration = Math.max(0.15, oDur + dx);
+    } else {
+      var ns = Math.max(0, oStart + dx);
+      var diff = ns - oStart;
+      state.words[index].start = r1(ns);
+      state.words[index].duration = Math.max(0.15, oDur - diff);
+    }
+    el.style.left = (20 + state.words[index].start * PX) + 'px';
+    el.style.width = Math.max(30, state.words[index].duration * PX) + 'px';
+  }
+  function end(){
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', end);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', end);
+    state._dirty = true;
+  }
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', end);
+  document.addEventListener('touchmove', move, {passive:false});
+  document.addEventListener('touchend', end);
+}
+
+function seekPlayhead(sec){
+  var ph = $('kPlayhead');
+  if(ph) ph.style.left = (20 + sec * PX) + 'px';
+  document.querySelectorAll('.k-word').forEach(function(el, i){
+    var w = state.words[i];
+    if(!w) return;
+    if(sec >= w.start && sec < w.start + w.duration) el.classList.add('playing');
+    else el.classList.remove('playing');
+  });
+}
+
+/* ===== WORDS ===== */
+function kSetSplit(type, btn){
+  state.split = type;
+  document.querySelectorAll('#kSplitWords, #kSplitLines').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+}
+
+function kApplyLyrics(){
+  var txt = $('kLyricsText').value.trim();
+  if(!txt){ showToast('اكتب كلمات أول','error'); return; }
+  if(!state.duration){ showToast('ارفع أغنية أول','error'); return; }
+
+  var items = [];
+  var lines = txt.split(/\n+/).filter(function(l){ return l.trim(); });
+
+  if(state.split === 'lines'){
+    items = lines;
+  } else {
+    lines.forEach(function(line){
+      line.split(/\s+/).filter(function(w){ return w.trim(); }).forEach(function(w){
+        items.push(w);
+      });
+    });
+  }
+
+  if(!items.length) return;
+
+  var total = state.duration;
+  var each = total / items.length;
+  state.words = items.map(function(text, i){
+    return { text: text, start: r1(i * each), duration: r1(each * 0.95) };
+  });
+
+  renderWords();
+  showToast('تم التوزيع: ' + items.length + ' كلمة','success');
+  kSheetClose();
+}
+
+/* ===== PRESETS ===== */
+function kPreset(name, btn){
+  var p = _presets[name]; if(!p) return;
+  state.preset = name;
+  state.font.color = p.color;
+  state.font.glow = p.glow;
+  state.font.family = p.font;
+  state.shake = p.shake;
+  state.kick = p.kick;
+
+  document.querySelectorAll('.k-preset').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+
+  $('kGlow').value = p.glow; $('kGlowVal').textContent = p.glow;
+  $('kShake').value = p.shake; $('kShakeVal').textContent = p.shake;
+  $('kKick').value = p.kick; $('kKickVal').textContent = p.kick;
+  document.querySelectorAll('[data-font]').forEach(function(b){
+    b.classList.toggle('active', b.dataset.font === p.font);
+  });
+  state._dirty = true;
+  showToast('الستايل: ' + name, 'success');
+}
+
+function kFont(family, btn){
+  state.font.family = family;
+  document.querySelectorAll('[data-font]').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  state._dirty = true;
+}
+
+/* ===== TAP TEMPO ===== */
+var _taps = [];
+function kTapTempo(){
+  var now = Date.now();
+  _taps.push(now);
+  _taps = _taps.filter(function(t){ return now - t < 3000; });
+  if(_taps.length < 2){ $('kTapText').textContent = '1/4'; return; }
+  if(_taps.length > 8) _taps.shift();
+
+  var intervals = [];
+  for(var i = 1; i < _taps.length; i++) intervals.push(_taps[i] - _taps[i-1]);
+  var avg = intervals.reduce(function(a,b){return a+b;}, 0) / intervals.length;
+  var bpm = Math.round(60000 / avg);
+  bpm = clamp(bpm, 60, 180);
+  state.bpm = bpm;
+  $('kBpm').value = bpm;
+  $('kBpmVal').textContent = bpm;
+  $('kTapText').textContent = bpm + ' BPM';
+  state._dirty = true;
+}
+
+/* ===== SHEET ===== */
+function kTab(name, btn){
+  var sheet = $('kSheet');
+  var isOpen = sheet.classList.contains('open');
+  var currentBody = document.querySelector('.k-sheet-body.active');
+
+  if(isOpen && currentBody && currentBody.dataset.sheet === name){
+    kSheetClose(); return;
+  }
+
+  document.querySelectorAll('.k-nav-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.k-sheet-body').forEach(function(b){b.classList.remove('active');});
+  var target = document.querySelector('[data-sheet="'+name+'"]');
+  if(target) target.classList.add('active');
+  $('kBack').classList.add('open');
+  sheet.classList.add('open');
+}
+
+function kSheetClose(){
+  document.querySelectorAll('.k-nav-btn').forEach(function(b){b.classList.remove('active');});
+  $('kBack').classList.remove('open');
+  $('kSheet').classList.remove('open');
+}
+
+/* ===== REMOVE ===== */
+function kRemoveBgVideo(){
+  if(state.bgVideoUrl) URL.revokeObjectURL(state.bgVideoUrl);
+  state.bgVideoUrl = null; state.bgVideoReady = false; state._cloudBgVideoUrl = null;
+  var v = $('bgVid'); v.pause(); v.src = '';
+  $('kBgVideoBtn').style.display='';
+  $('kBgVideoInfo').style.display='none';
+  $('kBgVideo').value = '';
+}
+function kRemoveBgImage(){
+  state.bgImg = null; state._cloudBgImgUrl = null;
+  $('kBgImageBtn').style.display='';
+  $('kBgImageInfo').style.display='none';
+  $('kBgImage').value = '';
+}
+function kRemoveAudio(){
+  if(state.audioUrl) URL.revokeObjectURL(state.audioUrl);
+  state.audioUrl = null; state.duration = 0; state.currentTime = 0;
+  $('kAudioEl').src = '';
+  $('kAudioBtn').style.display='';
+  $('kAudioInfo').style.display='none';
+  $('kAudio').value = '';
+  state.words = [];
+  renderWords(); renderRuler(); updateTime();
+}
+
+/* ===== RENDER ===== */
+function loop(){
+  if(state._exporting) return;
+  if(ctx) render(ctx, state.currentTime);
+  rafId = requestAnimationFrame(loop);
+}
+
+function render(ctx, t){
+  var beatDur = 60 / (state.bpm || 116);
+  var beatIdx = Math.floor(t / beatDur);
+  var timeInBeat = t - (beatIdx * beatDur);
+  var pulse = Math.max(0, 1 - (timeInBeat / 0.18));
+  var kickAmt = (state.kick / 100);
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  if(pulse > 0 && state.shake > 0){
+    var shake = state.shake * pulse * kickAmt;
+    var sx = (Math.random() - 0.5) * shake;
+    var sy = (Math.random() - 0.5) * shake;
+    var sc = 1 + (pulse * 0.04 * kickAmt);
+    ctx.translate(W/2, H/2);
+    ctx.scale(sc, sc);
+    ctx.translate(-W/2 + sx, -H/2 + sy);
+  }
+
+  if(state.bgVideoReady){
+    var v = $('bgVid');
+    if(v && v.readyState >= 2){
+      ctx.save();
+      ctx.globalAlpha = 1 - (state.bgOp / 100) * 0.6;
+      drawCoverVideo(ctx, v, 0, 0, W, H);
+      ctx.restore();
+    }
+  } else if(state.bgImg && state.bgImg.complete){
+    ctx.save();
+    ctx.globalAlpha = 1 - (state.bgOp / 100) * 0.6;
+    drawCoverImage(ctx, state.bgImg, 0, 0, W, H);
+    ctx.restore();
+  }
+
+  if(pulse > 0){
+    ctx.save();
+    ctx.fillStyle = hexToRgba(state.font.color, pulse * 0.12 * kickAmt);
+    ctx.fillRect(-30, -30, W+60, H+60);
+    ctx.restore();
+  }
+
+  renderWords2(ctx, t, pulse);
+
+  if(state.particles > 0){ renderParticles(ctx); }
+
+  ctx.restore();
+}
+
+function renderWords2(ctx, t, pulse){
+  var idx = -1;
+  for(var i = 0; i < state.words.length; i++){
+    var w = state.words[i];
+    if(t >= w.start && t < w.start + w.duration){ idx = i; break; }
+  }
+  if(idx < 0){
+    for(var j = 0; j < state.words.length; j++){
+      if(state.words[j].start > t){ idx = j; break; }
+    }
+  }
+  if(idx < 0){
+    if(state.words.length) idx = state.words.length - 1;
+  }
+
+  var word = (idx >= 0 && state.words[idx]) ? state.words[idx].text : '';
+  if(!word) return;
+
+  var w = state.words[idx];
+  var age = t - w.start;
+  var animDur = 0.22;
+  var p = clamp(age / animDur, 0, 1);
+  var easeOut = 1 - Math.pow(1 - p, 3);
+
+  var fontSize = state.font.size;
+  var font = '900 ' + fontSize + 'px "' + state.font.family + '", Cairo, sans-serif';
+  var cx = W / 2;
+  var cy = H / 2;
+
+  ctx.save();
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  var scaleAmt = 0.7 + easeOut * 0.3;
+  var translateY = (1 - easeOut) * 20;
+  ctx.translate(cx, cy + translateY);
+  ctx.scale(scaleAmt, scaleAmt);
+  ctx.translate(-cx, -(cy + translateY));
+
+  var glowAmt = (state.font.glow / 100) * 40;
+  ctx.shadowColor = state.font.color;
+  ctx.shadowBlur = glowAmt;
+
+  ctx.fillStyle = '#fff';
+  if(state.font.glow > 20){
+    ctx.fillStyle = state.font.color;
+    ctx.fillText(word, cx, cy);
+    ctx.shadowBlur = glowAmt * 2;
+    ctx.fillStyle = '#fff';
+  }
+  ctx.fillText(word, cx, cy);
+  ctx.restore();
+
+  if(pulse > 0){
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.font = font;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = hexToRgba(state.font.color, pulse * 0.5);
+    ctx.shadowColor = state.font.color;
+    ctx.shadowBlur = 50;
+    ctx.fillText(word, cx, cy);
+    ctx.restore();
+  }
+}
+
+function renderParticles(ctx){
+  var density = state.particles;
+  if(_particles.length < density * 0.6 && Math.random() < 0.25){
+    _particles.push({
+      x: Math.random() * W,
+      y: H + 10,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: -0.3 - Math.random() * 1.5,
+      size: 1 + Math.random() * 2.5,
+      life: 1,
+      color: state.font.color
+    });
+  }
+  for(var i = _particles.length - 1; i >= 0; i--){
+    var p = _particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.004;
+    if(p.life <= 0 || p.y < -10){ _particles.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha = p.life * 0.7;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawCoverImage(ctx, img, dx, dy, dw, dh){
+  if(!img.naturalWidth) return;
+  var ir = img.naturalWidth / img.naturalHeight;
+  var cr = dw / dh;
+  var w, h, x, y;
+  if(ir > cr){ h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+  else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+  ctx.drawImage(img, x, y, w, h);
+}
+
+function drawCoverVideo(ctx, v, dx, dy, dw, dh){
+  if(!v.videoWidth) return;
+  var ir = v.videoWidth / v.videoHeight;
+  var cr = dw / dh;
+  var w, h, x, y;
+  if(ir > cr){ h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+  else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+  ctx.drawImage(v, x, y, w, h);
+}
+
+function hexToRgba(hex, a){
+  hex = hex.replace('#','');
+  if(hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+  var r = parseInt(hex.substr(0,2),16);
+  var g = parseInt(hex.substr(2,2),16);
+  var b = parseInt(hex.substr(4,2),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+/* ===== EXPORT (FIXED) ===== */
+function kExportOpen(){
+  if(!state.audioUrl){ showToast('ارفع أغنية أول','error'); return; }
+  if(!state.duration || state.duration <= 0){
+    showToast('الأغنية ما تحملتش كاملة','error'); return;
+  }
+  $('kExportModal').classList.add('open');
+  $('kProgWrap').style.display = 'none';
+  $('kExportBtn').disabled = false;
+}
+function kExportClose(){
+  $('kExportModal').classList.remove('open');
+}
+
+async function kStartExport(){
+  var btn = $('kExportBtn');
+  btn.disabled = true;
+  $('kProgWrap').style.display = 'block';
+  var fill = $('kProgFill'), txt = $('kProgText');
+  fill.style.width = '0%'; txt.textContent = 'جاري التحضير...';
+
+  // ✅ وقف preview loop + نظّف الجزيئات
+  state._exporting = true;
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  _particles = [];
+
+  var hb = null;
+
+  try {
+    var q = parseInt(document.querySelector('#kQuality .k-opt.active').dataset.value);
+    var fps = parseInt(document.querySelector('#kFps .k-opt.active').dataset.value);
+    var W2 = q, H2 = Math.round(q * H / W);
+
+    var c = document.createElement('canvas');
+    c.width = W2; c.height = H2;
+    var cx = c.getContext('2d', { alpha: false });
+    var stream = c.captureStream(fps);
+    var player = $('kAudioEl');
+
+    try {
+      if(!_kAudioCtx){
+        _kAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        _kAudioSrc = _kAudioCtx.createMediaElementSource(player);
+        _kAudioDest = _kAudioCtx.createMediaStreamDestination();
+        _kAudioSrc.connect(_kAudioDest);
+        _kAudioSrc.connect(_kAudioCtx.destination);
+      }
+      if(_kAudioCtx.state === 'suspended') await _kAudioCtx.resume();
+    } catch(e){
+      console.warn('AudioCtx error:', e);
+    }
+
+    stream.getAudioTracks().forEach(function(t){ stream.removeTrack(t); });
+    if(_kAudioDest){
+      _kAudioDest.stream.getAudioTracks().forEach(function(t){ stream.addTrack(t); });
+    }
+
+    var mime = 'video/webm';
+    var prefs = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+    for(var i = 0; i < prefs.length; i++){
+      if(MediaRecorder.isTypeSupported(prefs[i])){ mime = prefs[i]; break; }
+    }
+
+    var rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: q === 1080 ? 8000000 : 4000000, audioBitsPerSecond: 128000 });
+    var chunks = [];
+    rec.ondataavailable = function(e){ if(e.data.size > 0) chunks.push(e.data); };
+    var stopped = new Promise(function(r){ rec.onstop = r; });
+    rec.start(200);
+
+    player.currentTime = 0;
+    await new Promise(function(r){
+      var h = function(){ player.removeEventListener('seeked', h); r(); };
+      player.addEventListener('seeked', h);
+      setTimeout(r, 400);
+    });
+
+    try {
+      var p = player.play();
+      if(p && p.catch) await p;
+      if(state.bgVideoReady){
+        var v = $('bgVid');
+        v.currentTime = 0; v.muted = true;
+        v.play().catch(function(){});
+      }
+    } catch(playErr){
+      try { rec.stop(); } catch(e){}
+      throw new Error('المتصفح رفض التشغيل: ' + playErr.message);
+    }
+
+    hb = setInterval(function(){
+      if(player.paused && !player.ended) player.play().catch(function(){});
+      if(_kAudioCtx && _kAudioCtx.state === 'suspended') _kAudioCtx.resume().catch(function(){});
+    }, 300);
+
+    await new Promise(function(resolve){
+      var expCtx = cx;
+      var scaleX = W2 / W;
+      var scaleY = H2 / H;
+
+      function exportLoop(){
+        var t = player.currentTime;
+
+        if(state.bgVideoReady){
+          var v = $('bgVid');
+          if(v && v.duration){
+            var vt = t % v.duration;
+            if(Math.abs(v.currentTime - vt) > 0.3) v.currentTime = vt;
+          }
+        }
+
+        if(t >= state.duration - 0.02 || player.ended){
+          if(rec.state !== 'inactive'){ try { rec.stop(); } catch(e){} }
+          resolve(); return;
+        }
+
+        expCtx.save();
+        expCtx.fillStyle = '#000';
+        expCtx.fillRect(0, 0, W2, H2);
+        expCtx.scale(scaleX, scaleY);
+        render(expCtx, t);
+        expCtx.restore();
+
+        var pct = Math.round((t / state.duration) * 100);
+        fill.style.width = pct + '%';
+        txt.textContent = 'جاري التصدير: ' + pct + '%';
+        requestAnimationFrame(exportLoop);
+      }
+      exportLoop();
+    });
+
+    await stopped;
+    if(state.bgVideoReady){ var v = $('bgVid'); if(v) v.pause(); }
+
+    var blob = new Blob(chunks, { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var ext = mime.indexOf('mp4') > -1 ? 'mp4' : 'webm';
+    a.href = url; a.download = 'kinetic-' + Date.now() + '.' + ext;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 15000);
+
+    fill.style.width = '100%'; txt.textContent = '✅ تم!';
+  } catch(err){
+    console.error('Export error:', err);
+    alert('خطأ في التصدير: ' + err.message);
+  } finally {
+    if(hb) clearInterval(hb);
+    state._exporting = false;
+    if(!rafId && ctx) loop();
+    setTimeout(function(){
+      kExportClose();
+      btn.disabled = false;
+    }, 1500);
+  }
+}
+
+/* ===== SAVE ===== */
+var firebaseConfig = {
+  apiKey: "AIzaSyC_yjHpXcygeUcuMKqqr-FH_35p32TZQbE",
+  authDomain: "dk-llyric.firebaseapp.com",
+  projectId: "dk-llyric",
+  storageBucket: "dk-llyric.firebasestorage.app",
+  messagingSenderId: "186577310307",
+  appId: "1:186577310307:web:8c49fc23dcf1d312911e56"
+};
+var CLOUDINARY_CLOUD = "dm0cqo2c";
+var CLOUDINARY_PRESET = "dk_llyric_unsigned";
+var _fb = { ready:false, user:null, db:null };
+
+try {
+  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  _fb.db = firebase.firestore();
+  firebase.auth().onAuthStateChanged(function(u){ _fb.user = u; _fb.ready = true; });
+} catch(e){ console.warn(e); }
+
+async function kSave(manual){
+  if(state._saving) return;
+  if(!state.audioUrl){ if(manual) showToast('ارفع أغنية','error'); return; }
+  if(!_fb.ready || !_fb.user){ if(manual) showToast('سجل دخول أول','error'); return; }
+  state._saving = true;
+
+  try {
+    showToast('جاري الحفظ...','saving');
+    var userId = _fb.user.uid;
+    var projectId = state._projectId || ('kine_' + Date.now());
+
+    var audioUrl = state._cloudAudioUrl;
+    if(!audioUrl && state.audioUrl){
+      var ab = await fetch(state.audioUrl).then(function(r){return r.blob();});
+      audioUrl = await kUpload(ab, 'video');
+      state._cloudAudioUrl = audioUrl;
+    }
+
+    var bgVideoUrl = state._cloudBgVideoUrl;
+    if(!bgVideoUrl && state.bgVideoUrl){
+      try {
+        var vb = await fetch(state.bgVideoUrl).then(function(r){return r.blob();});
+        bgVideoUrl = await kUpload(vb, 'video');
+        state._cloudBgVideoUrl = bgVideoUrl;
+      } catch(e){ console.warn(e); }
+    }
+
+    var bgImgUrl = state._cloudBgImgUrl;
+    if(!bgImgUrl && state.bgImg){
+      try {
+        var bc = document.createElement('canvas');
+        bc.width = state.bgImg.naturalWidth; bc.height = state.bgImg.naturalHeight;
+        bc.getContext('2d').drawImage(state.bgImg, 0, 0);
+        var bb = await new Promise(function(r){ bc.toBlob(r, 'image/jpeg', 0.85); });
+        bgImgUrl = await kUpload(bb, 'image');
+        state._cloudBgImgUrl = bgImgUrl;
+      } catch(e){ console.warn(e); }
+    }
+
+    var adminEmail = 'benssariyassine@gmail.com';
+    var isAdmin = (_fb.user.email === adminEmail);
+
+    await _fb.db.collection('projects').doc(projectId).set({
+      userId: userId,
+      userEmail: _fb.user.email || '',
+      isPublic: isAdmin,
+      type: 'kinetic',
+      name: state.songName || 'مشروع Kinetic',
+      createdAt: state._createdAt || Date.now(),
+      updatedAt: Date.now(),
+      audioUrl: audioUrl || null,
+      bgVideoUrl: bgVideoUrl || null,
+      bgImgUrl: bgImgUrl || null,
+      data: {
+        words: state.words,
+        font: state.font,
+        bpm: state.bpm,
+        kick: state.kick,
+        shake: state.shake,
+        particles: state.particles,
+        bgOp: state.bgOp,
+        bgBlur: state.bgBlur,
+        preset: state.preset,
+        duration: state.duration
+      }
+    }, { merge: true });
+
+    state._projectId = projectId;
+    state._createdAt = state._createdAt || Date.now();
+    state._dirty = false;
+    showToast('✅ تم الحفظ','success');
+  } catch(err){
+    console.error(err);
+    showToast('فشل: ' + err.message, 'error');
+  } finally {
+    state._saving = false;
+  }
+}
+
+function kUpload(blob, type){
+  return new Promise(function(resolve, reject){
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/' + type + '/upload');
+    xhr.timeout = 300000;
+    xhr.upload.onprogress = function(e){
+      if(e.lengthComputable){
+        var pct = Math.round((e.loaded / e.total) * 100);
+        showToast('رفع: ' + pct + '%','saving');
+      }
+    };
+    xhr.onload = function(){
+      if(xhr.status === 200){
+        var d = JSON.parse(xhr.responseText);
+        if(d.error) reject(new Error(d.error.message));
+        else resolve(d.secure_url);
+      } else reject(new Error('HTTP ' + xhr.status));
+    };
+    xhr.onerror = function(){ reject(new Error('فشل الاتصال')); };
+    xhr.ontimeout = function(){ reject(new Error('انتهى الوقت')); };
+    var fd = new FormData();
+    fd.append('file', blob);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    xhr.send(fd);
+  });
+}
+
+/* ===== LOAD TEMPLATE ===== */
+document.addEventListener('DOMContentLoaded', function(){
+  var p = new URLSearchParams(location.search);
+  var t = p.get('template');
+  if(t) setTimeout(function(){ kLoadTemplate(t); }, 1500);
+});
+
+async function kLoadTemplate(id){
+  if(!_fb.ready){
+    await new Promise(function(r){
+      var i = setInterval(function(){ if(_fb.ready){clearInterval(i); r();} }, 100);
+      setTimeout(function(){clearInterval(i); r();}, 5000);
+    });
+  }
+  try {
+    var doc = await _fb.db.collection('projects').doc(id).get();
+    if(!doc.exists){ showToast('القالب ما كاينش','error'); return; }
+    var full = doc.data();
+    var d = full.data || {};
+
+    if(full.bgVideoUrl){
+      var v = $('bgVid');
+      v.crossOrigin = 'anonymous';
+      v.src = full.bgVideoUrl;
+      v.muted = true; v.loop = true;
+      v.load();
+      await new Promise(function(r){
+        var done = false;
+        var f = function(){ if(!done){done=true; r();} };
+        v.onloadedmetadata = f;
+        setTimeout(f, 4000);
+      });
+      state.bgVideoUrl = full.bgVideoUrl;
+      state.bgVideoReady = true;
+      $('kBgVideoBtn').style.display='none';
+      $('kBgVideoInfo').style.display='flex';
+      $('kBgVideoName').textContent = 'فيديو محمل';
+    }
+    if(full.bgImgUrl){
+      state.bgImg = await kLoadImg(full.bgImgUrl);
+      $('kBgImageBtn').style.display='none';
+      $('kBgImageInfo').style.display='flex';
+      $('kBgImageName').textContent = 'صورة محملة';
+    }
+
+    state.words = d.words || [];
+    state.font = d.font || state.font;
+    state.bpm = d.bpm || 116;
+    state.kick = d.kick || 50;
+    state.shake = d.shake || 6;
+    state.particles = d.particles || 50;
+    state.bgOp = d.bgOp || 40;
+    state.bgBlur = d.bgBlur || 0;
+    state.preset = d.preset || 'neon';
+    state.duration = d.duration || 0;
+
+    $('kFontSize').value = state.font.size; $('kFontVal').textContent = state.font.size;
+    $('kGlow').value = state.font.glow; $('kGlowVal').textContent = state.font.glow;
+    $('kShake').value = state.shake; $('kShakeVal').textContent = state.shake;
+    $('kParticles').value = state.particles; $('kParticlesVal').textContent = state.particles;
+    $('kBpm').value = state.bpm; $('kBpmVal').textContent = state.bpm;
+    $('kKick').value = state.kick; $('kKickVal').textContent = state.kick;
+    $('kBgOp').value = state.bgOp; $('kBgOpVal').textContent = state.bgOp;
+
+    renderWords(); renderRuler();
+    showToast('تم تحميل القالب','success');
+  } catch(e){
+    showToast('خطأ: ' + e.message,'error');
+  }
+}
+
+function kLoadImg(url){
+  return new Promise(function(res, rej){
+    var i = new Image();
+    i.crossOrigin = 'anonymous';
+    i.onload = function(){ res(i); };
+    i.onerror = function(){ rej(new Error('فشل تحميل الصورة')); };
+    i.src = url;
+  });
+}
+
+function kClose(){
+  if(state._dirty && !confirm('فيه تعديلات غير محفوظة. تغادر؟')) return;
+  location.href = 'index.html';
+}
+</script>
+</body>
+</html>
