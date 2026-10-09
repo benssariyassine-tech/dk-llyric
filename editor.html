@@ -2204,10 +2204,25 @@ function bindBgVideo() {
       $('bgPreview').classList.add('hidden');
       $('bgFiltersBox').style.display = 'block';
       
-      markDirty();
+markDirty();
       showSaveToast('تم رفع الفيديو', 'success');
     };
   });
+}
+
+// تشغيل/إيقاف الفيديو مع الأغنية
+function playBgVideo() {
+  if (!state.bgVideoReady) return;
+  var v = $('bgVideoEl');
+  if (v && v.paused) {
+    v.play().catch(function() {});
+  }
+}
+
+function pauseBgVideo() {
+  if (!state.bgVideoReady) return;
+  var v = $('bgVideoEl');
+  if (v && !v.paused) v.pause();
 }
 
 function removeBackgroundVideo() {
