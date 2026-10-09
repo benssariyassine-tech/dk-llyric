@@ -2738,9 +2738,20 @@ if (rw > rh) {
       setTimeout(r, 400);
     });
 
-    try {
+try {
       var p = player.play();
       if (p && p.catch) await p;
+      
+      // ✅ شغّل فيديو الخلفية
+      if (state.bgVideoReady) {
+        var bgV = $('bgVideoEl');
+        if (bgV) {
+          bgV.currentTime = 0;
+          bgV.muted = true;
+          var vp = bgV.play();
+          if (vp && vp.catch) vp.catch(function(e) { console.warn('BG video play:', e); });
+        }
+      }
     } catch (playErr) {
       try { recorder.stop(); } catch (e) {}
       throw new Error('المتصفح رفض تشغيل الصوت. اضغط على الصفحة ثم أعد المحاولة.');
