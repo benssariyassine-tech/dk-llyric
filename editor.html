@@ -916,6 +916,63 @@ function setupBgGestures() {
       startOffsetY = state.bgOffsetY;
     }
   }, { passive: true });
+  // ✅ سحب البطاقة (بصبع واحد على الوسط)
+  var cardDragActive = false;
+  var cardStartX = 0, cardStartY = 0;
+  var cardStartOffX = 0, cardStartOffY = 0;
+  
+  c.addEventListener('touchstart', function(e) {
+    if (e.touches.length !== 1) return;
+    
+    // حدد موقع اللمسة بالنسبة لـ canvas
+    var r = c.getBoundingClientRect();
+    var touchX = (e.touches[0].clientX - r.left) / r.width;
+    var touchY = (e.touches[0].clientY - r.top) / r.height;
+    
+    // احسب موقع البطاقة الحالي
+    var maxW = 0.95;
+    var maxH = 0.95;
+    var cardW = Math.min((state.card.width || 320) * state.card.scale / DESIGN_W, maxW);
+    var cardH = Math.min((state.card.height || 320) * state.card.scale / DESIGN_W, maxH);
+    var cardLeft = 0.5 - cardW / 2 + (state.card.offsetX || 0);
+    var cardRight = 0.5 + cardW / 2 + (state.card.offsetX || 0);
+    var cardTop = 0.5 - cardH / 2 + (state.card.offsetY || 0);
+    var cardBottom = 0.5 + cardH / 2 + (state.card.offsetY || 0);
+    
+    // إلا كانت اللمسة داخل البطاقة
+    if (touchX >= cardLeft && touchX <= cardRight &&
+        touchY >= cardTop && touchY <= cardBottom) {
+      cardDragActive = true;
+      cardStartX = e.touches[0].clientX;
+      cardStartY = e.touches[0].clientY;
+      cardStartOffX = state.card.offsetX || 0;
+      cardStartOffY = state.card.offsetY || 0;
+    }
+  }, { passive: true });
+  
+  c.addEventListener('touchmove', function(e) {
+    if (!cardDragActive || e.touches.length !== 1) return;
+    
+    var r = c.getBoundingClientRect();
+    var dx = (e.touches[0].clientX - cardStartX) / r.width;
+    var dy = (e.touches[0].clientY - cardStartY) / r.height;
+    
+    state.card.offsetX = cardStartOffX + dx;
+    state.card.offsetY = cardStartOffY + dy;
+    
+    // حدود
+    state.card.offsetX = Math.max(-1, Math.min(1, state.card.offsetX));
+    state.card.offsetY = Math.max(-1, Math.min(1, state.card.offsetY));
+    
+    e.preventDefault();
+  }, { passive: false });
+  
+  c.addEventListener('touchend', function() {
+    if (cardDragActive) {
+      markDirty();
+      cardDragActive = false;
+    }
+  }, { passive: true });
 }
 
 function startRenderLoop() {
