@@ -1185,13 +1185,21 @@ function drawVideoCover(ctx, video, dx, dy, dw, dh) {
   } else if (fit === 'contain') {
     if (ir > cr) { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
     else { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+  } else if (fit === '1:1') {
+    var size = Math.min(dw, dh);
+    w = size; h = size;
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
+  } else if (fit === '9:16') {
+    if (dh / dw > 16/9) { w = dw; h = dw * 16/9; }
+    else { h = dh; w = dh * 9/16; }
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
+  } else if (fit === '16:9') {
+    if (dw / dh < 16/9) { w = dw; h = dw * 9/16; }
+    else { h = dh; w = dh * 16/9; }
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
   } else {
-    var parts = fit.split(':');
-    var targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
-    if (targetRatio > cr) { w = dw; h = dw / targetRatio; }
-    else { h = dh; w = dh * targetRatio; }
-    x = dx + (dw - w) / 2;
-    y = dy + (dh - h) / 2;
+    if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+    else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
   }
   
   if (fit !== 'cover') {
@@ -1199,49 +1207,69 @@ function drawVideoCover(ctx, video, dx, dy, dw, dh) {
     ctx.fillRect(dx, dy, dw, dh);
   }
   
-  ctx.drawImage(video, x, y, w, h);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(dx, dy, dw, dh);
+  ctx.clip();
+  
+  var cx = dx + dw / 2 + state.bgOffsetX * dw;
+  var cy = dy + dh / 2 + state.bgOffsetY * dh;
+  var finalW = w * state.bgScale;
+  var finalH = h * state.bgScale;
+  
+  ctx.drawImage(video, cx - finalW / 2, cy - finalH / 2, finalW, finalH);
+  ctx.restore();
 }
 function drawCover(ctx, img, dx, dy, dw, dh) {
   if (!img || !img.naturalWidth || !img.naturalHeight) return;
-  
   var fit = state.bgFit || 'cover';
   var ir = img.naturalWidth / img.naturalHeight;
   var cr = dw / dh;
   var w, h, x, y;
   
   if (fit === 'cover') {
-    // ملء الشاشة (الحالي)
     if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
     else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
-    
   } else if (fit === 'contain') {
-    // احتواء (كيبان كامل)
     if (ir > cr) { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
     else { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
-    
+  } else if (fit === '1:1') {
+    var size = Math.min(dw, dh);
+    w = size; h = size;
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
+  } else if (fit === '9:16') {
+    if (dh / dw > 16/9) { w = dw; h = dw * 16/9; }
+    else { h = dh; w = dh * 9/16; }
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
+  } else if (fit === '16:9') {
+    if (dw / dh < 16/9) { w = dw; h = dw * 9/16; }
+    else { h = dh; w = dh * 16/9; }
+    x = dx + (dw - w) / 2; y = dy + (dh - h) / 2;
   } else {
-    // نسب ثابتة (1:1, 9:16, 16:9)
-    var parts = fit.split(':');
-    var targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
-    
-    if (targetRatio > cr) {
-      w = dw;
-      h = dw / targetRatio;
-    } else {
-      h = dh;
-      w = dh * targetRatio;
-    }
-    x = dx + (dw - w) / 2;
-    y = dy + (dh - h) / 2;
+    // نسخة افتراضية
+    if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+    else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
   }
   
-  // ملي يكون contain ولا نسب ثابتة، نمسحو الخلفية الأولى
+  // تطبيق التحريك والتكبير
   if (fit !== 'cover') {
     ctx.fillStyle = '#000';
     ctx.fillRect(dx, dy, dw, dh);
   }
   
-  ctx.drawImage(img, x, y, w, h);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(dx, dy, dw, dh);
+  ctx.clip();
+  
+  // نطبق Scale + Offset
+  var cx = dx + dw / 2 + state.bgOffsetX * dw;
+  var cy = dy + dh / 2 + state.bgOffsetY * dh;
+  var finalW = w * state.bgScale;
+  var finalH = h * state.bgScale;
+  
+  ctx.drawImage(img, cx - finalW / 2, cy - finalH / 2, finalW, finalH);
+  ctx.restore();
 }
 
 function drawDivider(ctx, x, y, w, s) {
