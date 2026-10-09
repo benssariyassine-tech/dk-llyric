@@ -2783,70 +2783,104 @@ async function loadProjectFromURL(){
 
   if(!projectId) return;
 
+  // ✅ 1) Guest mode - تعامل معاه مباشرة
   if(guest){
     state.isGuest = true;
-    try{
-      var raw = localStorage.getItem('dk_guest_projects');
-      var list = raw ? JSON.parse(raw) : [];
-      var proj = list.find(function(x){ return x.id === projectId; });
-      if(proj){
-        state.projectId = projectId;
-        state.projectName = proj.name || 'مشروع';
-        if(proj.data) applyProjectData(proj.data);
-        if(proj.audioUrl) loadAudioURL(proj.audioUrl);
-        if(proj.bgVideoUrl) loadBgVideoURL(proj.bgVideoUrl);
-        if(proj.bgImgUrl) loadBgImgURL(proj.bgImgUrl);
-        if(proj.coverUrl) loadCoverURL(proj.coverUrl);
-        updateTitle();
-      }
-    }catch(e){ console.warn(e); }
+    var gOk = loadGuestProject(projectId);
+    if(!gOk){
+      showConfirm('المشروع ما كاينش. واش بغيتي ترجع للرئيسية؟',
+        function(){ location.href = 'index.html'; }, 'المشروع ما كاينش');
+    }
     return;
   }
 
+  // ✅ 2) استنى Firebase (8 ثواني بدل 5)
   if(!_fb.ready){
     await new Promise(function(r){
       var i = setInterval(function(){ if(_fb.ready){ clearInterval(i); r(); } }, 100);
-      setTimeout(function(){ clearInterval(i); r(); }, 5000);
+      setTimeout(function(){ clearInterval(i); r(); }, 8000);
     });
   }
 
-  if(!_fb.user){
-    toast('سجل دخول أول', 'error');
-    setTimeout(function(){ location.href = 'index.html'; }, 1500);
+  // ✅ 3) إذا مسجل دخول → حمّل من Firebase
+  if(_fb.user){
+    showLoader('جاري تحميل المشروع...');
+    try{
+      await loadProjectFromFirebase(projectId);
+      hideLoader();
+      toast('تم التحميل', 'success');
+    }catch(e){
+      console.error(e);
+      hideLoader();
+      // جرب من localStorage
+      if(loadGuestProject(projectId)){
+        toast('تم التحميل من الذاكرة المحلية', 'success');
+      } else {
+        showConfirm('فشل التحميل: ' + e.message,
+          function(){ location.href = 'index.html'; }, 'خطأ');
+      }
+    }
     return;
   }
 
-  showLoader('جاري تحميل المشروع...');
+  // ✅ 4) ماشي مسجل → جرب من localStorage
+  if(loadGuestProject(projectId)){
+    toast('تم التحميل من الذاكرة المحلية', 'success');
+    return;
+  }
+
+  // ✅ 5) فشل كلشي
+  showConfirm(
+    'خاصك تسجل دخول باش تحمّل المشروع. واش بغيتي ترجع للصفحة الرئيسية؟',
+    function(){ location.href = 'index.html'; },
+    'ماشي مسجل دخول'
+  );
+}
+
+/* ===== Helper: Guest Project Loader ===== */
+function loadGuestProject(projectId){
   try{
-    var doc = await _fb.db.collection('projects').doc(projectId).get();
-    if(!doc.exists){ hideLoader(); toast('المشروع ما كاينش', 'error'); return; }
-    var full = doc.data();
-    var d = full.data || {};
+    var raw = localStorage.getItem('dk_guest_projects');
+    var list = raw ? JSON.parse(raw) : [];
+    var proj = list.find(function(x){ return x.id === projectId; });
+    if(!proj) return false;
 
     state.projectId = projectId;
-    state.projectName = full.name || 'مشروع';
-    state._createdAt = full.createdAt || Date.now();
-    state.userId = full.userId;
-    state._cloudAudioUrl = full.audioUrl || null;
-    state._cloudBgVideoUrl = full.bgVideoUrl || null;
-    state._cloudBgImgUrl = full.bgImgUrl || null;
-    state._cloudCoverUrl = full.coverUrl || null;
-
-    if(d) applyProjectData(d);
-    if(full.audioUrl) loadAudioURL(full.audioUrl, true);
-    if(full.bgVideoUrl) loadBgVideoURL(full.bgVideoUrl, true);
-    if(full.bgImgUrl) loadBgImgURL(full.bgImgUrl, true);
-    if(full.coverUrl) loadCoverURL(full.coverUrl, true);
-
+    state.projectName = proj.name || 'مشروع';
+    if(proj.data) applyProjectData(proj.data);
+    if(proj.audioUrl) loadAudioURL(proj.audioUrl);
+    if(proj.bgVideoUrl) loadBgVideoURL(proj.bgVideoUrl);
+    if(proj.bgImgUrl) loadBgImgURL(proj.bgImgUrl);
+    if(proj.coverUrl) loadCoverURL(proj.coverUrl);
     updateTitle();
-    syncUI(); renderWordsList(); renderWords(); renderRuler(); renderAudioSeg(); updateTime();
-    hideLoader();
-    toast('تم التحميل', 'success');
-  }catch(e){
-    console.error(e);
-    hideLoader();
-    toast('فشل التحميل', 'error');
-  }
+    return true;
+  }catch(e){ console.warn(e); return false; }
+}
+
+/* ===== Helper: Firebase Project Loader ===== */
+async function loadProjectFromFirebase(projectId){
+  var doc = await _fb.db.collection('projects').doc(projectId).get();
+  if(!doc.exists) throw new Error('المشروع ما كاينش');
+  var full = doc.data();
+  var d = full.data || {};
+
+  state.projectId = projectId;
+  state.projectName = full.name || 'مشروع';
+  state._createdAt = full.createdAt || Date.now();
+  state.userId = full.userId;
+  state._cloudAudioUrl = full.audioUrl || null;
+  state._cloudBgVideoUrl = full.bgVideoUrl || null;
+  state._cloudBgImgUrl = full.bgImgUrl || null;
+  state._cloudCoverUrl = full.coverUrl || null;
+
+  if(d) applyProjectData(d);
+  if(full.audioUrl) loadAudioURL(full.audioUrl, true);
+  if(full.bgVideoUrl) loadBgVideoURL(full.bgVideoUrl, true);
+  if(full.bgImgUrl) loadBgImgURL(full.bgImgUrl, true);
+  if(full.coverUrl) loadCoverURL(full.coverUrl, true);
+
+  updateTitle();
+  syncUI(); renderWordsList(); renderWords(); renderRuler(); renderAudioSeg(); updateTime();
 }
 
 function applyProjectData(d){
