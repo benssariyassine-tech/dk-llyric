@@ -3152,9 +3152,13 @@ document.addEventListener('DOMContentLoaded', function() {
   var params = new URLSearchParams(window.location.search);
   var templateId = params.get('template');
   var projectId = params.get('project');
-  if (projectId) {
+if (projectId) {
     setTimeout(function() {
       loadProjectFromCloud(projectId);
+    }, 1500);
+  } else if (templateId) {
+    setTimeout(function() {
+      loadTemplateFromCloud(templateId);
     }, 1500);
   }
 });
