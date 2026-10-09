@@ -1294,8 +1294,9 @@ function updateAudioSegmentUI() {
 /* ===== PLAYBACK ===== */
 function togglePlay() {
   var el = $('audioPlayer');
-  if (state.isPlaying) {
+if (state.isPlaying) {
     el.pause();
+    pauseBgVideo();
     state.isPlaying = false;
     updatePlayIcon();
     return;
