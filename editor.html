@@ -2724,8 +2724,9 @@ if (!state.audioUrl) {
       name: state.songName || 'مشروعي',
       createdAt: state._createdAt || Date.now(),
       updatedAt: Date.now(),
-      audioUrl: audioUrl || null,
+    audioUrl: audioUrl || null,
       bgUrl: bgUrl || null,
+      bgVideoUrl: state._cloudBgVideoUrl || null,
       coverUrl: coverUrl || null,
       data: {
         songName: state.songName || '',
