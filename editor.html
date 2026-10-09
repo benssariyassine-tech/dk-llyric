@@ -472,6 +472,9 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
         <button class="upload-preview-remove" onclick="removeCover()">x</button>
       </div>
     </div>
+    <div class="font-group"><label class="font-label">عرض البطاقة: <span id="cardWidthVal">320</span>px</label><input type="range" id="cardWidthRange" min="100" max="500" value="320" class="slider"></div>
+    <div class="font-group"><label class="font-label">طول البطاقة: <span id="cardHeightVal">320</span>px</label><input type="range" id="cardHeightRange" min="100" max="700" value="320" class="slider"></div>
+    <button class="add-lyric-btn" onclick="resetCardPosition()" style="margin-bottom:14px">إعادة ضبط موضع البطاقة</button>
     <div class="font-group"><label class="font-label">حجم البطاقة: <span id="cardScaleVal">1.00</span>x</label><input type="range" id="cardScaleRange" min="0.5" max="1.2" step="0.05" value="1" class="slider"></div>
     <div class="font-group"><label class="font-label">شفافية: <span id="cardOpVal">65</span>%</label><input type="range" id="cardOpRange" min="20" max="100" value="65" class="slider"></div>
     <div class="font-group"><label class="font-label">استدارة: <span id="cardRadVal">26</span>px</label><input type="range" id="cardRadRange" min="0" max="40" value="26" class="slider"></div>
