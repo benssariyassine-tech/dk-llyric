@@ -2631,8 +2631,22 @@ async function startExport() {
   var recorder = null;
 
   try {
-    var W = exportSettings.quality === 1080 ? 1080 : 720;
-    var H = Math.round(W * DESIGN_H / DESIGN_W);
+var parts = (state.canvasRatio || '9:16').split(':');
+var rw = parseFloat(parts[0]);
+var rh = parseFloat(parts[1]);
+
+var baseSize = exportSettings.quality === 1080 ? 1080 : 720;
+var W, H;
+
+if (rw > rh) {
+  // أفقي: الارتفاع = baseSize
+  H = baseSize;
+  W = Math.round(baseSize * rw / rh);
+} else {
+  // عمودي أو مربع: العرض = baseSize (الجانب الأقصر)
+  W = baseSize;
+  H = Math.round(baseSize * rh / rw);
+}
 
     var canvas = document.createElement('canvas');
     canvas.width = W;
