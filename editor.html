@@ -245,7 +245,7 @@ body.menu-open .editor-nav{transform:translateX(-50%) translateY(120%);opacity:0
     <polyline points="7 3 7 8 15 8"/>
   </svg>
 </button>
-  <button class="etb-export" id="exportTopBtn" type="button">تصدير</button>
+<button class="etb-export" id="exportTopBtn" type="button" onclick="openExportModal()">تصدير</button>
 </header>
 
 <div class="preview-wrap">
@@ -2598,38 +2598,29 @@ function setFontFilter(filter, btn) {
 var exportSettings = { quality: 1080, fps: 30 };
 var _audioCtx = null, _audioSource = null, _audioDest = null;
 function bindExportButton() {
-  // ✅ Event Delegation على document — كيخدم مع أي زر حتى لو تحمل متأخر
-  document.addEventListener('click', function(e) {
-    var btn = e.target.closest('#exportTopBtn');
-    if (!btn) return;
+  var btn = document.getElementById('exportTopBtn');
+  if (!btn) {
+    console.warn('زر التصدير ماشي موجود');
+    return;
+  }
+  
+  var handler = function(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     
-    e.preventDefault();
-    e.stopPropagation();
-    
-    try {
-      if (!state.audioUrl) {
-        showAlert('ارفع أغنية أول', 'لا يمكن التصدير', 'warning');
-        return;
-      }
-      $('exportModal').classList.add('open');
-      $('exportProgress').style.display = 'none';
-      $('exportStartBtn').disabled = false;
-    } catch (err) {
-      console.error('Export click error:', err);
-      showAlert('خطأ: ' + err.message, 'فشل', 'error');
+    if (!state.audioUrl) {
+      showAlert('ارفع أغنية أول', 'لا يمكن التصدير', 'warning');
+      return;
     }
-  }, false);
+    $('exportModal').classList.add('open');
+    $('exportProgress').style.display = 'none';
+    $('exportStartBtn').disabled = false;
+  };
   
-  // ✅ إضافي: touchstart كـ fallback
-  document.addEventListener('touchstart', function(e) {
-    var btn = e.target.closest('#exportTopBtn');
-    if (!btn) return;
-    
-    // ما نديروش preventDefault هنا حيت ممكن يأثر على click
-    console.log('📱 touchstart على زر التصدير');
-  }, { passive: true });
+  // ربط مباشر على الزر
+  btn.addEventListener('click', handler, false);
+  btn.addEventListener('touchend', handler, { passive: false });
   
-  console.log('✅ زر التصدير مربوط بـ delegation');
+  console.log('✅ زر التصدير مربوط مباشرة');
 }
 function bindExportOptions() {
   document.querySelectorAll('#exportQuality .export-opt').forEach(function(b) {
