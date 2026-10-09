@@ -1266,6 +1266,12 @@ if (curr) {
   ctx.fillText(state.igName, igX + iconSize + 6 * s, footerY);
   ctx.restore();
 }
+  function resetCardPosition() {
+  state.card.offsetX = 0;
+  state.card.offsetY = 0;
+  markDirty();
+  showSaveToast('تم إعادة ضبط البطاقة', 'success');
+}
   function resetBgPosition() {
   state.bgOffsetX = 0;
   state.bgOffsetY = 0;
