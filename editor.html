@@ -1786,8 +1786,9 @@ function startLongPress(e, index, segEl) {
       if (pendingLeft != null) {
         state.lyrics[index].start = pendingLeft;
       }
-      renderRuler();
+renderRuler();
       renderTimeline();
+      markDirty();
     }
     document.addEventListener('mousemove', move);
     document.addEventListener('mouseup', end);
