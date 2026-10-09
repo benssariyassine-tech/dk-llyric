@@ -424,7 +424,10 @@ function bindAll(){
     };
     img.src = url;
   });
-
+$('kSongNameInput').addEventListener('input', function(){
+  state.songName = this.value;
+  state._dirty = true;
+});
   $('kLyricsText').addEventListener('input', function(){ state._dirty = true; });
 
   function sl(id, valId, key){
