@@ -2829,7 +2829,27 @@ async function loadProjectFromCloud(projectId) {
     if (!doc.exists) { alert('المشروع ما كاينش'); return; }
     var full = doc.data();
     var d = full.data || {};
-
+if (full.bgVideoUrl) {
+      var v = $('bgVideoEl');
+      v.src = full.bgVideoUrl;
+      v.muted = true;
+      v.load();
+      await new Promise(function(res) {
+        var done = false;
+        var finish = function() { if (!done) { done = true; res(); } };
+        v.onloadedmetadata = finish;
+        setTimeout(finish, 4000);
+      });
+      state.bgVideoUrl = full.bgVideoUrl;
+      state.bgVideoReady = true;
+      state._cloudBgVideoUrl = full.bgVideoUrl;
+      
+      $('bgVideoUploadBtn').classList.add('hidden');
+      $('bgVideoPreview').classList.remove('hidden');
+      $('bgVideoPreviewPlayer').src = full.bgVideoUrl;
+      $('bgVideoPreviewName').textContent = 'فيديو محمل';
+      $('bgFiltersBox').style.display = 'block';
+    }
     if (full.bgUrl) {
       state.bgImg = await loadImageCORS(full.bgUrl);
       state.bgImgVersion++;
