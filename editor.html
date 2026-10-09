@@ -2903,7 +2903,21 @@ if (!state.audioUrl) {
       var d1 = await r1.json();
       if (!d1.error) { bgUrl = d1.secure_url; state._cloudBgUrl = bgUrl; }
     }
-    
+    // 2.5. رفع فيديو الخلفية
+    var bgVideoUrl = state._cloudBgVideoUrl;
+    if (state.bgVideoUrl && !bgVideoUrl && state.bgVideoUrl.indexOf('http') !== 0) {
+      try {
+        var vidBlob = await fetch(state.bgVideoUrl).then(function(r) { return r.blob(); });
+        var fdV = new FormData();
+        fdV.append('file', vidBlob);
+        fdV.append('upload_preset', CLOUDINARY_PRESET);
+        var rV = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/video/upload', { method: 'POST', body: fdV });
+        var dV = await rV.json();
+        if (!dV.error) { bgVideoUrl = dV.secure_url; state._cloudBgVideoUrl = bgVideoUrl; }
+      } catch (e) {
+        console.warn('Video upload failed:', e);
+      }
+    }
     // 3. رفع الغلاف
     var coverUrl = state._cloudCoverUrl;
     if (state.coverImg && !coverUrl) {
