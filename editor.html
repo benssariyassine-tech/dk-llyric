@@ -53,7 +53,7 @@ button{font-family:inherit;cursor:pointer}
 .pc-btn svg polygon{fill:currentColor;stroke:none}
 .pc-time{flex:1;text-align:center;font-size:11px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
 
-.timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border-color);padding-bottom:76px}
+.timeline-wrap{flex-shrink:0;background:rgba(7,7,13,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border-color);padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .timeline-viewport{position:relative;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0 6px;touch-action:pan-x}
 .timeline-viewport::-webkit-scrollbar{display:none}
 .timeline-content{position:relative;min-width:max-content;padding-right:60px}
