@@ -1169,7 +1169,36 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
 }
-
+function drawVideoCover(ctx, video, dx, dy, dw, dh) {
+  if (!video || !video.videoWidth || !video.videoHeight) return;
+  
+  var fit = state.bgFit || 'cover';
+  var ir = video.videoWidth / video.videoHeight;
+  var cr = dw / dh;
+  var w, h, x, y;
+  
+  if (fit === 'cover') {
+    if (ir > cr) { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+    else { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+  } else if (fit === 'contain') {
+    if (ir > cr) { w = dw; h = dw / ir; x = dx; y = dy + (dh - h) / 2; }
+    else { h = dh; w = dh * ir; x = dx + (dw - w) / 2; y = dy; }
+  } else {
+    var parts = fit.split(':');
+    var targetRatio = parseFloat(parts[0]) / parseFloat(parts[1]);
+    if (targetRatio > cr) { w = dw; h = dw / targetRatio; }
+    else { h = dh; w = dh * targetRatio; }
+    x = dx + (dw - w) / 2;
+    y = dy + (dh - h) / 2;
+  }
+  
+  if (fit !== 'cover') {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(dx, dy, dw, dh);
+  }
+  
+  ctx.drawImage(video, x, y, w, h);
+}
 function drawCover(ctx, img, dx, dy, dw, dh) {
   if (!img || !img.naturalWidth || !img.naturalHeight) return;
   
