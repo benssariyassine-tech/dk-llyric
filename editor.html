@@ -1360,6 +1360,7 @@ function seekBy(delta) {
   if (state.audioUrl) $('audioPlayer').currentTime = state.trimIn + (t - state.audioStart);
   seekPlayhead(t);
   updateTimeDisplay();
+  syncBgVideo(t);
 }
 
 function updateTimeDisplay() {
