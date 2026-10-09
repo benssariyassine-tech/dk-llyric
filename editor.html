@@ -3262,7 +3262,11 @@ state.audioUrl = full.audioUrl;
     state.igName = d.igName || 'dk.llyric';
     state.lyrics = d.lyrics || state.lyrics;
     state.font = d.font || state.font;
-    state.card = d.card || state.card;
+   state.card = d.card || state.card;
+    if (d.cardWidth) state.card.width = d.cardWidth;
+    if (d.cardHeight) state.card.height = d.cardHeight;
+    if (typeof d.cardOffsetX !== 'undefined') state.card.offsetX = d.cardOffsetX;
+    if (typeof d.cardOffsetY !== 'undefined') state.card.offsetY = d.cardOffsetY;
 state.bgFilters = d.bgFilters || state.bgFilters;
 state.bgFit = d.bgFit || 'cover';
     if (d.canvasRatio) {
