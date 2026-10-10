@@ -1,448 +1,2178 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>dk.llyric — استوديو الكلمات</title>
-<meta name="theme-color" content="#06060a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="dk.llyric">
-<meta name="format-detection" content="telephone=no">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a14" />
+<title>DK Web OS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
 <style>
-:root{
-  --bg:#050509;
-  --bg2:#0a0a14;
-  --surface:rgba(255,255,255,0.03);
-  --surface2:rgba(255,255,255,0.06);
-  --surface3:rgba(255,255,255,0.1);
-  --text:#fff;
-  --text2:rgba(255,255,255,0.7);
-  --sub:#8a8a92;
-  --accent:#6366f1;
-  --accent2:#8b5cf6;
-  --accent3:#ec4899;
-  --success:#10b981;
-  --danger:#ef4444;
-  --warning:#f59e0b;
-  --border:rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.14);
-  --grad:linear-gradient(135deg,#6366f1,#8b5cf6);
-  --grad2:linear-gradient(135deg,#8b5cf6,#ec4899);
-  --grad3:linear-gradient(135deg,#6366f1,#ec4899);
-  --shadow:0 24px 60px rgba(0,0,0,0.5);
-  --sat:env(safe-area-inset-top,0px);
-  --sab:env(safe-area-inset-bottom,0px);
-  --sal:env(safe-area-inset-left,0px);
-  --sar:env(safe-area-inset-right,0px);
+/* ============================================
+   DK WEB OS - Complete Stylesheet
+   ============================================ */
+
+:root {
+  --bg-primary: #0a0a14;
+  --bg-secondary: #13131f;
+  --bg-tertiary: #1c1c2e;
+  --bg-window: #16161f;
+  --bg-hover: #252538;
+  --accent: #6366f1;
+  --accent-hover: #7c7ff2;
+  --accent-light: #818cf8;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border: #2a2a3e;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --taskbar-height: 56px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-input,textarea{-webkit-user-select:text;user-select:text}
-html,body{background:var(--bg);color:var(--text);font-family:'Cairo',-apple-system,BlinkMacSystemFont,sans-serif;overflow-x:hidden;height:100dvh;overscroll-behavior:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{position:fixed;width:100%;-webkit-touch-callout:none}
-button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;background:none;color:inherit;font-weight:700}
-a{text-decoration:none;color:inherit}
 
-/* ===== AMBIENT BACKGROUND ===== */
-.ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.35;animation:orb 24s ease-in-out infinite}
-.orb-1{width:380px;height:380px;background:#6366f1;top:-120px;right:-120px}
-.orb-2{width:340px;height:340px;background:#ec4899;bottom:-100px;left:-100px;animation-delay:-8s}
-.orb-3{width:280px;height:280px;background:#8b5cf6;top:50%;left:50%;animation-delay:-16s}
-@keyframes orb{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-60px) scale(1.15)}66%{transform:translate(-40px,40px) scale(0.92)}}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
-.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 80%)}
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
 
-/* ===== SCREENS ===== */
-.screen{display:none;flex-direction:column;height:100dvh;overflow-y:auto;position:relative;z-index:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.screen.active{display:flex}
+/* ============================================
+   LOGIN SCREEN
+   ============================================ */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #0a0a14 0%, #1a1a2e 50%, #16213e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  overflow-y: auto;
+}
 
-/* ===== LOGIN SCREEN ===== */
-#screenLogin{padding:calc(var(--sat) + 40px) 24px calc(var(--sab) + 40px);align-items:center;justify-content:center}
-.login-container{width:100%;max-width:420px}
+#login-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(99,102,241,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139,92,246,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
 
-.brand{text-align:center;margin-bottom:44px;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.brand-logo{width:96px;height:96px;margin:0 auto 22px;border-radius:28px;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 30px 80px rgba(99,102,241,0.5),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden}
-.brand-logo::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.3),transparent 60%);opacity:0.5}
-.brand-logo svg{width:52px;height:52px;stroke:#fff;fill:none;stroke-width:2.2;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3))}
-.brand-title{font-size:40px;font-weight:900;letter-spacing:-1.5px;line-height:1;background:linear-gradient(135deg,#fff 0%,#a5b4fc 50%,#c4b5fd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.brand-sub{font-size:14px;color:var(--text2);margin-top:12px;font-weight:500;letter-spacing:0.3px}
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(19,19,31,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  animation: loginFade 0.5s ease;
+}
 
-.auth-card{background:rgba(255,255,255,0.02);backdrop-filter:blur(60px) saturate(180%);-webkit-backdrop-filter:blur(60px) saturate(180%);border:1px solid var(--border2);border-radius:28px;padding:28px 24px;box-shadow:var(--shadow);animation:fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) backwards}
+@keyframes loginFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-.auth-tabs{display:flex;gap:4px;padding:4px;background:rgba(0,0,0,0.4);border-radius:14px;margin-bottom:22px}
-.auth-tab{flex:1;padding:11px;color:var(--sub);font-size:13px;font-weight:800;border-radius:10px;transition:all 0.25s}
-.auth-tab.active{background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(99,102,241,0.4)}
+.login-logo {
+  text-align: center;
+  margin-bottom: 8px;
+}
 
-.google-btn{width:100%;padding:15px;background:#fff;color:#1a1a1a;border-radius:14px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.15s;margin-bottom:18px;font-family:'Inter','Cairo',sans-serif}
-.google-btn:active{transform:scale(0.97);background:#f5f5f5}
-.google-btn svg{width:20px;height:20px;flex-shrink:0}
-.google-btn:disabled{opacity:0.6;pointer-events:none}
+.login-logo svg {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 4px 12px rgba(99,102,241,0.5));
+}
 
-.divider{display:flex;align-items:center;gap:14px;margin:18px 0;color:var(--sub);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.login-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-.auth-field{margin-bottom:14px}
-.auth-label{display:block;font-size:11px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
-.auth-input{width:100%;padding:16px 18px;background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:14px;color:#fff;font-size:16px;font-weight:600;outline:none;font-family:inherit;transition:all 0.2s;-webkit-user-select:text;user-select:text}
-.auth-input::placeholder{color:rgba(255,255,255,0.25);font-weight:500}
-.auth-input:focus{border-color:var(--accent);background:rgba(99,102,241,0.08);box-shadow:0 0 0 4px rgba(99,102,241,0.12)}
+.login-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 30px;
+}
 
-.auth-submit{width:100%;padding:17px;background:var(--grad);color:#fff;border-radius:15px;font-size:15px;font-weight:800;margin-top:8px;box-shadow:0 12px 36px rgba(99,102,241,0.4);transition:transform 0.15s;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden}
-.auth-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent 60%);opacity:0;transition:opacity 0.2s}
-.auth-submit:active{transform:scale(0.97)}
-.auth-submit:active::before{opacity:1}
-.auth-submit:disabled{opacity:0.5;pointer-events:none}
-.auth-submit svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5}
+.login-tabs {
+  display: flex;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
 
-.auth-error{padding:12px 14px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:14px;display:none;text-align:center}
-.auth-error.show{display:block;animation:shake 0.4s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-tab {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  font-family: var(--font);
+}
 
-.auth-info{padding:12px 14px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);color:#a5b4fc;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:14px;text-align:center;line-height:1.6}
-.auth-info.show{display:block}
+.login-tab.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
 
-.auth-guest{width:100%;padding:14px;background:transparent;border:1.5px dashed var(--border2);color:var(--text2);border-radius:14px;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;margin-top:14px}
-.auth-guest:active{transform:scale(0.97);background:rgba(255,255,255,0.04);color:#fff}
-.auth-guest svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-.auth-footer{text-align:center;margin-top:24px;font-size:12px;color:var(--sub);line-height:1.6}
-.auth-footer a{color:var(--accent);font-weight:700}
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 
-/* ===== DASHBOARD ===== */
-#screenDash{padding-top:0}
-.dash-header{padding:calc(var(--sat) + 22px) 22px 18px;display:flex;align-items:center;gap:14px}
-.avatar{width:54px;height:54px;border-radius:18px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff;flex-shrink:0;box-shadow:0 10px 30px rgba(99,102,241,0.4),inset 0 1px 0 rgba(255,255,255,0.2);position:relative;overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.avatar::after{content:'';position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:var(--success);border:3px solid var(--bg);border-radius:50%}
-.dash-header-info{flex:1;min-width:0}
-.dash-hi{font-size:12px;color:var(--sub);font-weight:700;letter-spacing:0.5px}
-.dash-user{font-size:23px;font-weight:900;color:#fff;letter-spacing:-0.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dash-action{width:46px;height:46px;border-radius:15px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
-.dash-action:active{transform:scale(0.92);background:var(--surface2)}
-.dash-action svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2}
+.input-group svg {
+  position: absolute;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-muted);
+  pointer-events: none;
+}
 
-.hero-card{margin:0 22px 20px;padding:22px;background:var(--grad);border-radius:24px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(99,102,241,0.35);min-height:140px;display:flex;flex-direction:column;justify-content:space-between}
-.hero-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.25),transparent 70%);border-radius:50%}
-.hero-card::after{content:'';position:absolute;bottom:-30%;left:-20%;width:180px;height:180px;background:radial-gradient(circle,rgba(236,72,153,0.4),transparent 70%);border-radius:50%}
-.hero-content{position:relative;z-index:1}
-.hero-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.2}
-.hero-sub{font-size:13px;color:rgba(255,255,255,0.85);margin-top:6px;font-weight:600}
-.hero-cta{margin-top:16px;align-self:flex-start;padding:12px 22px;background:#fff;color:#6366f1;border-radius:12px;font-size:13px;font-weight:900;display:flex;align-items:center;gap:8px;position:relative;z-index:1;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.15s}
-.hero-cta:active{transform:scale(0.96)}
-.hero-cta svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.8}
+.input-group input {
+  width: 100%;
+  padding: 14px 44px 14px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.2s;
+  direction: rtl;
+}
 
-.stats{padding:0 22px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 10px;text-align:center;backdrop-filter:blur(20px);position:relative;overflow:hidden}
-.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0.8}
-.stat-val{font-size:24px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
-.stat-lbl{font-size:10px;color:var(--sub);font-weight:800;margin-top:6px;text-transform:uppercase;letter-spacing:0.8px}
+.input-group input:focus {
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
 
-.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 22px 20px}
-.quick-btn{padding:16px 14px;background:var(--surface);border:1px solid var(--border);border-radius:18px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;transition:all 0.2s;position:relative;overflow:hidden;text-align:right}
-.quick-btn:active{transform:scale(0.96);background:var(--surface2)}
-.quick-btn .q-icon{width:36px;height:36px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(99,102,241,0.4)}
-.quick-btn .q-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4}
-.quick-btn.grad2 .q-icon{background:var(--grad2);box-shadow:0 6px 18px rgba(236,72,153,0.4)}
-.quick-btn .q-title{font-size:14px;font-weight:900;color:#fff;letter-spacing:-0.2px}
-.quick-btn .q-sub{font-size:11px;color:var(--sub);font-weight:600;margin-top:-4px}
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
 
-.section-head{padding:0 22px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.section-title{font-size:16px;font-weight:900;color:#fff;letter-spacing:-0.3px}
-.section-action{color:var(--accent);font-size:12px;font-weight:800;background:none;border:none;padding:0;font-family:inherit}
+.btn {
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 
-.tabs{padding:0 22px;margin-bottom:16px}
-.tabs-inner{display:flex;gap:4px;padding:4px;background:rgba(0,0,0,0.35);border-radius:14px}
-.tab{flex:1;padding:11px;color:var(--sub);font-size:13px;font-weight:800;border-radius:10px;transition:all 0.25s}
-.tab.active{background:var(--surface3);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+}
 
-.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 22px calc(var(--sab) + 130px)}
-.proj{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:transform 0.2s;cursor:pointer;position:relative;backdrop-filter:blur(20px)}
-.proj:active{transform:scale(0.96)}
-.proj-thumb{aspect-ratio:4/5;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(236,72,153,0.25))}
-.proj-thumb img{width:100%;height:100%;object-fit:cover}
-.proj-thumb .ph{width:48px;height:48px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:1.5}
-.proj-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%);pointer-events:none}
-.proj-badge{position:absolute;top:10px;right:10px;padding:5px 10px;background:rgba(0,0,0,0.6);backdrop-filter:blur(14px);border-radius:9px;font-size:10px;font-weight:900;color:#fff;letter-spacing:0.3px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,0.1)}
-.proj-badge svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5}
-.proj-del{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.6);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;transition:all 0.2s;z-index:2;border:1px solid rgba(255,255,255,0.1)}
-.proj-del:active{transform:scale(0.9);background:rgba(239,68,68,0.7)}
-.proj-del svg{width:14px;height:14px;stroke:#fca5a5;fill:none;stroke-width:2.5}
-.proj-info{padding:12px 14px}
-.proj-name{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.2px}
-.proj-date{font-size:10.5px;color:var(--sub);margin-top:5px;font-weight:600}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
 
-.templates-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 22px calc(var(--sab) + 130px)}
-.tpl{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer;transition:transform 0.2s;position:relative}
-.tpl:active{transform:scale(0.96)}
-.tpl-thumb{aspect-ratio:9/16;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.tpl-grad{position:absolute;inset:0;opacity:0.95}
-.tpl-text{position:relative;font-size:17px;font-weight:900;padding:12px;text-align:center;line-height:1.3;z-index:1}
-.tpl-tag{position:absolute;top:10px;right:10px;padding:4px 9px;background:rgba(0,0,0,0.6);backdrop-filter:blur(14px);border-radius:8px;font-size:9px;font-weight:900;color:#fff;z-index:2;letter-spacing:0.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1)}
-.tpl-info{padding:11px 12px}
-.tpl-name{font-size:12px;font-weight:800;color:#fff;text-align:center;letter-spacing:-0.2px}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
 
-.empty{padding:70px 30px calc(var(--sab) + 130px);text-align:center;color:var(--sub)}
-.empty svg{width:80px;height:80px;stroke:var(--sub);fill:none;stroke-width:1.2;opacity:0.3;margin-bottom:20px}
-.empty-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:-0.3px}
-.empty-text{font-size:13px;line-height:1.7;max-width:280px;margin:0 auto;font-weight:500}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-.skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:14px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.skeleton-proj{aspect-ratio:4/5;border-radius:20px}
+.btn-google {
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
 
-/* Bottom Nav */
-.bnav{position:fixed;bottom:calc(var(--sab) + 14px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-around;background:rgba(18,18,26,0.9);backdrop-filter:blur(60px) saturate(200%);-webkit-backdrop-filter:blur(60px) saturate(200%);border:1px solid var(--border2);border-radius:32px;padding:8px 6px;width:calc(100% - 32px);max-width:420px;z-index:100;box-shadow:0 24px 70px rgba(0,0,0,0.7);transition:opacity 0.25s,transform 0.25s}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;color:rgba(255,255,255,0.5);font-size:9.5px;font-weight:800;border-radius:24px;transition:all 0.25s;letter-spacing:0.3px}
-.bnav-btn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2.2}
-.bnav-btn.active{color:#fff;background:var(--grad);box-shadow:0 8px 22px rgba(99,102,241,0.5);transform:translateY(-1px)}
+.btn-google:hover {
+  background: #f5f5f5;
+}
 
-/* Modal */
-.modal{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-end;justify-content:center}
-.modal.open{display:flex}
-.modal-back{position:absolute;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:fadeIn 0.2s}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal-box{position:relative;width:100%;max-width:500px;background:rgba(18,18,26,0.97);backdrop-filter:blur(60px);-webkit-backdrop-filter:blur(60px);border-top-left-radius:32px;border-top-right-radius:32px;border-top:1px solid var(--border2);padding:16px 24px calc(var(--sab) + 28px);animation:slideUp 0.4s cubic-bezier(0.16,1,0.3,1)}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.handle{width:44px;height:5px;background:rgba(255,255,255,0.3);border-radius:5px;margin:0 auto 20px}
-.modal-title{font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;letter-spacing:-0.3px}
-.modal-sub{font-size:13px;color:var(--sub);text-align:center;margin-bottom:22px;line-height:1.6;font-weight:500}
-.modal-input{width:100%;padding:17px;background:rgba(255,255,255,0.05);border:1.5px solid var(--border);border-radius:15px;color:#fff;font-size:16px;font-weight:700;outline:none;font-family:inherit;margin-bottom:14px;transition:all 0.2s;-webkit-user-select:text;user-select:text}
-.modal-input::placeholder{color:rgba(255,255,255,0.25);font-weight:500}
-.modal-input:focus{border-color:var(--accent);background:rgba(99,102,241,0.08);box-shadow:0 0 0 4px rgba(99,102,241,0.1)}
-.modal-btn{width:100%;padding:16px;background:var(--grad);color:#fff;border-radius:15px;font-size:15px;font-weight:800;box-shadow:0 12px 36px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform 0.15s}
-.modal-btn:active{transform:scale(0.97)}
-.modal-btn:disabled{opacity:0.5;pointer-events:none}
-.modal-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5}
-.modal-btn.ghost{background:rgba(255,255,255,0.06);box-shadow:none;margin-top:10px;color:#fff}
+.btn-google svg {
+  width: 20px;
+  height: 20px;
+}
 
-/* Toast */
-.toast{position:fixed;top:calc(var(--sat) + 70px);left:50%;transform:translateX(-50%) translateY(-20px) scale(0.9);padding:12px 22px;background:rgba(40,40,48,0.96);backdrop-filter:blur(50px);-webkit-backdrop-filter:blur(50px);color:#fff;font-size:13px;font-weight:700;border-radius:22px;z-index:99999;opacity:0;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);pointer-events:none;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,0.5);border:1px solid var(--border2)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
-.toast.success{background:rgba(16,185,129,0.96)}
-.toast.error{background:rgba(239,68,68,0.96)}
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 8px 0;
+}
 
-/* Loader */
-.loader{position:fixed;inset:0;z-index:99999;background:rgba(5,5,9,0.96);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:24px}
-.loader.show{display:flex}
-.spinner{width:56px;height:56px;border:3px solid rgba(255,255,255,0.08);border-top-color:#6366f1;border-right-color:#ec4899;border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:0.3px}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 
-/* Splash */
-.splash{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;transition:opacity 0.5s,visibility 0.5s}
-.splash.hide{opacity:0;visibility:hidden}
-.splash-logo{width:100px;height:100px;border-radius:30px;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 30px 80px rgba(99,102,241,0.6);animation:pulse 2s ease-in-out infinite}
-.splash-logo svg{width:54px;height:54px;stroke:#fff;fill:none;stroke-width:2.2}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.splash-text{font-size:22px;font-weight:900;background:linear-gradient(135deg,#fff,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px}
-.splash-dots{display:flex;gap:6px}
-.splash-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:dotPulse 1.4s ease-in-out infinite}
-.splash-dots span:nth-child(2){animation-delay:0.2s;background:var(--accent2)}
-.splash-dots span:nth-child(3){animation-delay:0.4s;background:var(--accent3)}
-@keyframes dotPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+.login-message {
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  text-align: center;
+  display: none;
+  margin-top: 8px;
+}
 
-.hidden{display:none!important}
-::-webkit-scrollbar{width:0}
+.login-message.error {
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.3);
+  display: block;
+}
+
+.login-message.success {
+  background: rgba(34,197,94,0.15);
+  color: #86efac;
+  border: 1px solid rgba(34,197,94,0.3);
+  display: block;
+}
+
+.login-loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   DESKTOP
+   ============================================ */
+#os-screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+}
+
+#desktop {
+  position: absolute;
+  inset: 0;
+  bottom: var(--taskbar-height);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+#desktop-icons {
+  position: absolute;
+  inset: 0;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.desktop-icon {
+  width: 90px;
+  padding: 10px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.15s;
+  text-align: center;
+}
+
+.desktop-icon:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.desktop-icon:active {
+  background: rgba(255,255,255,0.2);
+}
+
+.desktop-icon svg {
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.desktop-icon-label {
+  font-size: 12px;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ============================================
+   WINDOWS
+   ============================================ */
+.window {
+  position: absolute;
+  background: var(--bg-window);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 280px;
+  min-height: 200px;
+  animation: windowOpen 0.18s ease;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+@keyframes windowOpen {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.window.minimized {
+  display: none;
+}
+
+.window.maximized {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+}
+
+.window-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  cursor: move;
+  touch-action: none;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.window-header svg.window-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.window-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.window-controls {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.window-control {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+  background: transparent;
+}
+
+.window-control svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
+.window-control.minimize {
+  background: var(--warning);
+  color: #000;
+}
+
+.window-control.maximize {
+  background: var(--success);
+  color: #000;
+}
+
+.window-control.close {
+  background: var(--danger);
+  color: white;
+}
+
+.window-control:hover {
+  filter: brightness(1.2);
+  transform: scale(1.1);
+}
+
+.window-body {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.window-resize {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 10;
+}
+
+.window-resize::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+}
+
+/* ============================================
+   TASKBAR
+   ============================================ */
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--taskbar-height);
+  background: rgba(19,19,31,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  z-index: 5000;
+}
+
+#start-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+#start-btn:hover {
+  background: var(--bg-hover);
+}
+
+#start-btn.active {
+  background: var(--accent);
+}
+
+#start-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+#taskbar-apps {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  height: 100%;
+  align-items: center;
+}
+
+#taskbar-apps::-webkit-scrollbar {
+  display: none;
+}
+
+.taskbar-app {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  font-family: var(--font);
+  max-width: 180px;
+}
+
+.taskbar-app svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.taskbar-app .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskbar-app:hover {
+  background: var(--bg-hover);
+}
+
+.taskbar-app.active {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+#taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.tray-icon {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+  padding: 0;
+}
+
+.tray-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tray-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+#clock {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  line-height: 1.3;
+  min-width: 80px;
+}
+
+#clock:hover {
+  background: var(--bg-hover);
+}
+
+#clock .time {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#clock .date {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   START MENU
+   ============================================ */
+#start-menu {
+  position: fixed;
+  bottom: calc(var(--taskbar-height) + 10px);
+  left: 10px;
+  width: 340px;
+  max-width: calc(100vw - 20px);
+  max-height: 70vh;
+  background: rgba(19,19,31,0.96);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 6000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#start-menu.open {
+  display: flex;
+}
+
+.start-search {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.start-search input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  font-family: var(--font);
+}
+
+.start-search input:focus {
+  border-color: var(--accent);
+}
+
+.start-user {
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.start-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #c084fc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.start-user-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.start-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.start-user-email {
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.start-apps {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  align-content: start;
+}
+
+.start-app {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.15s;
+  font-family: var(--font);
+}
+
+.start-app:hover {
+  background: var(--bg-hover);
+}
+
+.start-app svg {
+  width: 26px;
+  height: 26px;
+}
+
+.start-app span {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.start-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.start-footer-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+
+.start-footer-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.start-footer-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================
+   CONTEXT MENU
+   ============================================ */
+#context-menu {
+  position: fixed;
+  background: rgba(19,19,31,0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  min-width: 200px;
+  z-index: 9000;
+  display: none;
+  animation: ctxFade 0.15s ease;
+}
+
+@keyframes ctxFade {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+#context-menu.open {
+  display: block;
+}
+
+.ctx-item {
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font);
+  text-align: right;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.1s;
+}
+
+.ctx-item:hover {
+  background: var(--accent);
+}
+
+.ctx-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.ctx-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* ============================================
+   NOTIFICATIONS
+   ============================================ */
+#notifications {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  align-items: flex-end;
+}
+
+.notification {
+  background: rgba(19,19,31,0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 380px;
+  pointer-events: auto;
+  animation: notifIn 0.3s ease;
+  border-right: 3px solid var(--accent);
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.notification.removing {
+  animation: notifOut 0.3s ease forwards;
+}
+
+@keyframes notifOut {
+  to { opacity: 0; transform: translateX(50px); }
+}
+
+.notification svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.notification-message {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   APP STYLES
+   ============================================ */
+
+/* Notes App */
+.notes-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.notes-toolbar {
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.notes-toolbar input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  font-family: var(--font);
+}
+
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-item {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.note-item:hover {
+  border-color: var(--accent);
+  transform: translateX(-2px);
+}
+
+.note-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-item-content {
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.note-item-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.note-item-delete {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.note-item:hover .note-item-delete {
+  opacity: 1;
+}
+
+.note-item-delete:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Calculator */
+.calc-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.calc-display {
+  padding: 20px;
+  text-align: left;
+  font-size: 36px;
+  font-weight: 300;
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: ltr;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.calc-history {
+  font-size: 13px;
+  color: var(--text-muted);
+  position: absolute;
+  top: 6px;
+  right: 20px;
+}
+
+.calc-buttons {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 10px;
+}
+
+.calc-btn {
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: var(--font);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-btn:hover {
+  background: var(--bg-hover);
+}
+
+.calc-btn:active {
+  transform: scale(0.96);
+}
+
+.calc-btn.op {
+  background: var(--bg-hover);
+  color: var(--accent-light);
+}
+
+.calc-btn.equals {
+  background: var(--accent);
+  color: white;
+}
+
+.calc-btn.clear {
+  background: var(--danger);
+  color: white;
+}
+
+/* Terminal */
+.terminal-app {
+  background: #0a0a0a;
+  color: #00ff00;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 12px;
+  height: 100%;
+  overflow-y: auto;
+  direction: ltr;
+  text-align: left;
+  cursor: text;
+  line-height: 1.5;
+}
+
+.terminal-line {
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-prompt {
+  color: #00ff00;
+  flex-shrink: 0;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #00ff00;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  caret-color: #00ff00;
+}
+
+/* Settings */
+.settings-app {
+  display: flex;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.settings-sidebar {
+  width: 160px;
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 8px;
+}
+
+.settings-nav {
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font);
+  text-align: right;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+
+.settings-nav:hover {
+  background: var(--bg-hover);
+}
+
+.settings-nav.active {
+  background: var(--accent);
+}
+
+.settings-nav svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.settings-section {
+  margin-bottom: 24px;
+}
+
+.settings-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.settings-item {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-item-label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.settings-item-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.settings-item svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.settings-btn {
+  padding: 8px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+
+.settings-btn:hover {
+  background: var(--accent-hover);
+}
+
+.settings-btn.danger {
+  background: var(--danger);
+}
+
+.settings-btn.danger:hover {
+  background: #dc2626;
+}
+
+.settings-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #c084fc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.wallpaper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.wallpaper-item {
+  aspect-ratio: 16/10;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+  background-size: cover;
+  background-position: center;
+}
+
+.wallpaper-item:hover {
+  transform: scale(1.05);
+}
+
+.wallpaper-item.active {
+  border-color: var(--accent);
+}
+
+/* File Manager */
+.files-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.files-toolbar {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.files-path {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  direction: ltr;
+  text-align: left;
+}
+
+.files-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  align-content: start;
+}
+
+.file-item {
+  padding: 12px 6px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: center;
+}
+
+.file-item:hover {
+  background: var(--bg-hover);
+}
+
+.file-item svg {
+  width: 36px;
+  height: 36px;
+}
+
+.file-item-name {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Music Player */
+.music-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(180deg, #1e1b4b 0%, #0a0a14 100%);
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.music-cover {
+  width: 180px;
+  height: 180px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), #c084fc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  animation: pulse 3s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.music-cover svg {
+  width: 80px;
+  height: 80px;
+  opacity: 0.9;
+}
+
+.music-info {
+  text-align: center;
+}
+
+.music-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.music-artist {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.music-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.music-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.music-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.music-btn.play {
+  width: 64px;
+  height: 64px;
+  background: var(--accent);
+}
+
+.music-btn.play:hover {
+  background: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+.music-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.music-btn.play svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Browser */
+.browser-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.browser-bar {
+  padding: 8px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.browser-nav-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.browser-nav-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.browser-url {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  font-family: var(--font);
+  direction: ltr;
+  text-align: left;
+}
+
+.browser-iframe {
+  flex: 1;
+  border: none;
+  background: white;
+  width: 100%;
+}
+
+/* Paint */
+.paint-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.paint-toolbar {
+  padding: 8px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.paint-color {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.15s;
+  padding: 0;
+}
+
+.paint-color:hover {
+  transform: scale(1.15);
+}
+
+.paint-color.active {
+  border-color: white;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.paint-tool {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.paint-tool.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.paint-tool svg {
+  width: 16px;
+  height: 16px;
+}
+
+.paint-canvas {
+  flex: 1;
+  background: white;
+  cursor: crosshair;
+  touch-action: none;
+  display: block;
+}
+
+/* Calendar */
+.calendar-app {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--bg-window);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.calendar-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 6px;
+}
+
+.calendar-nav button {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.calendar-nav button:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-name {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.calendar-day:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-day.other-month {
+  color: var(--text-muted);
+}
+
+.calendar-day.today {
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+/* Text Editor */
+.editor-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-window);
+}
+
+.editor-toolbar {
+  padding: 8px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.editor-toolbar button {
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.editor-toolbar button:hover {
+  background: var(--bg-hover);
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+  direction: ltr;
+  text-align: left;
+}
+
+/* Clock App */
+.clock-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: linear-gradient(180deg, #1e1b4b, #0a0a14);
+  gap: 20px;
+  padding: 20px;
+}
+
+.clock-time {
+  font-size: 56px;
+  font-weight: 200;
+  font-family: var(--font-mono);
+  direction: ltr;
+  letter-spacing: 2px;
+}
+
+.clock-date {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+/* About */
+.about-app {
+  padding: 30px;
+  text-align: center;
+  background: var(--bg-window);
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.about-app svg {
+  width: 80px;
+  height: 80px;
+}
+
+.about-title {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-version {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.about-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* Loading */
+.loading-app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  gap: 12px;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Empty state */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .login-container {
+    padding: 30px 20px;
+  }
+  
+  .login-title {
+    font-size: 22px;
+  }
+  
+  .window {
+    width: calc(100vw - 20px) !important;
+    left: 10px !important;
+    max-width: none;
+  }
+  
+  .settings-sidebar {
+    width: 130px;
+  }
+  
+  #start-menu {
+    width: calc(100vw - 20px);
+    left: 10px;
+  }
+  
+  .start-apps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .calc-display {
+    font-size: 28px;
+    min-height: 70px;
+  }
+  
+  .clock-time {
+    font-size: 40px;
+  }
+  
+  .desktop-icon {
+    width: 76px;
+  }
+  
+  .desktop-icon svg {
+    width: 34px;
+    height: 34px;
+  }
+  
+  .desktop-icon-label {
+    font-size: 10px;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
-<div class="splash" id="splash">
-  <div class="splash-logo">
-    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-  </div>
-  <div class="splash-text">dk.llyric</div>
-  <div class="splash-dots"><span></span><span></span><span></span></div>
-</div>
-
-<!-- AMBIENT -->
-<div class="ambient">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
-<div class="grid-overlay"></div>
-
-<!-- ===== LOGIN ===== -->
-<div class="screen active" id="screenLogin">
+<!-- ============================================
+     LOGIN SCREEN
+     ============================================ -->
+<div id="login-screen">
   <div class="login-container">
-    <div class="brand">
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      </div>
-      <div class="brand-title">dk.llyric</div>
-      <div class="brand-sub">استوديو الكلمات الحركية</div>
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none">
+        <defs>
+          <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#818cf8"/>
+            <stop offset="100%" stop-color="#c084fc"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="3" width="20" height="14" rx="2" stroke="url(#lg)" stroke-width="1.5" fill="none"/>
+        <path d="M8 21h8M12 17v4" stroke="url(#lg)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="12" cy="10" r="2" fill="url(#lg)"/>
+      </svg>
+    </div>
+    <h1 class="login-title">DK Web OS</h1>
+    <p class="login-subtitle">نظام تشغيل ويب حديث ومتكامل</p>
+
+    <div class="login-tabs">
+      <button class="login-tab active" data-tab="login">تسجيل الدخول</button>
+      <button class="login-tab" data-tab="signup">حساب جديد</button>
     </div>
 
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-auth="login" onclick="switchAuth('login')">دخول</button>
-        <button class="auth-tab" data-auth="signup" onclick="switchAuth('signup')">حساب جديد</button>
-      </div>
-
-      <div class="auth-error" id="authError"></div>
-      <div class="auth-info" id="authInfo"></div>
-
-      <button class="google-btn" id="googleBtn" onclick="handleGoogle()">
-        <svg viewBox="0 0 48 48">
-          <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
-          <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-          <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
-          <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+    <form class="login-form" id="login-form">
+      <div class="input-group">
+        <input type="email" id="login-email" placeholder="البريد الإلكتروني" autocomplete="email" required />
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
         </svg>
-        <span id="googleBtnText">متابعة بحساب Google</span>
+      </div>
+      <div class="input-group">
+        <input type="password" id="login-password" placeholder="كلمة المرور" autocomplete="current-password" required minlength="6" />
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-submit">
+        <span>دخول</span>
       </button>
+    </form>
 
-      <div class="divider">أو بالبريد الإلكتروني</div>
-
-      <div class="auth-field" id="fieldName" style="display:none">
-        <label class="auth-label">الاسم الكامل</label>
-        <input type="text" class="auth-input" id="inputName" placeholder="اسمك الكامل" autocomplete="name">
+    <form class="login-form hidden" id="signup-form">
+      <div class="input-group">
+        <input type="text" id="signup-name" placeholder="الاسم الكامل" autocomplete="name" required />
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
       </div>
-      <div class="auth-field">
-        <label class="auth-label">البريد الإلكتروني</label>
-        <input type="email" class="auth-input" id="inputEmail" placeholder="example@mail.com" autocomplete="email" inputmode="email">
+      <div class="input-group">
+        <input type="email" id="signup-email" placeholder="البريد الإلكتروني" autocomplete="email" required />
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
       </div>
-      <div class="auth-field">
-        <label class="auth-label">كلمة المرور</label>
-        <input type="password" class="auth-input" id="inputPassword" placeholder="••••••••" autocomplete="current-password">
+      <div class="input-group">
+        <input type="password" id="signup-password" placeholder="كلمة المرور (6 أحرف على الأقل)" autocomplete="new-password" required minlength="6" />
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
       </div>
-
-      <button class="auth-submit" id="authSubmit" onclick="handleAuth()">
-        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        <span id="authBtnText">دخول</span>
+      <button type="submit" class="btn btn-primary" id="signup-submit">
+        <span>إنشاء الحساب</span>
       </button>
+    </form>
 
-      <button class="auth-guest" onclick="handleGuest()">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        الدخول كضيف
+    <div class="login-divider">أو</div>
+
+    <button class="btn btn-google" id="google-login">
+      <svg viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z"/>
+        <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C41.1 35.5 44 30.2 44 24c0-1.2-.1-2.4-.4-3.5z"/>
+      </svg>
+      <span>الدخول بـ Google</span>
+    </button>
+
+    <div class="login-message" id="login-message"></div>
+  </div>
+</div>
+
+<!-- ============================================
+     OS SCREEN
+     ============================================ -->
+<div id="os-screen">
+  <div id="desktop">
+    <div id="desktop-icons"></div>
+  </div>
+
+  <div id="taskbar">
+    <button id="start-btn" title="ابدأ">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+      </svg>
+    </button>
+    <div id="taskbar-apps"></div>
+    <div id="taskbar-tray">
+      <button class="tray-icon" id="tray-notifications" title="الإشعارات">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <button class="tray-icon" id="tray-settings" title="الإعدادات">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+      <div id="clock">
+        <div class="time" id="clock-time">00:00</div>
+        <div class="date" id="clock-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="start-menu">
+    <div class="start-search">
+      <input type="text" id="start-search-input" placeholder="🔍 ابحث عن تطبيق..." />
+    </div>
+    <div class="start-user">
+      <div class="start-user-avatar" id="start-avatar">U</div>
+      <div class="start-user-info">
+        <div class="start-user-name" id="start-name">مستخدم</div>
+        <div class="start-user-email" id="start-email">user@example.com</div>
+      </div>
+    </div>
+    <div class="start-apps" id="start-apps"></div>
+    <div class="start-footer">
+      <button class="start-footer-btn" id="start-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        الإعدادات
+      </button>
+      <button class="start-footer-btn" id="start-logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        خروج
       </button>
     </div>
-
-    <div class="auth-footer">بالمتابعة، أنت توافق على شروط الخدمة</div>
   </div>
+
+  <div id="context-menu"></div>
+  <div id="notifications"></div>
 </div>
 
-<!-- ===== DASHBOARD ===== -->
-<div class="screen" id="screenDash">
-  <div class="dash-header">
-    <div class="avatar" id="userAvatar">?</div>
-    <div class="dash-header-info">
-      <div class="dash-hi">مرحباً بك</div>
-      <div class="dash-user" id="userName">مستخدم</div>
-    </div>
-    <button class="dash-action" onclick="handleLogout()" title="خروج">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-    </button>
-  </div>
+<script type="module">
+/* ============================================
+   DK WEB OS - Main Script
+   ============================================ */
 
-  <div class="hero-card">
-    <div class="hero-content">
-      <div class="hero-title">ابدأ مشروعك</div>
-      <div class="hero-sub">كلمات حركية بتأثيرات سينمائية</div>
-    </div>
-    <button class="hero-cta" onclick="openNewProject()">
-      <svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      إنشاء
-    </button>
-  ق </div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-  <div class="stats">
-    <div class="stat"><div class="stat-val" id="statProjects">0</div><div class="stat-lbl">مشروع</div></div>
-    <div class="stat"><div class="stat-val">24</div><div class="stat-lbl">قالب</div></div>
-    <div class="stat"><div class="stat-val">∞</div><div class="stat-lbl">إبداع</div></div>
-  </div>
-
-  <div class="quick-actions">
-    <button class="quick-btn" onclick="switchTab('templates')">
-      <div class="q-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
-      </div>
-      <div class="q-title">القوالب</div>
-      <div class="q-sub">24الب جاهز</div>
-    </button>
-    <button class="quick-btn grad2" onclick="openNewProject()">
-      <div class="q-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      </div>
-      <div class="q-title">مشروع فارغ</div>
-      <div class="q-sub">ابدأ من الصفر</div>
-    </button>
-  </div>
-
-  <div class="section-head">
-    <div class="section-title">أعمالي</div>
-    <button class="section-action" id="seeAllBtn" onclick="switchTab('templates')">شوف الكل</button>
-  </div>
-
-  <div id="projectsWrap">
-    <div class="projects-grid" id="projectsList">
-      <div class="skeleton skeleton-proj"></div>
-      <div class="skeleton skeleton-proj"></div>
-    </div>
-    <div class="empty hidden" id="projectsEmpty">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <div class="empty-title">ما كاينش مشاريع</div>
-      <div class="empty-text">ابدأ مشروعك الأول وشوف الإبداع ديالك</div>
-    </div>
-  </div>
-
-  <div id="templatesWrap" class="hidden">
-    <div class="templates-grid" id="templatesList"></div>
-  </div>
-</div>
-
-<!-- New Project Modal -->
-<div class="modal" id="newProjectModal">
-  <div class="modal-back" onclick="closeNewProject()"></div>
-  <div class="modal-box">
-    <div class="handle"></div>
-    <h3 class="modal-title">مشروع جديد</h3>
-    <p class="modal-sub">اختر اسم للمشروع باش تبدا</p>
-    <input type="text" class="modal-input" id="newProjectName" placeholder="مثال: أغنية الشتاء">
-    <button class="modal-btn" id="createProjectBtn" onclick="createProject()">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      <span id="createBtnText">إنشاء المشروع</span>
-    </button>
-    <button class="modal-btn ghost" onclick="closeNewProject()">إلغاء</button>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<nav class="bnav" id="bottomNav" style="display:none">
-  <button class="bnav-btn active" data-nav="home" onclick="switchTab('projects')">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>الرئيسية</span>
-  </button>
-  <button class="bnav-btn" data-nav="templates" onclick="switchTab('templates')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
-    <span>القوالب</span>
-  </button>
-  <button class="bnav-btn" data-nav="new" onclick="openNewProject()">
-    <svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    <span>جديد</span>
-  </button>
-</nav>
-
-<div class="loader" id="loader">
-  <div class="spinner"></div>
-  <div class="loader-text" id="loaderText">جاري التحميل...</div>
-</div>
-<div class="toast" id="toast"></div>
-
-<script>
-/* ============================================================
-   dk.llyric — Dashboard v3 (Google Sign-In)
-   ============================================================ */
-var firebaseConfig = {
+// ============================================
+// FIREBASE CONFIG
+// ============================================
+const firebaseConfig = {
   apiKey: "AIzaSyC_yjHpXcygeUcuMKqqr-FH_35p32TZQbE",
   authDomain: "dk-llyric.firebaseapp.com",
   projectId: "dk-llyric",
@@ -451,580 +2181,1988 @@ var firebaseConfig = {
   appId: "1:186577310307:web:8c49fc23dcf1d312911e56"
 };
 
-var _fb = { ready:false, user:null, db:null, isGuest:false };
-var _currentAuth = 'login';
-var _currentTab = 'projects';
-var _projects = [];
-var _toastTimer = null;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-/* ===== 24 TEMPLATES ===== */
-var TEMPLATES = [
-  { id:'neon_blue',   name:'نيون أزرق',       color:'#6366f1', glow:55, font:'Cairo',    preset:'neon',     anim:'fade',       text:'كلماتك هنا' },
-  { id:'neon_pink',   name:'نيون وردي',       color:'#ec4899', glow:55, font:'Tajawal',  preset:'romantic', anim:'scale',      text:'كلماتك هنا' },
-  { id:'neon_cyan',   name:'نيون سماوي',      color:'#06b6d4', glow:60, font:'Cairo',    preset:'neon',     anim:'slideUp',    text:'كلماتك هنا' },
-  { id:'neon_lime',   name:'نيون ليموني',     color:'#a3e635', glow:60, font:'Inter',    preset:'neon',     anim:'typewriter', text:'YOUR TEXT' },
-  { id:'neon_violet', name:'نيون بنفسجي',    color:'#a855f7', glow:55, font:'Reem Kufi',preset:'cinema',   anim:'blur',       text:'كلماتك هنا' },
-  { id:'gold',        name:'ذهبي فاخر',      color:'#fbbf24', glow:50, font:'Tajawal',  preset:'gold',     anim:'scale',      text:'كلماتك هنا' },
-  { id:'gold_dark',   name:'ذهبي غامق',      color:'#f59e0b', glow:45, font:'Almarai',  preset:'gold',     anim:'fade',       text:'كلماتك هنا' },
-  { id:'rose',        name:'وردي ناعم',      color:'#fb7185', glow:40, font:'Cairo',    preset:'romantic', anim:'fade',       text:'كلماتك هنا' },
-  { id:'magenta',     name:'ماجنتا',         color:'#db2777', glow:55, font:'Tajawal',  preset:'romantic', anim:'bounce',     text:'كلماتك هنا' },
-  { id:'fire',        name:'نار حمراء',       color:'#ef4444', glow:60, font:'Almarai',  preset:'fire',     anim:'scale',      text:'كلماتك هنا' },
-  { id:'orange',      name:'برتقالي دافي',    color:'#f97316', glow:50, font:'Tajawal',  preset:'fire',     anim:'slideUp',    text:'كلماتك هنا' },
-  { id:'blood',       name:'أحمر داكن',       color:'#dc2626', glow:45, font:'Reem Kufi',preset:'fire',     anim:'blur',       text:'كلماتك هنا' },
-  { id:'mint',        name:'نعناعي',          color:'#10b981', glow:45, font:'Cairo',    preset:'neon',     anim:'fade',       text:'كلماتك هنا' },
-  { id:'forest',      name:'أخضر غابة',      color:'#22c55e', glow:40, font:'Almarai',  preset:'neon',     anim:'slideDown',  text:'كلماتك هنا' },
-  { id:'sky',         name:'أزرق سماوي',      color:'#0ea5e9', glow:50, font:'Cairo',    preset:'neon',     anim:'slideUp',    text:'كلماتك هنا' },
-  { id:'indigo',      name:'نيلي',            color:'#6366f1', glow:50, font:'Tajawal',  preset:'cinema',   anim:'fade',       text:'كلماتك هنا' },
-  { id:'white_pure',  name:'أبيض نقي',       color:'#ffffff', glow:20, font:'Inter',    preset:'minimal',  anim:'fade',       text:'YOUR TEXT' },
-  { id:'white_outline',name:'أبيض بحدود',    color:'#ffffff', glow:0,  font:'Cairo',    preset:'minimal',  anim:'typewriter', text:'كلماتك هنا' },
-  { id:'mono',        name:'أحادي',           color:'#a1a1aa', glow:30, font:'Inter',    preset:'minimal',  anim:'slideUp',    text:'YOUR TEXT' },
-  { id:'silver',      name:'فضي',             color:'#e4e4e7', glow:35, font:'Cairo',    preset:'minimal',  anim:'scale',      text:'كلماتك هنا' },
-  { id:'sunset',      name:'غروب',            color:'#f97316', glow:55, font:'Tajawal',  preset:'fire',     anim:'fade',       text:'كلماتك هنا' },
-  { id:'ocean',       name:'محيط',            color:'#0891b2', glow:50, font:'Almarai',  preset:'neon',     anim:'slideDown',  text:'كلماتك هنا' },
-  { id:'candy',       name:'حلوى',            color:'#f472b6', glow:55, font:'Cairo',    preset:'romantic', anim:'bounce',     text:'كلماتك هنا' },
-  { id:'royal',       name:'ملكي',            color:'#7c3aed', glow:50, font:'Reem Kufi',preset:'cinema',   anim:'rotate',     text:'كلماتك هنا' }
+// ============================================
+// SVG ICON LIBRARY
+// ============================================
+const ICONS = {
+  notes: `<svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  calculator: `<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>`,
+  terminal: `<svg viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  files: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+  music: `<svg viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  browser: `<svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  paint: `<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  editor: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  about: `<svg viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+  power: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>`,
+  close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  minimize: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  maximize: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
+  folder: `<svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+  file: `<svg viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`,
+  image: `<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+  logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+  warning: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+  pause: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`,
+  prev: `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>`,
+  next: `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>`,
+  back: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+  forward: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  save: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
+  brush: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>`,
+  eraser: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>`,
+  fill: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
+  moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  wifi: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
+  battery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="10" x2="23" y2="14"/></svg>`,
+  volume: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  grid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
+  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  eyeOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+};
+
+// ============================================
+// WALLPAPERS
+// ============================================
+const WALLPAPERS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+  'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+  'linear-gradient(135deg, #0a0a14 0%, #1a1a2e 100%)',
+  'linear-gradient(135deg, #232526 0%, #414345 100%)',
+  'radial-gradient(circle at 20% 30%, #667eea, #764ba2)',
+  'radial-gradient(circle at 80% 70%, #f093fb, #f5576c)'
 ];
 
-/* ===== UTILS ===== */
-function $(id){ return document.getElementById(id); }
-function haptic(s){
-  if(!navigator.vibrate) return;
-  var p = { light:[5], medium:[12], heavy:[20], success:[10,50,15], error:[30,40,30] };
-  try { navigator.vibrate(p[s]||p.light); } catch(e){}
-}
-function toast(msg, type){
-  var t = $('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
-}
-function showLoader(text){ $('loaderText').textContent = text || 'جاري التحميل...'; $('loader').classList.add('show'); }
-function hideLoader(){ $('loader').classList.remove('show'); }
-function showAuthError(msg){
-  var el = $('authError');
-  el.textContent = msg;
-  el.classList.add('show');
-  $('authInfo').classList.remove('show');
-  haptic('error');
-  setTimeout(function(){ el.classList.remove('show'); }, 5000);
-}
-function showAuthInfo(msg){
-  var el = $('authInfo');
-  el.textContent = msg;
-  el.classList.add('show');
-  $('authError').classList.remove('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 5000);
-}
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  $('screen' + (name === 'login' ? 'Login' : 'Dash')).classList.add('active');
-  $('bottomNav').style.display = (name === 'dash') ? 'flex' : 'none';
-}
-function hexA(hex, a){
-  hex = hex.replace('#','');
-  if(hex.length === 3) hex = hex.split('').map(function(c){ return c+c; }).join('');
-  return 'rgba(' + parseInt(hex.substr(0,2),16) + ',' + parseInt(hex.substr(2,2),16) + ',' + parseInt(hex.substr(4,2),16) + ',' + a + ')';
-}
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+// ============================================
+// STATE
+// ============================================
+let currentUser = null;
+let userSettings = {
+  wallpaper: WALLPAPERS[8],
+  theme: 'dark',
+  accentColor: '#6366f1'
+};
+let openWindows = {};
+let zIndexCounter = 100;
+let windowCounter = 0;
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+function showNotification(title, message, type = 'info') {
+  const container = document.getElementById('notifications');
+  const notif = document.createElement('div');
+  notif.className = 'notification';
+  
+  let icon = ICONS.info;
+  if (type === 'success') icon = ICONS.check;
+  if (type === 'error') icon = ICONS.warning;
+  if (type === 'warning') icon = ICONS.warning;
+  
+  notif.innerHTML = `
+    ${icon}
+    <div class="notification-content">
+      <div class="notification-title">${title}</div>
+      <div class="notification-message">${message}</div>
+    </div>
+  `;
+  
+  container.appendChild(notif);
+  
+  setTimeout(() => {
+    notif.classList.add('removing');
+    setTimeout(() => notif.remove(), 300);
+  }, 3500);
 }
 
-/* ===== FIREBASE INIT ===== */
-var _googleProvider = null;
-try {
-  if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  _fb.db = firebase.firestore();
-  _googleProvider = new firebase.auth.GoogleAuthProvider();
-  _googleProvider.setCustomParameters({ prompt: 'select_account' });
+// ============================================
+// LOGIN SCREEN
+// ============================================
+const loginScreen = document.getElementById('login-screen');
+const osScreen = document.getElementById('os-screen');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
+const loginMessage = document.getElementById('login-message');
 
-  firebase.auth().onAuthStateChanged(function(u){
-    _fb.user = u;
-    _fb.ready = true;
-    if(u){
-      console.log('✅ Logged:', u.email || u.uid);
-      showScreen('dash');
-      loadUserProfile();
-      loadProjects();
-      // خبي splash
-      setTimeout(function(){ $('splash').classList.add('hide'); }, 300);
-    } else if(!_fb.isGuest){
-      showScreen('login');
-      setTimeout(function(){ $('splash').classList.add('hide'); }, 600);
-    }
-  });
-  // Fallback: خبي splash بعد 3 ثواني على الأقل
-  setTimeout(function(){ $('splash').classList.add('hide'); }, 3000);
-} catch(e){
-  console.error(e);
-  setTimeout(function(){ $('splash').classList.add('hide'); }, 800);
-}
-
-/* ===== GOOGLE SIGN-IN ===== */
-async function handleGoogle(){
-  var btn = $('googleBtn');
-  btn.disabled = true;
-  haptic('medium');
-  showLoader('جاري الاتصال بـ Google...');
-  try {
-    var result = await firebase.auth().signInWithPopup(_googleProvider);
-    var u = result.user;
-    // Save profile
-    var doc = await _fb.db.collection('users').doc(u.uid).get();
-    if(!doc.exists){
-      await _fb.db.collection('users').doc(u.uid).set({
-        name: u.displayName || 'مستخدم',
-        email: u.email || '',
-        photo: u.photoURL || '',
-        createdAt: Date.now()
-      });
-    }
-    toast('مرحباً ' + (u.displayName || '') + '!', 'success');
-    haptic('success');
-    hideLoader();
-  } catch(e){
-    console.error(e);
-    hideLoader();
-    haptic('error');
-    var msg = 'فشل الدخول بـ Google';
-    if(e.code === 'auth/popup-blocked') msg = 'المتصفح حجب النافذة. جرب مرة أخرى';
-    else if(e.code === 'auth/popup-closed-by-user') msg = 'تم إلغاء الدخول';
-    else if(e.code === 'auth/cancelled-popup-request') msg = '';
-    else if(e.code === 'auth/network-request-failed') msg = 'مشكل في الاتصال';
-    else if(e.code === 'auth/unauthorized-domain') msg = 'الدومين ماشي مسموح فـ Firebase';
-    if(msg) showAuthError(msg);
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-/* ===== AUTH EMAIL/PASSWORD ===== */
-function switchAuth(mode){
-  _currentAuth = mode;
-  haptic('light');
-  document.querySelectorAll('.auth-tab').forEach(function(t){
-    t.classList.toggle('active', t.dataset.auth === mode);
-  });
-  $('fieldName').style.display = (mode === 'signup') ? 'block' : 'none';
-  $('authBtnText').textContent = (mode === 'signup') ? 'إنشاء حساب' : 'دخول';
-  $('authError').classList.remove('show');
-}
-
-async function handleAuth(){
-  var email = $('inputEmail').value.trim();
-  var pass = $('inputPassword').value;
-  var name = $('inputName').value.trim();
-
-  if(!email || !pass){ showAuthError('خاصك تكتب البريد وكلمة المرور'); return; }
-  if(pass.length < 6){ showAuthError('كلمة المرور خاصها 6 أحرف على الأقل'); return; }
-  if(_currentAuth === 'signup' && !name){ showAuthError('خاصك تكتب الاسم'); return; }
-
-  $('authSubmit').disabled = true;
-  haptic('medium');
-  showLoader(_currentAuth === 'signup' ? 'جاري إنشاء الحساب...' : 'جاري الدخول...');
-
-  try {
-    if(_currentAuth === 'signup'){
-      var cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
-      await cred.user.updateProfile({ displayName: name });
-      await _fb.db.collection('users').doc(cred.user.uid).set({
-        name: name, email: email, photo: '', createdAt: Date.now()
-      }, { merge: true });
-      toast('تم إنشاء حسابك!', 'success');
-      haptic('success');
+document.querySelectorAll('.login-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    if (tab.dataset.tab === 'login') {
+      loginForm.classList.remove('hidden');
+      signupForm.classList.add('hidden');
     } else {
-      await firebase.auth().signInWithEmailAndPassword(email, pass);
-      toast('مرحباً بك!', 'success');
-      haptic('success');
+      loginForm.classList.add('hidden');
+      signupForm.classList.remove('hidden');
     }
-    hideLoader();
-  } catch(err){
-    hideLoader();
-    var msg = 'خطأ غير معروف';
-    var codes = {
-      'auth/email-already-in-use':'البريد مستعمل من قبل',
-      'auth/invalid-email':'البريد غير صحيح',
-      'auth/weak-password':'كلمة المرور ضعيفة',
-      'auth/user-not-found':'الحساب ما كاينش',
-      'auth/wrong-password':'كلمة المرور غلط',
-      'auth/invalid-credential':'البريد ولا كلمة المرور غلط',
-      'auth/network-request-failed':'مشكل في الاتصال',
-      'auth/too-many-requests':'محاولات كثيرة. جرب بعد قليل'
-    };
-    msg = codes[err.code] || err.message;
-    showAuthError(msg);
-  } finally {
-    $('authSubmit').disabled = false;
-  }
-}
-
-function handleGuest(){
-  haptic('light');
-  _fb.isGuest = true;
-  _fb.user = { uid:'guest_' + Date.now(), displayName:'ضيف', email:'', photoURL:'' };
-  showScreen('dash');
-  $('userName').textContent = 'ضيف';
-  $('userAvatar').innerHTML = 'ض';
-  loadGuestProjects();
-  toast('مرحباً بك كضيف', 'success');
-  setTimeout(function(){ $('splash').classList.add('hide'); }, 100);
-}
-
-function handleLogout(){
-  haptic('light');
-  if(_fb.isGuest){
-    _fb.isGuest = false;
-    _fb.user = null;
-    showScreen('login');
-    return;
-  }
-  firebase.auth().signOut().then(function(){
-    toast('تم الخروج', 'success');
+    loginMessage.className = 'login-message';
   });
-}
-
-/* ===== USER PROFILE ===== */
-async function loadUserProfile(){
-  if(!_fb.user) return;
-  try {
-    var doc = await _fb.db.collection('users').doc(_fb.user.uid).get();
-    var name = _fb.user.displayName || (_fb.user.email ? _fb.user.email.split('@')[0] : 'مستخدم');
-    var photo = _fb.user.photoURL || '';
-    if(doc.exists){
-      var d = doc.data();
-      if(d.name) name = d.name;
-      if(d.photo) photo = d.photo;
-    }
-    $('userName').textContent = name;
-    if(photo){
-      $('userAvatar').innerHTML = '<img src="' + photo + '" alt="">';
-    } else {
-      $('userAvatar').textContent = name.charAt(0).toUpperCase();
-    }
-  } catch(e){
-    var n = _fb.user.email ? _fb.user.email.split('@')[0] : 'مستخدم';
-    $('userName').textContent = n;
-    $('userAvatar').textContent = n.charAt(0).toUpperCase();
-  }
-}
-
-/* ===== PROJECTS ===== */
-async function loadProjects(){
-  if(!_fb.user || _fb.isGuest) return;
-  $('projectsList').innerHTML = '<div class="skeleton skeleton-proj"></div><div class="skeleton skeleton-proj"></div>';
-  try {
-    var snap = await _fb.db.collection('projects')
-      .where('userId', '==', _fb.user.uid)
-      .orderBy('updatedAt', 'desc')
-      .limit(60).get();
-    _projects = [];
-    snap.forEach(function(d){ _projects.push({ id:d.id, ...d.data() }); });
-    renderProjects();
-    $('statProjects').textContent = _projects.length;
-  } catch(e){
-    console.error(e);
-    // فحالة index ماشي موجود، جرب بلا orderBy
-    try {
-      var snap2 = await _fb.db.collection('projects')
-        .where('userId', '==', _fb.user.uid)
-        .limit(60).get();
-      _projects = [];
-      snap2.forEach(function(d){ _projects.push({ id:d.id, ...d.data() }); });
-      _projects.sort(function(a,b){ return (b.updatedAt||0) - (a.updatedAt||0); });
-      renderProjects();
-      $('statProjects').textContent = _projects.length;
-    } catch(e2){
-      console.error(e2);
-      _projects = [];
-      renderProjects();
-    }
-  }
-}
-
-function loadGuestProjects(){
-  try {
-    var raw = localStorage.getItem('dk_guest_projects');
-    _projects = raw ? JSON.parse(raw) : [];
-    renderProjects();
-    $('statProjects').textContent = _projects.length;
-  } catch(e){ _projects = []; renderProjects(); }
-}
-function saveGuestProjects(){
-  try {
-    localStorage.setItem('dk_guest_projects', JSON.stringify(_projects));
-    $('statProjects').textContent = _projects.length;
-  } catch(e){}
-}
-
-function renderProjects(){
-  var list = $('projectsList');
-  var empty = $('projectsEmpty');
-  list.innerHTML = '';
-  if(!_projects.length){
-    empty.classList.remove('hidden');
-    list.style.display = 'none';
-    return;
-  }
-  empty.classList.add('hidden');
-  list.style.display = 'grid';
-
-  _projects.forEach(function(p){
-    var card = document.createElement('div');
-    card.className = 'proj';
-
-    var thumbContent = '';
-    if(p.bgImgUrl){
-      thumbContent = '<img src="' + p.bgImgUrl + '" alt="" loading="lazy">';
-    } else if(p.bgVideoUrl){
-      thumbContent = '<svg class="ph" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>';
-    } else {
-      thumbContent = '<svg class="ph" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-    }
-    var wc = (p.data && p.data.words && p.data.words.length) || 0;
-    var date = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('ar-EG', {day:'numeric',month:'short'}) : '';
-
-    card.innerHTML =
-      '<div class="proj-thumb">' +
-        thumbContent +
-        '<div class="proj-overlay"></div>' +
-        '<div class="proj-badge">' +
-          '<svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>' +
-          wc +
-        '</div>' +
-      '</div>' +
-      '<button class="proj-del" onclick="event.stopPropagation();deleteProject(\'' + p.id + '\')">' +
-        '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>' +
-      '</button>' +
-      '<div class="proj-info">' +
-        '<div class="proj-name">' + escapeHtml(p.name || 'بدون اسم') + '</div>' +
-        '<div class="proj-date">' + date + '</div>' +
-      '</div>';
-
-    card.onclick = function(){ haptic('light'); openProject(p.id); };
-    list.appendChild(card);
-  });
-}
-
-async function deleteProject(id){
-  haptic('medium');
-  if(!confirm('واش متأكد من الحذف؟')) return;
-  if(_fb.isGuest){
-    _projects = _projects.filter(function(p){ return p.id !== id; });
-    saveGuestProjects();
-    renderProjects();
-    toast('تم الحذف', 'success');
-    return;
-  }
-  try {
-    await _fb.db.collection('projects').doc(id).delete();
-    _projects = _projects.filter(function(p){ return p.id !== id; });
-    renderProjects();
-    toast('تم الحذف', 'success');
-    haptic('success');
-  } catch(e){
-    toast('فشل الحذف', 'error');
-  }
-}
-
-function openProject(id){
-  var url = 'editor.html?project=' + id;
-  if(_fb.isGuest) url += '&guest=1';
-  location.href = url;
-}
-
-/* ===== NEW PROJECT ===== */
-function openNewProject(){
-  haptic('light');
-  $('newProjectName').value = '';
-  $('newProjectModal').classList.add('open');
-  setTimeout(function(){ $('newProjectName').focus(); }, 350);
-}
-function closeNewProject(){
-  $('newProjectModal').classList.remove('open');
-}
-
-async function createProject(){
-  var name = $('newProjectName').value.trim();
-  if(!name){ toast('اكتب اسم المشروع', 'error'); haptic('error'); return; }
-
-  var btn = $('createProjectBtn');
-  btn.disabled = true;
-  $('createBtnText').textContent = 'جاري الإنشاء...';
-  haptic('medium');
-
-  var baseData = {
-    words: [],
-    font: { family:'Cairo', size:36, color:'#6366f1', glow:40, opacity:1, style:'glow' },
-    anim: { in:'fade', out:'fade', inDur:300, outDur:200, special:'none' },
-    bpm: 116, kick: 50, shake: 5, particles: 50,
-    canvasRatio: '9:16',
-    preset: 'neon',
-    beatEnabled: true,
-    kineticEnabled: true,
-    wordPulseEnabled: true,
-    textY: 0.5,
-    textScale: 1,
-    textOffsetX: 0, textOffsetY: 0,
-    bgOffsetX: 0, bgOffsetY: 0, bgScale: 1,
-    bgOp: 40, bgBlur: 0
-  };
-
-  try {
-    if(_fb.isGuest){
-      var id = 'guest_' + Date.now();
-      var proj = {
-        id: id, name: name, userId: 'guest', type: 'kinetic',
-        createdAt: Date.now(), updatedAt: Date.now(),
-        data: baseData
-      };
-      _projects.unshift(proj);
-      saveGuestProjects();
-      renderProjects();
-      closeNewProject();
-      toast('تم الإنشاء', 'success');
-      haptic('success');
-      setTimeout(function(){ location.href = 'editor.html?project=' + id + '&guest=1'; }, 350);
-      return;
-    }
-
-    var docRef = _fb.db.collection('projects').doc();
-    await docRef.set({
-      userId: _fb.user.uid,
-      userEmail: _fb.user.email || '',
-      type: 'kinetic',
-      name: name,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      isPublic: false,
-      data: baseData
-    });
-
-    closeNewProject();
-    toast('تم الإنشاء', 'success');
-    haptic('success');
-    setTimeout(function(){ location.href = 'editor.html?project=' + docRef.id; }, 350);
-  } catch(e){
-    console.error(e);
-    toast('فشل: ' + e.message, 'error');
-    haptic('error');
-  } finally {
-    btn.disabled = false;
-    $('createBtnText').textContent = 'إنشاء المشروع';
-  }
-}
-
-/* ===== TABS ===== */
-function switchTab(tab){
-  _currentTab = tab;
-  haptic('light');
-  document.querySelectorAll('.tab').forEach(function(t){
-    t.classList.toggle('active', t.dataset.tab === tab);
-  });
-  document.querySelectorAll('.bnav-btn').forEach(function(b){
-    var n = b.dataset.nav;
-    b.classList.toggle('active', (tab === 'templates' && n === 'templates') || (tab === 'projects' && n === 'home'));
-  });
-  $('projectsWrap').classList.toggle('hidden', tab !== 'projects');
-  $('templatesWrap').classList.toggle('hidden', tab !== 'templates');
-  if(tab === 'templates') renderTemplates();
-}
-
-/* ===== TEMPLATES ===== */
-function renderTemplates(){
-  var list = $('templatesList');
-  if(list.dataset.rendered === '1') return;
-  list.dataset.rendered = '1';
-  list.innerHTML = '';
-  TEMPLATES.forEach(function(t){
-    var card = document.createElement('div');
-    card.className = 'tpl';
-    var grad = 'linear-gradient(135deg,' + hexA(t.color, 0.4) + ',' + hexA(t.color, 0.1) + ')';
-    var shadow = '0 0 24px ' + t.color + ',0 0 48px ' + t.color;
-    card.innerHTML =
-      '<div class="tpl-thumb">' +
-        '<div class="tpl-grad" style="background:' + grad + '"></div>' +
-        '<div class="tpl-text" style="color:' + t.color + ';text-shadow:' + shadow + ';font-family:\'' + t.font + '\',Cairo,sans-serif">' + t.text + '</div>' +
-        '<div class="tpl-tag">' + t.preset + '</div>' +
-      '</div>' +
-      '<div class="tpl-info">' +
-        '<div class="tpl-name">' + t.name + '</div>' +
-      '</div>';
-    card.onclick = function(){ haptic('medium'); useTemplate(t); };
-    list.appendChild(card);
-  });
-}
-
-async function useTemplate(t){
-  haptic('medium');
-  showLoader('جاري تحضير القالب...');
-  var data = {
-    words: [{ text: t.text, start: 1, duration: 3 }],
-    font: { family: t.font, size: 36, color: t.color, glow: t.glow, opacity: 1, style: 'glow' },
-    anim: { in: t.anim, out: 'fade', inDur: 300, outDur: 200, special: 'none' },
-    bpm: 116, kick: 50, shake: 5, particles: 50,
-    canvasRatio: '9:16',
-    preset: t.preset,
-    beatEnabled: true, kineticEnabled: true, wordPulseEnabled: true,
-    textY: 0.5, textScale: 1, textOffsetX: 0, textOffsetY: 0,
-    bgOffsetX: 0, bgOffsetY: 0, bgScale: 1, bgOp: 40, bgBlur: 0
-  };
-  try {
-    if(_fb.isGuest){
-      var id = 'guest_' + Date.now();
-      var proj = {
-        id: id, name: 'قالب ' + t.name, userId: 'guest', type: 'kinetic',
-        createdAt: Date.now(), updatedAt: Date.now(),
-        data: data
-      };
-      _projects.unshift(proj);
-      saveGuestProjects();
-      hideLoader();
-      toast('تم التحضير', 'success');
-      setTimeout(function(){ location.href = 'editor.html?project=' + id + '&guest=1'; }, 350);
-      return;
-    }
-    var docRef = _fb.db.collection('projects').doc();
-    await docRef.set({
-      userId: _fb.user.uid,
-      userEmail: _fb.user.email || '',
-      type: 'kinetic',
-      name: 'قالب ' + t.name,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      isPublic: false,
-      data: data
-    });
-    hideLoader();
-    toast('تم التحضير', 'success');
-    haptic('success');
-    setTimeout(function(){ location.href = 'editor.html?project=' + docRef.id; }, 350);
-  } catch(e){
-    console.error(e);
-    hideLoader();
-    toast('فشل', 'error');
-    haptic('error');
-  }
-}
-
-/* ===== ENTER KEY ===== */
-document.addEventListener('DOMContentLoaded', function(){
-  var pass = $('inputPassword');
-  if(pass) pass.addEventListener('keydown', function(e){ if(e.key === 'Enter') handleAuth(); });
-  var email = $('inputEmail');
-  if(email) email.addEventListener('keydown', function(e){ if(e.key === 'Enter') $('inputPassword').focus(); });
-  var pname = $('newProjectName');
-  if(pname) pname.addEventListener('keydown', function(e){ if(e.key === 'Enter') createProject(); });
 });
 
-/* ===== Prevent double-tap zoom ===== */
-var _lastTap = 0;
-document.addEventListener('touchend', function(e){
-  var now = Date.now();
-  if(now - _lastTap <= 300) e.preventDefault();
-  _lastTap = now;
+function showLoginMessage(msg, type = 'error') {
+  loginMessage.textContent = msg;
+  loginMessage.className = `login-message ${type}`;
+  setTimeout(() => {
+    loginMessage.className = 'login-message';
+  }, 5000);
+}
+
+function setLoading(btn, loading) {
+  const span = btn.querySelector('span');
+  const originalText = span ? span.textContent : btn.textContent;
+  
+  if (loading) {
+    btn.disabled = true;
+    if (span) {
+      span.innerHTML = '<div class="login-loader" style="display:inline-block;vertical-align:middle;"></div>';
+    }
+  } else {
+    btn.disabled = false;
+    if (span) span.textContent = originalText;
+  }
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-submit');
+  
+  setLoading(btn, true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    showLoginMessage('تم تسجيل الدخول بنجاح!', 'success');
+  } catch (err) {
+    console.error(err);
+    let msg = 'خطأ في تسجيل الدخول';
+    if (err.code === 'auth/user-not-found') msg = 'الحساب غير موجود';
+    else if (err.code === 'auth/wrong-password') msg = 'كلمة المرور غير صحيحة';
+    else if (err.code === 'auth/invalid-email') msg = 'البريد الإلكتروني غير صالح';
+    else if (err.code === 'auth/invalid-credential') msg = 'البيانات غير صحيحة';
+    else if (err.code === 'auth/too-many-requests') msg = 'حاول لاحقًا، عدد المحاولات كبير';
+    showLoginMessage(msg);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const btn = document.getElementById('signup-submit');
+  
+  setLoading(btn, true);
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: name });
+    // إنشاء مستند المستخدم في Firestore
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name: name,
+      email: email,
+      createdAt: serverTimestamp(),
+      settings: userSettings
+    });
+    showLoginMessage('تم إنشاء الحساب بنجاح!', 'success');
+  } catch (err) {
+    console.error(err);
+    let msg = 'خطأ في إنشاء الحساب';
+    if (err.code === 'auth/email-already-in-use') msg = 'البريد مستخدم مسبقًا';
+    else if (err.code === 'auth/weak-password') msg = 'كلمة المرور ضعيفة';
+    else if (err.code === 'auth/invalid-email') msg = 'البريد الإلكتروني غير صالح';
+    showLoginMessage(msg);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+document.getElementById('google-login').addEventListener('click', async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    // إنشاء مستند المستخدم إذا لم يكن موجودًا
+    const userRef = doc(db, 'users', result.user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        name: result.user.displayName || 'مستخدم',
+        email: result.user.email,
+        createdAt: serverTimestamp(),
+        settings: userSettings
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    if (err.code === 'auth/popup-closed-by-user') return;
+    showLoginMessage('خطأ في الدخول بـ Google');
+  }
+});
+
+// ============================================
+// AUTH STATE
+// ============================================
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    // تحميل إعدادات المستخدم
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists() && userSnap.data().settings) {
+        userSettings = { ...userSettings, ...userSnap.data().settings };
+      }
+    } catch (e) {
+      console.warn('تعذر تحميل الإعدادات:', e);
+    }
+    
+    loginScreen.style.display = 'none';
+    osScreen.style.display = 'block';
+    initOS();
+  } else {
+    currentUser = null;
+    loginScreen.style.display = 'flex';
+    osScreen.style.display = 'none';
+    openWindows = {};
+    document.getElementById('taskbar-apps').innerHTML = '';
+    document.getElementById('desktop-icons').innerHTML = '';
+  }
+});
+
+// ============================================
+// OS INIT
+// ============================================
+function initOS() {
+  const displayName = currentUser.displayName || 'مستخدم';
+  const email = currentUser.email || '';
+  const initial = displayName.charAt(0).toUpperCase();
+  
+  document.getElementById('start-avatar').textContent = initial;
+  document.getElementById('start-name').textContent = displayName;
+  document.getElementById('start-email').textContent = email;
+  
+  document.getElementById('desktop').style.background = userSettings.wallpaper;
+  
+  renderDesktopIcons();
+  renderStartApps();
+  startClock();
+  setupDesktopEvents();
+}
+
+// ============================================
+// DESKTOP ICONS
+// ============================================
+function renderDesktopIcons() {
+  const container = document.getElementById('desktop-icons');
+  container.innerHTML = '';
+  
+  const desktopApps = ['files', 'notes', 'terminal', 'browser', 'paint'];
+  
+  desktopApps.forEach(appId => {
+    const appDef = APPS[appId];
+    if (!appDef) return;
+    
+    const icon = document.createElement('div');
+    icon.className = 'desktop-icon';
+    icon.innerHTML = `
+      ${appDef.icon}
+      <div class="desktop-icon-label">${appDef.name}</div>
+    `;
+    icon.addEventListener('dblclick', () => openApp(appId));
+    // للهاتف: نقرة واحدة
+    icon.addEventListener('click', (e) => {
+      if (e.detail === 1 && 'ontouchstart' in window) {
+        openApp(appId);
+      }
+    });
+    container.appendChild(icon);
+  });
+}
+
+// ============================================
+// APPS REGISTRY
+// ============================================
+const APPS = {
+  notes: { name: 'المفكرة', icon: ICONS.notes, open: openNotesApp },
+  calculator: { name: 'الآلة الحاسبة', icon: ICONS.calculator, open: openCalculatorApp },
+  terminal: { name: 'الطرفية', icon: ICONS.terminal, open: openTerminalApp },
+  settings: { name: 'الإعدادات', icon: ICONS.settings, open: openSettingsApp },
+  files: { name: 'الملفات', icon: ICONS.files, open: openFilesApp },
+  music: { name: 'الموسيقى', icon: ICONS.music, open: openMusicApp },
+  browser: { name: 'المتصفح', icon: ICONS.browser, open: openBrowserApp },
+  paint: { name: 'الرسم', icon: ICONS.paint, open: openPaintApp },
+  calendar: { name: 'التقويم', icon: ICONS.calendar, open: openCalendarApp },
+  editor: { name: 'المحرر', icon: ICONS.editor, open: openEditorApp },
+  clock: { name: 'الساعة', icon: ICONS.clock, open: openClockApp },
+  about: { name: 'حول النظام', icon: ICONS.about, open: openAboutApp }
+};
+
+function renderStartApps() {
+  const container = document.getElementById('start-apps');
+  container.innerHTML = '';
+  
+  Object.entries(APPS).forEach(([appId, appDef]) => {
+    const btn = document.createElement('button');
+    btn.className = 'start-app';
+    btn.dataset.name = appDef.name;
+    btn.innerHTML = `
+      ${appDef.icon}
+      <span>${appDef.name}</span>
+    `;
+    btn.addEventListener('click', () => {
+      closeStartMenu();
+      openApp(appId);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function openApp(appId) {
+  const appDef = APPS[appId];
+  if (appDef && appDef.open) {
+    appDef.open();
+  }
+}
+
+// ============================================
+// WINDOW MANAGER
+// ============================================
+function createWindow(options) {
+  const {
+    id,
+    title,
+    icon,
+    content,
+    width = 500,
+    height = 400,
+    onMount
+  } = options;
+  
+  // إذا كانت النافذة موجودة
+  if (openWindows[id]) {
+    const win = openWindows[id].element;
+    if (win.classList.contains('minimized')) {
+      win.classList.remove('minimized');
+    }
+    bringToFront(win);
+    updateTaskbarActiveState();
+    return openWindows[id];
+  }
+  
+  const winId = `win-${++windowCounter}`;
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.id = winId;
+  win.dataset.appId = id;
+  
+  // حساب الموقع
+  const dw = window.innerWidth;
+  const dh = window.innerHeight;
+  const w = Math.min(width, dw - 20);
+  const h = Math.min(height, dh - 100);
+  const left = Math.max(10, (dw - w) / 2 + (windowCounter % 5) * 20 - 40);
+  const top = Math.max(10, (dh - h - 80) / 2 + (windowCounter % 5) * 20 - 40);
+  
+  win.style.left = left + 'px';
+  win.style.top = top + 'px';
+  win.style.width = w + 'px';
+  win.style.height = h + 'px';
+  win.style.zIndex = ++zIndexCounter;
+  
+  win.innerHTML = `
+    <div class="window-header">
+      <span class="window-icon">${icon || ''}</span>
+      <span class="window-title">${title}</span>
+      <div class="window-controls">
+        <button class="window-control minimize" title="تصغير">${ICONS.minimize}</button>
+        <button class="window-control maximize" title="تكبير">${ICONS.maximize}</button>
+        <button class="window-control close" title="إغلاق">${ICONS.close}</button>
+      </div>
+    </div>
+    <div class="window-body">
+      ${content || ''}
+    </div>
+    <div class="window-resize"></div>
+  `;
+  
+  document.getElementById('desktop').appendChild(win);
+  
+  const body = win.querySelector('.window-body');
+  
+  // إغلاق
+  win.querySelector('.window-control.close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeWindow(id);
+  });
+  
+  // تصغير
+  win.querySelector('.window-control.minimize').addEventListener('click', (e) => {
+    e.stopPropagation();
+    win.classList.add('minimized');
+    updateTaskbarActiveState();
+  });
+  
+  // تكبير
+  win.querySelector('.window-control.maximize').addEventListener('click', (e) => {
+    e.stopPropagation();
+    win.classList.toggle('maximized');
+  });
+  
+  // السحب
+  makeDraggable(win);
+  
+  // التكبير بالحجم
+  makeResizable(win);
+  
+  // التركيز
+  win.addEventListener('mousedown', () => {
+    bringToFront(win);
+    updateTaskbarActiveState();
+  });
+  win.addEventListener('touchstart', () => {
+    bringToFront(win);
+    updateTaskbarActiveState();
+  }, { passive: true });
+  
+  openWindows[id] = { element: win, title, icon };
+  
+  addTaskbarApp(id, title, icon);
+  updateTaskbarActiveState();
+  
+  // استدعاء onMount بعد الإضافة
+  if (onMount) {
+    setTimeout(() => onMount(body, win), 0);
+  }
+  
+  return openWindows[id];
+}
+
+function closeWindow(id) {
+  const entry = openWindows[id];
+  if (!entry) return;
+  
+  const win = entry.element;
+  win.style.opacity = '0';
+  win.style.transform = 'scale(0.95)';
+  
+  setTimeout(() => {
+    win.remove();
+    delete openWindows[id];
+    removeTaskbarApp(id);
+    updateTaskbarActiveState();
+  }, 150);
+}
+
+function bringToFront(win) {
+  win.style.zIndex = ++zIndexCounter;
+}
+
+function makeDraggable(win) {
+  const header = win.querySelector('.window-header');
+  let isDragging = false;
+  let startX, startY, startLeft, startTop;
+  
+  const start = (e) => {
+    if (win.classList.contains('maximized')) return;
+    if (e.target.closest('.window-control')) return;
+    
+    isDragging = true;
+    const point = e.touches ? e.touches[0] : e;
+    startX = point.clientX;
+    startY = point.clientY;
+    startLeft = win.offsetLeft;
+    startTop = win.offsetTop;
+    bringToFront(win);
+  };
+  
+  const move = (e) => {
+    if (!isDragging) return;
+    const point = e.touches ? e.touches[0] : e;
+    const dx = point.clientX - startX;
+    const dy = point.clientY - startY;
+    
+    let newLeft = startLeft + dx;
+    let newTop = startTop + dy;
+    
+    // الحدود
+    newLeft = Math.max(-win.offsetWidth + 100, Math.min(window.innerWidth - 100, newLeft));
+    newTop = Math.max(0, Math.min(window.innerHeight - 100, newTop));
+    
+    win.style.left = newLeft + 'px';
+    win.style.top = newTop + 'px';
+    
+    if (e.cancelable) e.preventDefault();
+  };
+  
+  const end = () => { isDragging = false; };
+  
+  header.addEventListener('mousedown', start);
+  header.addEventListener('touchstart', start, { passive: true });
+  document.addEventListener('mousemove', move);
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('mouseup', end);
+  document.addEventListener('touchend', end);
+}
+
+function makeResizable(win) {
+  const handle = win.querySelector('.window-resize');
+  let isResizing = false;
+  let startX, startY, startW, startH;
+  
+  const start = (e) => {
+    if (win.classList.contains('maximized')) return;
+    isResizing = true;
+    const point = e.touches ? e.touches[0] : e;
+    startX = point.clientX;
+    startY = point.clientY;
+    startW = win.offsetWidth;
+    startH = win.offsetHeight;
+    bringToFront(win);
+    if (e.cancelable) e.preventDefault();
+  };
+  
+  const move = (e) => {
+    if (!isResizing) return;
+    const point = e.touches ? e.touches[0] : e;
+    const dw = startX - point.clientX;
+    const dh = point.clientY - startY;
+    win.style.width = Math.max(280, startW + dw) + 'px';
+    win.style.height = Math.max(200, startH + dh) + 'px';
+    if (e.cancelable) e.preventDefault();
+  };
+  
+  const end = () => { isResizing = false; };
+  
+  handle.addEventListener('mousedown', start);
+  handle.addEventListener('touchstart', start, { passive: false });
+  document.addEventListener('mousemove', move);
+  document.addEventListener('touchmove', move, { passive: false });
+  document.addEventListener('mouseup', end);
+  document.addEventListener('touchend', end);
+}
+
+function addTaskbarApp(id, title, icon) {
+  const container = document.getElementById('taskbar-apps');
+  const btn = document.createElement('button');
+  btn.className = 'taskbar-app';
+  btn.dataset.appId = id;
+  btn.innerHTML = `
+    ${icon || ''}
+    <span class="label">${title}</span>
+  `;
+  btn.addEventListener('click', () => {
+    const entry = openWindows[id];
+    if (!entry) return;
+    const win = entry.element;
+    
+    if (win.classList.contains('minimized')) {
+      win.classList.remove('minimized');
+      bringToFront(win);
+    } else if (parseInt(win.style.zIndex) === zIndexCounter) {
+      win.classList.add('minimized');
+    } else {
+      bringToFront(win);
+    }
+    updateTaskbarActiveState();
+  });
+  container.appendChild(btn);
+}
+
+function removeTaskbarApp(id) {
+  const btn = document.querySelector(`.taskbar-app[data-app-id="${id}"]`);
+  if (btn) btn.remove();
+}
+
+function updateTaskbarActiveState() {
+  document.querySelectorAll('.taskbar-app').forEach(btn => {
+    const entry = openWindows[btn.dataset.appId];
+    if (!entry) return;
+    const win = entry.element;
+    const isActive = !win.classList.contains('minimized') && parseInt(win.style.zIndex) === zIndexCounter;
+    btn.classList.toggle('active', isActive);
+  });
+}
+
+// ============================================
+// START MENU
+// ============================================
+const startMenu = document.getElementById('start-menu');
+const startBtn = document.getElementById('start-btn');
+
+function closeStartMenu() {
+  startMenu.classList.remove('open');
+  startBtn.classList.remove('active');
+}
+
+startBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  startMenu.classList.toggle('open');
+  startBtn.classList.toggle('active');
+});
+
+document.addEventListener('click', (e) => {
+  if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+    closeStartMenu();
+  }
+});
+
+document.getElementById('start-settings').addEventListener('click', () => {
+  closeStartMenu();
+  openApp('settings');
+});
+
+document.getElementById('start-logout').addEventListener('click', async () => {
+  closeStartMenu();
+  try {
+    await signOut(auth);
+    showNotification('تم تسجيل الخروج', 'نراك قريبًا!', 'success');
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+document.getElementById('start-search-input').addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.start-app').forEach(app => {
+    const name = app.dataset.name.toLowerCase();
+    app.style.display = name.includes(term) ? '' : 'none';
+  });
+});
+
+document.getElementById('tray-settings').addEventListener('click', () => openApp('settings'));
+
+document.getElementById('tray-notifications').addEventListener('click', () => {
+  showNotification('مرحبًا بك في DK Web OS', 'نظام تشغيل ويب متكامل', 'info');
+});
+
+// ============================================
+// CLOCK
+// ============================================
+function startClock() {
+  const update = () => {
+    const now = new Date();
+    const time = now.toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+    const date = now.toLocaleDateString('ar-DZ', { day: '2-digit', month: 'short' });
+    document.getElementById('clock-time').textContent = time;
+    document.getElementById('clock-date').textContent = date;
+  };
+  update();
+  setInterval(update, 1000);
+}
+
+// ============================================
+// CONTEXT MENU
+// ============================================
+const contextMenu = document.getElementById('context-menu');
+const desktop = document.getElementById('desktop');
+
+desktop.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  showContextMenu(e.clientX, e.clientY);
+});
+
+function showContextMenu(x, y) {
+  contextMenu.innerHTML = `
+    <button class="ctx-item" data-action="refresh">${ICONS.refresh}<span>تحديث</span></button>
+    <button class="ctx-item" data-action="wallpaper">${ICONS.image}<span>تغيير الخلفية</span></button>
+    <button class="ctx-item" data-action="new-note">${ICONS.notes}<span>ملاحظة جديدة</span></button>
+    <div class="ctx-sep"></div>
+    <button class="ctx-item" data-action="settings">${ICONS.settings}<span>الإعدادات</span></button>
+    <button class="ctx-item" data-action="about">${ICONS.about}<span>حول النظام</span></button>
+  `;
+  
+  contextMenu.classList.add('open');
+  
+  // تعديل الموقع
+  const rect = contextMenu.getBoundingClientRect();
+  let cx = x, cy = y;
+  if (x + rect.width > window.innerWidth) cx = window.innerWidth - rect.width - 10;
+  if (y + rect.height > window.innerHeight) cy = window.innerHeight - rect.height - 10;
+  contextMenu.style.left = Math.max(5, cx) + 'px';
+  contextMenu.style.top = Math.max(5, cy) + 'px';
+  
+  contextMenu.querySelectorAll('.ctx-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const action = item.dataset.action;
+      contextMenu.classList.remove('open');
+      
+      if (action === 'refresh') {
+        location.reload();
+      } else if (action === 'wallpaper') {
+        openApp('settings');
+        setTimeout(() => {
+          const btn = document.querySelector('[data-settings-nav="appearance"]');
+          if (btn) btn.click();
+        }, 200);
+      } else if (action === 'new-note') {
+        openApp('notes');
+      } else if (action === 'settings') {
+        openApp('settings');
+      } else if (action === 'about') {
+        openApp('about');
+      }
+    });
+  });
+}
+
+document.addEventListener('click', (e) => {
+  if (!contextMenu.contains(e.target)) {
+    contextMenu.classList.remove('open');
+  }
+});
+
+function setupDesktopEvents() {
+  // Long-press للهاتف لفتح قائمة السياق
+  let pressTimer;
+  desktop.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.window')) return;
+    pressTimer = setTimeout(() => {
+      const touch = e.touches[0];
+      showContextMenu(touch.clientX, touch.clientY);
+    }, 600);
+  }, { passive: true });
+  
+  desktop.addEventListener('touchend', () => clearTimeout(pressTimer));
+  desktop.addEventListener('touchmove', () => clearTimeout(pressTimer));
+}
+
+// ============================================
+// NOTES APP
+// ============================================
+function openNotesApp() {
+  createWindow({
+    id: 'notes',
+    title: 'المفكرة',
+    icon: ICONS.notes,
+    width: 520,
+    height: 480,
+    content: `
+      <div class="notes-app">
+        <div class="notes-toolbar">
+          <input type="text" id="notes-search" placeholder="🔍 ابحث..." />
+          <button class="settings-btn" id="notes-new">
+            ${ICONS.plus}
+          </button>
+        </div>
+        <div class="notes-list" id="notes-list">
+          <div class="loading-app"><div class="spinner"></div><span>جاري التحميل...</span></div>
+        </div>
+      </div>
+    `,
+    onMount: async (body) => {
+      const list = body.querySelector('#notes-list');
+      const searchInput = body.querySelector('#notes-search');
+      
+      const loadNotes = async () => {
+        list.innerHTML = '<div class="loading-app"><div class="spinner"></div><span>جاري التحميل...</span></div>';
+        try {
+          const q = query(
+            collection(db, 'notes'),
+            where('userId', '==', currentUser.uid)
+          );
+          const snap = await getDocs(q);
+          const notes = [];
+          snap.forEach(d => notes.push({ id: d.id, ...d.data() }));
+          notes.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+          
+          if (notes.length === 0) {
+            list.innerHTML = `
+              <div class="empty-state">
+                ${ICONS.notes}
+                <p>لا توجد ملاحظات بعد</p>
+                <p style="margin-top:8px;font-size:11px;">اضغط + لإضافة ملاحظة</p>
+              </div>
+            `;
+            return;
+          }
+          
+          list.innerHTML = '';
+          notes.forEach(note => {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            const date = note.createdAt?.seconds 
+              ? new Date(note.createdAt.seconds * 1000).toLocaleDateString('ar-DZ') 
+              : '';
+            item.innerHTML = `
+              <div class="note-item-title">${escapeHtml(note.title || 'بدون عنوان')}</div>
+              <div class="note-item-content">${escapeHtml(note.content || '')}</div>
+              <div class="note-item-date">${date}</div>
+              <button class="note-item-delete">${ICONS.trash}</button>
+            `;
+            item.querySelector('.note-item-delete').addEventListener('click', async (e) => {
+              e.stopPropagation();
+              if (!confirm('حذف هذه الملاحظة؟')) return;
+              await deleteDoc(doc(db, 'notes', note.id));
+              showNotification('تم الحذف', 'تم حذف الملاحظة', 'success');
+              loadNotes();
+            });
+            item.addEventListener('click', () => editNote(note, loadNotes));
+            list.appendChild(item);
+          });
+        } catch (e) {
+          console.error(e);
+          list.innerHTML = '<div class="empty-state"><p>خطأ في التحميل</p></div>';
+        }
+      };
+      
+      body.querySelector('#notes-new').addEventListener('click', () => {
+        editNote({ title: '', content: '' }, loadNotes);
+      });
+      
+      searchInput.addEventListener('input', () => {
+        const term = searchInput.value.toLowerCase();
+        list.querySelectorAll('.note-item').forEach(item => {
+          const text = item.textContent.toLowerCase();
+          item.style.display = text.includes(term) ? '' : 'none';
+        });
+      });
+      
+      await loadNotes();
+    }
+  });
+}
+
+function editNote(note, onSave) {
+  const winId = 'note-editor';
+  if (openWindows[winId]) {
+    closeWindow(winId);
+  }
+  
+  createWindow({
+    id: winId,
+    title: note.id ? 'تعديل ملاحظة' : 'ملاحظة جديدة',
+    icon: ICONS.notes,
+    width: 500,
+    height: 400,
+    content: `
+      <div class="editor-app">
+        <div class="editor-toolbar">
+          <button id="note-save">${ICONS.save} حفظ</button>
+          <button id="note-cancel">إلغاء</button>
+        </div>
+        <input type="text" id="note-title-input" placeholder="العنوان..." 
+          style="padding:12px;background:var(--bg-primary);border:none;border-bottom:1px solid var(--border);color:white;font-size:15px;outline:none;font-family:var(--font);"
+          value="${escapeHtml(note.title || '')}" />
+        <textarea class="editor-textarea" id="note-content-input" placeholder="اكتب ملاحظتك هنا...">${escapeHtml(note.content || '')}</textarea>
+      </div>
+    `,
+    onMount: (body) => {
+      const titleInput = body.querySelector('#note-title-input');
+      const contentInput = body.querySelector('#note-content-input');
+      
+      body.querySelector('#note-save').addEventListener('click', async () => {
+        const title = titleInput.value.trim() || 'بدون عنوان';
+        const content = contentInput.value;
+        
+        try {
+          if (note.id) {
+            await updateDoc(doc(db, 'notes', note.id), { title, content });
+          } else {
+            await addDoc(collection(db, 'notes'), {
+              title, content,
+              userId: currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+          }
+          showNotification('تم الحفظ', 'تم حفظ الملاحظة بنجاح', 'success');
+          closeWindow(winId);
+          if (onSave) onSave();
+        } catch (e) {
+          console.error(e);
+          showNotification('خطأ', 'تعذر حفظ الملاحظة', 'error');
+        }
+      });
+      
+      body.querySelector('#note-cancel').addEventListener('click', () => closeWindow(winId));
+    }
+  });
+}
+
+// ============================================
+// CALCULATOR APP
+// ============================================
+function openCalculatorApp() {
+  createWindow({
+    id: 'calculator',
+    title: 'الآلة الحاسبة',
+    icon: ICONS.calculator,
+    width: 320,
+    height: 480,
+    content: `
+      <div class="calc-app">
+        <div class="calc-display">
+          <div class="calc-history" id="calc-history"></div>
+          <div id="calc-result">0</div>
+        </div>
+        <div class="calc-buttons">
+          <button class="calc-btn clear" data-action="clear">C</button>
+          <button class="calc-btn op" data-action="op" data-op="%">%</button>
+          <button class="calc-btn op" data-action="op" data-op="/">÷</button>
+          <button class="calc-btn op" data-action="del">⌫</button>
+          
+          <button class="calc-btn" data-num="7">7</button>
+          <button class="calc-btn" data-num="8">8</button>
+          <button class="calc-btn" data-num="9">9</button>
+          <button class="calc-btn op" data-action="op" data-op="*">×</button>
+          
+          <button class="calc-btn" data-num="4">4</button>
+          <button class="calc-btn" data-num="5">5</button>
+          <button class="calc-btn" data-num="6">6</button>
+          <button class="calc-btn op" data-action="op" data-op="-">−</button>
+          
+          <button class="calc-btn" data-num="1">1</button>
+          <button class="calc-btn" data-num="2">2</button>
+          <button class="calc-btn" data-num="3">3</button>
+          <button class="calc-btn op" data-action="op" data-op="+">+</button>
+          
+          <button class="calc-btn" data-num="0">0</button>
+          <button class="calc-btn" data-num=".">.</button>
+          <button class="calc-btn equals" data-action="equals" style="grid-column: span 2;">=</button>
+        </div>
+      </div>
+    `,
+    onMount: (body) => {
+      let current = '0';
+      let previous = '';
+      let operation = null;
+      let shouldReset = false;
+      
+      const result = body.querySelector('#calc-result');
+      const history = body.querySelector('#calc-history');
+      
+      const updateDisplay = () => {
+        result.textContent = current;
+        history.textContent = previous ? `${previous} ${operation || ''}` : '';
+      };
+      
+      body.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.num !== undefined) {
+            const num = btn.dataset.num;
+            if (shouldReset) {
+              current = num === '.' ? '0.' : num;
+              shouldReset = false;
+            } else {
+              if (num === '.' && current.includes('.')) return;
+              current = current === '0' && num !== '.' ? num : current + num;
+            }
+          } else if (btn.dataset.action === 'clear') {
+            current = '0';
+            previous = '';
+            operation = null;
+            shouldReset = false;
+          } else if (btn.dataset.action === 'del') {
+            current = current.length > 1 ? current.slice(0, -1) : '0';
+          } else if (btn.dataset.action === 'op') {
+            if (operation && !shouldReset) {
+              // احسب أولاً
+              const res = compute(parseFloat(previous), parseFloat(current), operation);
+              current = String(res);
+            }
+            previous = current;
+            operation = btn.dataset.op;
+            shouldReset = true;
+          } else if (btn.dataset.action === 'equals') {
+            if (operation) {
+              const res = compute(parseFloat(previous), parseFloat(current), operation);
+              current = String(res);
+              previous = '';
+              operation = null;
+              shouldReset = true;
+            }
+          }
+          updateDisplay();
+        });
+      });
+      
+      function compute(a, b, op) {
+        switch(op) {
+          case '+': return a + b;
+          case '-': return a - b;
+          case '*': return a * b;
+          case '/': return b !== 0 ? a / b : 'خطأ';
+          case '%': return a % b;
+          default: return b;
+        }
+      }
+      
+      updateDisplay();
+    }
+  });
+}
+
+// ============================================
+// TERMINAL APP
+// ============================================
+function openTerminalApp() {
+  createWindow({
+    id: 'terminal',
+    title: 'الطرفية',
+    icon: ICONS.terminal,
+    width: 600,
+    height: 400,
+    content: `
+      <div class="terminal-app" id="terminal">
+        <div class="terminal-line">DK Web OS Terminal v1.0.0</div>
+        <div class="terminal-line">اكتب "help" لعرض الأوامر المتاحة</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div id="terminal-output"></div>
+        <div class="terminal-input-line">
+          <span class="terminal-prompt">user@dk-os:~$</span>
+          <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" autofocus />
+        </div>
+      </div>
+    `,
+    onMount: (body) => {
+      const output = body.querySelector('#terminal-output');
+      const input = body.querySelector('#terminal-input');
+      const terminal = body.querySelector('#terminal');
+      
+      const history = [];
+      let historyIndex = -1;
+      
+      const print = (text, color) => {
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+        if (color) line.style.color = color;
+        line.textContent = text;
+        output.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      };
+      
+      const commands = {
+        help: () => {
+          print('الأوامر المتاحة:');
+          print('  help        - عرض هذه القائمة');
+          print('  clear       - مسح الشاشة');
+          print('  date        - عرض التاريخ والوقت');
+          print('  whoami      - عرض المستخدم الحالي');
+          print('  echo [نص]   - طباعة النص');
+          print('  ls          - عرض الملفات');
+          print('  open [app]  - فتح تطبيق');
+          print('  apps        - قائمة التطبيقات');
+          print('  exit        - إغلاق الطرفية');
+        },
+        clear: () => {
+          output.innerHTML = '';
+        },
+        date: () => {
+          print(new Date().toLocaleString('ar-DZ'));
+        },
+        whoami: () => {
+          print(currentUser.displayName || 'مستخدم');
+          print(currentUser.email);
+        },
+        echo: (args) => {
+          print(args.join(' '));
+        },
+        ls: () => {
+          print('📁 Desktop/');
+          print('📁 Documents/');
+          print('📁 Pictures/');
+          print('📄 notes.txt');
+        },
+        apps: () => {
+          Object.entries(APPS).forEach(([id, def]) => {
+            print(`  ${id.padEnd(15)} - ${def.name}`);
+          });
+        },
+        open: (args) => {
+          if (!args[0]) {
+            print('الاستخدام: open [app-id]', '#f59e0b');
+            return;
+          }
+          if (APPS[args[0]]) {
+            openApp(args[0]);
+            print(`تم فتح ${APPS[args[0]].name}`, '#22c55e');
+          } else {
+            print(`تطبيق غير موجود: ${args[0]}`, '#ef4444');
+          }
+        },
+        exit: () => {
+          closeWindow('terminal');
+        }
+      };
+      
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const cmd = input.value.trim();
+          if (!cmd) return;
+          print(`user@dk-os:~$ ${cmd}`, '#00ff00');
+          history.push(cmd);
+          historyIndex = history.length;
+          
+          const parts = cmd.split(' ');
+          const command = parts[0];
+          const args = parts.slice(1);
+          
+          if (commands[command]) {
+            commands[command](args);
+          } else {
+            print(`الأمر غير موجود: ${command}`, '#ef4444');
+            print('اكتب "help" للأوامر المتاحة', '#f59e0b');
+          }
+          
+          input.value = '';
+        } else if (e.key === 'ArrowUp') {
+          if (historyIndex > 0) {
+            historyIndex--;
+            input.value = history[historyIndex];
+          }
+          e.preventDefault();
+        } else if (e.key === 'ArrowDown') {
+          if (historyIndex < history.length - 1) {
+            historyIndex++;
+            input.value = history[historyIndex];
+          } else {
+            historyIndex = history.length;
+            input.value = '';
+          }
+          e.preventDefault();
+        }
+      });
+      
+      terminal.addEventListener('click', () => input.focus());
+    }
+  });
+}
+
+// ============================================
+// SETTINGS APP
+// ============================================
+function openSettingsApp() {
+  createWindow({
+    id: 'settings',
+    title: 'الإعدادات',
+    icon: ICONS.settings,
+    width: 700,
+    height: 500,
+    content: `
+      <div class="settings-app">
+        <div class="settings-sidebar">
+          <button class="settings-nav active" data-section="profile">${ICONS.user}<span>الحساب</span></button>
+          <button class="settings-nav" data-section="appearance">${ICONS.image}<span>المظهر</span></button>
+          <button class="settings-nav" data-section="system">${ICONS.info}<span>النظام</span></button>
+          <button class="settings-nav" data-section="about">${ICONS.about}<span>حول</span></button>
+        </div>
+        <div class="settings-content" id="settings-content"></div>
+      </div>
+    `,
+    onMount: (body) => {
+      const content = body.querySelector('#settings-content');
+      
+      const sections = {
+        profile: () => {
+          const name = currentUser.displayName || 'مستخدم';
+          const initial = name.charAt(0).toUpperCase();
+          content.innerHTML = `
+            <div class="settings-section">
+              <div class="settings-section-title">معلومات الحساب</div>
+              <div class="settings-item">
+                <div class="settings-avatar">${initial}</div>
+                <div class="settings-item-info">
+                  <div class="settings-item-label">${name}</div>
+                  <div class="settings-item-desc">${currentUser.email}</div>
+                </div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">الإجراءات</div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">تسجيل الخروج</div>
+                  <div class="settings-item-desc">الخروج من الحساب الحالي</div>
+                </div>
+                <button class="settings-btn danger" id="logout-btn">${ICONS.logout} خروج</button>
+              </div>
+            </div>
+          `;
+          content.querySelector('#logout-btn').addEventListener('click', async () => {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+              await signOut(auth);
+            }
+          });
+        },
+        
+        appearance: () => {
+          content.innerHTML = `
+            <div class="settings-section">
+              <div class="settings-section-title">الخلفية</div>
+              <div class="wallpaper-grid" id="wallpaper-grid"></div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">اللون الأساسي</div>
+              <div class="wallpaper-grid" id="accent-grid"></div>
+            </div>
+          `;
+          
+          const wpGrid = content.querySelector('#wallpaper-grid');
+          WALLPAPERS.forEach(wp => {
+            const item = document.createElement('div');
+            item.className = 'wallpaper-item';
+            if (wp === userSettings.wallpaper) item.classList.add('active');
+            item.style.background = wp;
+            item.addEventListener('click', () => {
+              userSettings.wallpaper = wp;
+              document.getElementById('desktop').style.background = wp;
+              wpGrid.querySelectorAll('.wallpaper-item').forEach(i => i.classList.remove('active'));
+              item.classList.add('active');
+              saveSettings();
+            });
+            wpGrid.appendChild(item);
+          });
+          
+          const accentColors = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f59e0b', '#22c55e', '#06b6d4', '#3b82f6'];
+          const aGrid = content.querySelector('#accent-grid');
+          accentColors.forEach(color => {
+            const item = document.createElement('div');
+            item.className = 'wallpaper-item';
+            if (color === userSettings.accentColor) item.classList.add('active');
+            item.style.background = color;
+            item.addEventListener('click', () => {
+              userSettings.accentColor = color;
+              document.documentElement.style.setProperty('--accent', color);
+              aGrid.querySelectorAll('.wallpaper-item').forEach(i => i.classList.remove('active'));
+              item.classList.add('active');
+              saveSettings();
+            });
+            aGrid.appendChild(item);
+          });
+        },
+        
+        system: () => {
+          content.innerHTML = `
+            <div class="settings-section">
+              <div class="settings-section-title">معلومات النظام</div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">المتصفح</div>
+                  <div class="settings-item-desc">${navigator.userAgent.split(' ').slice(0, 2).join(' ')}</div>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">اللغة</div>
+                  <div class="settings-item-desc">${navigator.language}</div>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">دقة الشاشة</div>
+                  <div class="settings-item-desc">${window.screen.width} × ${window.screen.height}</div>
+                </div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">الذاكرة</div>
+                  <div class="settings-item-desc">${navigator.deviceMemory || '؟'} GB</div>
+                </div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">إعادة التعيين</div>
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <div class="settings-item-label">إعادة تعيين الإعدادات</div>
+                  <div class="settings-item-desc">إرجاع كل الإعدادات للوضع الافتراضي</div>
+                </div>
+                <button class="settings-btn danger" id="reset-btn">${ICONS.refresh} إعادة تعيين</button>
+              </div>
+            </div>
+          `;
+          content.querySelector('#reset-btn').addEventListener('click', () => {
+            if (confirm('إعادة تعيين كل الإعدادات؟')) {
+              userSettings = {
+                wallpaper: WALLPAPERS[8],
+                theme: 'dark',
+                accentColor: '#6366f1'
+              };
+              document.getElementById('desktop').style.background = userSettings.wallpaper;
+              document.documentElement.style.setProperty('--accent', '#6366f1');
+              saveSettings();
+              showNotification('تم', 'تم إعادة التعيين', 'success');
+            }
+          });
+        },
+        
+        about: () => {
+          content.innerHTML = `
+            <div class="about-app">
+              <svg viewBox="0 0 24 24" fill="none" style="width:80px;height:80px;">
+                <defs><linearGradient id="aboutLg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#818cf8"/>
+                  <stop offset="100%" stop-color="#c084fc"/>
+                </linearGradient></defs>
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke="url(#aboutLg)" stroke-width="1.5" fill="none"/>
+                <path d="M8 21h8M12 17v4" stroke="url(#aboutLg)" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="10" r="2" fill="url(#aboutLg)"/>
+              </svg>
+              <div class="about-title">DK Web OS</div>
+              <div class="about-version">الإصدار 1.0.0</div>
+              <div class="about-desc">نظام تشغيل ويب متكامل يعمل بالكامل في المتصفح، مدعوم بـ Firebase للتخزين السحابي.</div>
+            </div>
+          `;
+        }
+      };
+      
+      body.querySelectorAll('.settings-nav').forEach(nav => {
+        nav.addEventListener('click', () => {
+          body.querySelectorAll('.settings-nav').forEach(n => n.classList.remove('active'));
+          nav.classList.add('active');
+          sections[nav.dataset.section]();
+        });
+      });
+      
+      sections.profile();
+      
+      // دعم الرابط المباشر
+      body.querySelectorAll('.settings-nav').forEach(nav => {
+        nav.setAttribute('data-settings-nav', nav.dataset.section);
+      });
+    }
+  });
+}
+
+async function saveSettings() {
+  if (!currentUser) return;
+  try {
+    await updateDoc(doc(db, 'users', currentUser.uid), {
+      settings: userSettings
+    });
+  } catch (e) {
+    console.warn('تعذر حفظ الإعدادات:', e);
+  }
+}
+
+// ============================================
+// FILES APP
+// ============================================
+function openFilesApp() {
+  createWindow({
+    id: 'files',
+    title: 'الملفات',
+    icon: ICONS.files,
+    width: 600,
+    height: 450,
+    content: `
+      <div class="files-app">
+        <div class="files-toolbar">
+          <button class="settings-btn" id="files-new">${ICONS.plus} جديد</button>
+          <div class="files-path">/home/user/</div>
+          <button class="settings-btn" id="files-refresh">${ICONS.refresh}</button>
+        </div>
+        <div class="files-grid" id="files-grid">
+          <div class="loading-app"><div class="spinner"></div><span>جاري التحميل...</span></div>
+        </div>
+      </div>
+    `,
+    onMount: async (body) => {
+      const grid = body.querySelector('#files-grid');
+      
+      const loadFiles = async () => {
+        grid.innerHTML = '<div class="loading-app"><div class="spinner"></div><span>جاري التحميل...</span></div>';
+        try {
+          const q = query(collection(db, 'files'), where('userId', '==', currentUser.uid));
+          const snap = await getDocs(q);
+          const files = [];
+          snap.forEach(d => files.push({ id: d.id, ...d.data() }));
+          
+          if (files.length === 0) {
+            grid.innerHTML = `
+              <div class="empty-state" style="grid-column: 1/-1;">
+                ${ICONS.folder}
+                <p>لا توجد ملفات</p>
+                <p style="margin-top:8px;font-size:11px;">اضغط "جديد" لإضافة ملف</p>
+              </div>
+            `;
+            return;
+          }
+          
+          grid.innerHTML = '';
+          files.forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            const isImage = (file.type || '').startsWith('image/');
+            item.innerHTML = `
+              ${isImage ? ICONS.image : ICONS.file}
+              <div class="file-item-name">${escapeHtml(file.name)}</div>
+            `;
+            item.addEventListener('click', () => {
+              showNotification(file.name, file.content || 'ملف فارغ', 'info');
+            });
+            grid.appendChild(item);
+          });
+        } catch (e) {
+          console.error(e);
+          grid.innerHTML = '<div class="empty-state"><p>خطأ في التحميل</p></div>';
+        }
+      };
+      
+      body.querySelector('#files-new').addEventListener('click', async () => {
+        const name = prompt('اسم الملف:');
+        if (!name) return;
+        await addDoc(collection(db, 'files'), {
+          name,
+          content: '',
+          type: 'text/plain',
+          userId: currentUser.uid,
+          createdAt: serverTimestamp()
+        });
+        showNotification('تم', 'تم إنشاء الملف', 'success');
+        loadFiles();
+      });
+      
+      body.querySelector('#files-refresh').addEventListener('click', loadFiles);
+      
+      await loadFiles();
+    }
+  });
+}
+
+// ============================================
+// MUSIC APP
+// ============================================
+function openMusicApp() {
+  createWindow({
+    id: 'music',
+    title: 'الموسيقى',
+    icon: ICONS.music,
+    width: 380,
+    height: 520,
+    content: `
+      <div class="music-app">
+        <div class="music-cover">
+          ${ICONS.music}
+        </div>
+        <div class="music-info">
+          <div class="music-title">Demo Track</div>
+          <div class="music-artist">DK Web OS</div>
+        </div>
+        <div class="music-controls">
+          <button class="music-btn" id="music-prev">${ICONS.prev}</button>
+          <button class="music-btn play" id="music-play">${ICONS.play}</button>
+          <button class="music-btn" id="music-next">${ICONS.next}</button>
+        </div>
+        <div style="width:100%;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:11px;color:var(--text-secondary);">0:00</span>
+          <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;position:relative;">
+            <div style="width:0%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s;" id="music-progress"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text-secondary);">3:45</span>
+        </div>
+      </div>
+    `,
+    onMount: (body) => {
+      let isPlaying = false;
+      let progress = 0;
+      let interval;
+      
+      const playBtn = body.querySelector('#music-play');
+      const progressBar = body.querySelector('#music-progress');
+      
+      playBtn.addEventListener('click', () => {
+        isPlaying = !isPlaying;
+        playBtn.innerHTML = isPlaying ? ICONS.pause : ICONS.play;
+        
+        if (isPlaying) {
+          interval = setInterval(() => {
+            progress += 0.5;
+            if (progress > 100) {
+              progress = 0;
+              isPlaying = false;
+              playBtn.innerHTML = ICONS.play;
+              clearInterval(interval);
+            }
+            progressBar.style.width = progress + '%';
+          }, 200);
+        } else {
+          clearInterval(interval);
+        }
+      });
+      
+      body.querySelector('#music-prev').addEventListener('click', () => {
+        progress = 0;
+        progressBar.style.width = '0%';
+      });
+      
+      body.querySelector('#music-next').addEventListener('click', () => {
+        progress = 0;
+        progressBar.style.width = '0%';
+      });
+    }
+  });
+}
+
+// ============================================
+// BROWSER APP
+// ============================================
+function openBrowserApp() {
+  createWindow({
+    id: 'browser',
+    title: 'المتصفح',
+    icon: ICONS.browser,
+    width: 700,
+    height: 500,
+    content: `
+      <div class="browser-app">
+        <div class="browser-bar">
+          <button class="browser-nav-btn" id="br-back">${ICONS.back}</button>
+          <button class="browser-nav-btn" id="br-forward">${ICONS.forward}</button>
+          <button class="browser-nav-btn" id="br-refresh">${ICONS.refresh}</button>
+          <input type="text" class="browser-url" id="br-url" value="https://www.example.com" />
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;background:white;color:#333;text-align:center;padding:40px;flex-direction:column;gap:20px;">
+          ${ICONS.browser}
+          <h3 style="color:#333;">متصفح ويب</h3>
+          <p style="color:#666;font-size:13px;max-width:300px;">لأسباب أمنية، لا يمكن تحميل المواقع داخل iframe. هذا عرض توضيحي.</p>
+        </div>
+      </div>
+    `,
+    onMount: (body) => {
+      body.querySelector('#br-refresh').addEventListener('click', () => {
+        showNotification('تحديث', 'تم تحديث الصفحة', 'info');
+      });
+      body.querySelector('#br-back').addEventListener('click', () => {
+        showNotification('رجوع', 'لا توجد صفحة سابقة', 'info');
+      });
+      body.querySelector('#br-forward').addEventListener('click', () => {
+        showNotification('تقدم', 'لا توجد صفحة تالية', 'info');
+      });
+    }
+  });
+}
+
+// ============================================
+// PAINT APP
+// ============================================
+function openPaintApp() {
+  createWindow({
+    id: 'paint',
+    title: 'الرسم',
+    icon: ICONS.paint,
+    width: 700,
+    height: 550,
+    content: `
+      <div class="paint-app">
+        <div class="paint-toolbar">
+          <button class="paint-tool active" data-tool="brush" title="فرشاة">${ICONS.brush}</button>
+          <button class="paint-tool" data-tool="eraser" title="ممحاة">${ICONS.eraser}</button>
+          <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+          <button class="paint-color active" data-color="#000000" style="background:#000;"></button>
+          <button class="paint-color" data-color="#ef4444" style="background:#ef4444;"></button>
+          <button class="paint-color" data-color="#f59e0b" style="background:#f59e0b;"></button>
+          <button class="paint-color" data-color="#22c55e" style="background:#22c55e;"></button>
+          <button class="paint-color" data-color="#3b82f6" style="background:#3b82f6;"></button>
+          <button class="paint-color" data-color="#8b5cf6" style="background:#8b5cf6;"></button>
+          <button class="paint-color" data-color="#ec4899" style="background:#ec4899;"></button>
+          <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+          <button class="settings-btn" id="paint-clear">مسح</button>
+        </div>
+        <canvas class="paint-canvas" id="paint-canvas"></canvas>
+      </div>
+    `,
+    onMount: (body) => {
+      const canvas = body.querySelector('#paint-canvas');
+      const ctx = canvas.getContext('2d');
+      let isDrawing = false;
+      let tool = 'brush';
+      let color = '#000000';
+      
+      const resize = () => {
+        const parent = canvas.parentElement;
+        const w = parent.clientWidth;
+        const h = parent.clientHeight;
+        const imageData = canvas.width ? ctx.getImageData(0, 0, canvas.width, canvas.height) : null;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, w, h);
+        if (imageData) {
+          try { ctx.putImageData(imageData, 0, 0); } catch(e){}
+        }
+      };
+      
+      setTimeout(resize, 50);
+      window.addEventListener('resize', resize);
+      
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const point = e.touches ? e.touches[0] : e;
+        return {
+          x: point.clientX - rect.left,
+          y: point.clientY - rect.top
+        };
+      };
+      
+      const start = (e) => {
+        isDrawing = true;
+        const { x, y } = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        if (e.cancelable) e.preventDefault();
+      };
+      
+      const draw = (e) => {
+        if (!isDrawing) return;
+        const { x, y } = getPos(e);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = tool === 'eraser' ? 'white' : color;
+        ctx.lineWidth = tool === 'eraser' ? 20 : 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        if (e.cancelable) e.preventDefault();
+      };
+      
+      const end = () => { isDrawing = false; };
+      
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', end);
+      canvas.addEventListener('mouseleave', end);
+      
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', draw, { passive: false });
+      canvas.addEventListener('touchend', end);
+      
+      body.querySelectorAll('.paint-tool').forEach(btn => {
+        btn.addEventListener('click', () => {
+          body.querySelectorAll('.paint-tool').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          tool = btn.dataset.tool;
+        });
+      });
+      
+      body.querySelectorAll('.paint-color').forEach(btn => {
+        btn.addEventListener('click', () => {
+          body.querySelectorAll('.paint-color').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          color = btn.dataset.color;
+          tool = 'brush';
+          body.querySelectorAll('.paint-tool').forEach(b => b.classList.remove('active'));
+          body.querySelector('[data-tool="brush"]').classList.add('active');
+        });
+      });
+      
+      body.querySelector('#paint-clear').addEventListener('click', () => {
+        if (confirm('مسح كل الرسم؟')) {
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      });
+    }
+  });
+}
+
+// ============================================
+// CALENDAR APP
+// ============================================
+function openCalendarApp() {
+  createWindow({
+    id: 'calendar',
+    title: 'التقويم',
+    icon: ICONS.calendar,
+    width: 420,
+    height: 480,
+    content: `
+      <div class="calendar-app">
+        <div class="calendar-header">
+          <div class="calendar-title" id="cal-title"></div>
+          <div class="calendar-nav">
+            <button id="cal-prev">${ICONS.back}</button>
+            <button id="cal-next">${ICONS.forward}</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+    `,
+    onMount: (body) => {
+      let currentDate = new Date();
+      const title = body.querySelector('#cal-title');
+      const grid = body.querySelector('#cal-grid');
+      
+      const render = () => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        title.textContent = currentDate.toLocaleDateString('ar-DZ', { month: 'long', year: 'numeric' });
+        
+        const days = ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+        grid.innerHTML = '';
+        
+        days.forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'calendar-day-name';
+          el.textContent = d;
+          grid.appendChild(el);
+        });
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrev = new Date(year, month, 0).getDate();
+        const today = new Date();
+        
+        for (let i = firstDay - 1; i >= 0; i--) {
+          const el = document.createElement('div');
+          el.className = 'calendar-day other-month';
+          el.textContent = daysInPrev - i;
+          grid.appendChild(el);
+        }
+        
+        for (let i = 1; i <= daysInMonth; i++) {
+          const el = document.createElement('div');
+          el.className = 'calendar-day';
+          if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            el.classList.add('today');
+          }
+          el.textContent = i;
+          grid.appendChild(el);
+        }
+        
+        const total = firstDay + daysInMonth;
+        const remaining = (7 - total % 7) % 7;
+        for (let i = 1; i <= remaining; i++) {
+          const el = document.createElement('div');
+          el.className = 'calendar-day other-month';
+          el.textContent = i;
+          grid.appendChild(el);
+        }
+      };
+      
+      body.querySelector('#cal-prev').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        render();
+      });
+      
+      body.querySelector('#cal-next').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        render();
+      });
+      
+      render();
+    }
+  });
+}
+
+// ============================================
+// EDITOR APP
+// ============================================
+function openEditorApp() {
+  createWindow({
+    id: 'editor',
+    title: 'المحرر النصي',
+    icon: ICONS.editor,
+    width: 600,
+    height: 450,
+    content: `
+      <div class="editor-app">
+        <div class="editor-toolbar">
+          <button id="ed-new">${ICONS.plus} جديد</button>
+          <button id="ed-save">${ICONS.save} حفظ</button>
+          <button id="ed-download">⬇️ تحميل</button>
+          <span style="flex:1;"></span>
+          <span id="ed-status" style="font-size:11px;color:var(--text-secondary);padding:6px;"></span>
+        </div>
+        <textarea class="editor-textarea" id="ed-text" placeholder="اكتب هنا..."></textarea>
+      </div>
+    `,
+    onMount: (body) => {
+      const text = body.querySelector('#ed-text');
+      const status = body.querySelector('#ed-status');
+      
+      const updateStatus = () => {
+        const chars = text.value.length;
+        const words = text.value.trim() ? text.value.trim().split(/\s+/).length : 0;
+        status.textContent = `${words} كلمة، ${chars} حرف`;
+      };
+      
+      text.addEventListener('input', updateStatus);
+      
+      body.querySelector('#ed-new').addEventListener('click', () => {
+        if (text.value && !confirm('فقدان التغييرات غير المحفوظة؟')) return;
+        text.value = '';
+        updateStatus();
+      });
+      
+      body.querySelector('#ed-save').addEventListener('click', async () => {
+        const name = prompt('اسم الملف:', 'document.txt');
+        if (!name) return;
+        try {
+          await addDoc(collection(db, 'files'), {
+            name, content: text.value, type: 'text/plain',
+            userId: currentUser.uid,
+            createdAt: serverTimestamp()
+          });
+          showNotification('تم الحفظ', 'تم حفظ الملف في Firestore', 'success');
+        } catch (e) {
+          showNotification('خطأ', 'تعذر الحفظ', 'error');
+        }
+      });
+      
+      body.querySelector('#ed-download').addEventListener('click', () => {
+        const blob = new Blob([text.value], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+      
+      updateStatus();
+    }
+  });
+}
+
+// ============================================
+// CLOCK APP
+// ============================================
+function openClockApp() {
+  createWindow({
+    id: 'clock',
+    title: 'الساعة',
+    icon: ICONS.clock,
+    width: 400,
+    height: 300,
+    content: `
+      <div class="clock-app">
+        <div class="clock-time" id="clock-app-time">00:00:00</div>
+        <div class="clock-date" id="clock-app-date"></div>
+      </div>
+    `,
+    onMount: (body) => {
+      const timeEl = body.querySelector('#clock-app-time');
+      const dateEl = body.querySelector('#clock-app-date');
+      
+      const update = () => {
+        const now = new Date();
+        timeEl.textContent = now.toLocaleTimeString('ar-DZ');
+        dateEl.textContent = now.toLocaleDateString('ar-DZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      };
+      
+      update();
+      setInterval(update, 1000);
+    }
+  });
+}
+
+// ============================================
+// ABOUT APP
+// ============================================
+function openAboutApp() {
+  createWindow({
+    id: 'about',
+    title: 'حول النظام',
+    icon: ICONS.about,
+    width: 400,
+    height: 400,
+    content: `
+      <div class="about-app">
+        <svg viewBox="0 0 24 24" fill="none" style="width:80px;height:80px;">
+          <defs><linearGradient id="aboutLg2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#818cf8"/>
+            <stop offset="100%" stop-color="#c084fc"/>
+          </linearGradient></defs>
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="url(#aboutLg2)" stroke-width="1.5" fill="none"/>
+          <path d="M8 21h8M12 17v4" stroke="url(#aboutLg2)" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="10" r="2" fill="url(#aboutLg2)"/>
+        </svg>
+        <div class="about-title">DK Web OS</div>
+        <div class="about-version">الإصدار 1.0.0</div>
+        <div class="about-desc">نظام تشغيل ويب متكامل يعمل بالكامل في المتصفح، مع دعم Firebase للتخزين السحابي والمصادقة.</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:20px;">صُنع بـ ❤️ في الجزائر</div>
+      </div>
+    `
+  });
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text || '';
+  return div.innerHTML;
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+document.addEventListener('keydown', (e) => {
+  // Escape لإغلاق قائمة ابدأ
+  if (e.key === 'Escape') {
+    closeStartMenu();
+    contextMenu.classList.remove('open');
+  }
+  
+  // Ctrl+Alt+T للطرفية
+  if (e.ctrlKey && e.altKey && e.key === 't') {
+    e.preventDefault();
+    openTerminalApp();
+  }
+  
+  // Super/Escape لفتح قائمة ابدأ
+  if (e.key === 'Meta') {
+    e.preventDefault();
+    startBtn.click();
+  }
+});
+
+// ============================================
+// WINDOW RESIZE
+// ============================================
+window.addEventListener('resize', () => {
+  // تصحيح مواقع النوافذ خارج الشاشة
+  Object.values(openWindows).forEach(({ element }) => {
+    const rect = element.getBoundingClientRect();
+    if (rect.left > window.innerWidth - 100) {
+      element.style.left = (window.innerWidth - 200) + 'px';
+    }
+    if (rect.top > window.innerHeight - 100) {
+      element.style.top = (window.innerHeight - 200) + 'px';
+    }
+  });
+});
+
+// ============================================
+// PREVENT ZOOM ON DOUBLE TAP
+// ============================================
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    e.preventDefault();
+  }
+  lastTouchEnd = now;
 }, { passive: false });
 
-console.log('✅ Dashboard v3 loaded');
+console.log('%cDK Web OS', 'font-size:24px;font-weight:bold;color:#818cf8;');
+console.log('%cتم التحميل بنجاح', 'font-size:14px;color:#22c55e;');
 </script>
 </body>
 </html>
