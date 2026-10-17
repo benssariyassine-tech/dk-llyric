@@ -1,379 +1,371 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Attack on Titan - Canvas Anime</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<title>Attack on Titan - Interactive Episode</title>
 <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body, html {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #000;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        user-select: none;
-        -webkit-user-select: none;
+        width: 100%; height: 100%; overflow: hidden;
+        background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        touch-action: manipulation;
     }
-    canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
+    
+    #episode-container {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        cursor: pointer; background: #000;
     }
-    #overlay {
-        position: absolute;
-        bottom: 20px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        pointer-events: none;
-        z-index: 10;
+
+    /* الشاشة السينمائية (الأشرطة السوداء) */
+    .cinematic-bar {
+        position: absolute; left: 0; width: 100%; height: 8vh;
+        background: #000; z-index: 100; pointer-events: none;
+        transition: height 1s ease-in-out;
     }
-    #overlay h1 {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 18px;
-        margin: 0;
-        text-shadow: 0 2px 4px #000;
+    .top-bar { top: 0; }
+    .bottom-bar { bottom: 0; }
+
+    /* المشهد والخلفية */
+    #scene-bg {
+        position: absolute; inset: 0;
+        background-size: cover; background-position: center;
+        transition: transform 5s ease-out, filter 1s;
+        transform: scale(1);
     }
-    #overlay p {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 12px;
-        margin: 5px 0 0 0;
+    
+    /* الشخصية */
+    #character {
+        position: absolute; bottom: -5%; left: 50%;
+        transform: translateX(-50%) scale(1);
+        height: 85%; max-height: 800px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+        transition: all 0.5s ease;
+        opacity: 0; z-index: 10;
+    }
+
+    /* تأثير الاهتزاز */
+    .shake {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+        10%, 90% { transform: translate3d(-2px, 0, 0) scale(1.05); }
+        20%, 80% { transform: translate3d(4px, 0, 0) scale(1.05); }
+        30%, 50%, 70% { transform: translate3d(-6px, 0, 0) scale(1.05); }
+        40%, 60% { transform: translate3d(6px, 0, 0) scale(1.05); }
+    }
+
+    /* صندوق الحوار */
+    #dialogue-box {
+        position: absolute; bottom: 10vh; left: 5%; right: 5%;
+        background: rgba(0, 0, 0, 0.85);
+        border: 2px solid #fff;
+        border-radius: 10px; padding: 20px;
+        z-index: 200; backdrop-filter: blur(5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,255,255,0.1);
+        display: none;
+    }
+    #speaker-name {
+        position: absolute; top: -18px; right: 20px;
+        background: #fff; color: #000;
+        padding: 4px 15px; border-radius: 5px;
+        font-weight: bold; font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    #dialogue-text {
+        color: #fff; font-size: 18px; line-height: 1.6;
+        text-shadow: 0 2px 4px #000; min-height: 60px;
+    }
+    #next-hint {
+        position: absolute; bottom: 10px; left: 20px;
+        color: #888; font-size: 14px; animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* تأثيرات إضافية */
+    .flash-white {
+        position: absolute; inset: 0; background: #fff;
+        z-index: 500; opacity: 0; pointer-events: none;
+    }
+    .flash-red {
+        position: absolute; inset: 0; background: #ff0000;
+        z-index: 500; opacity: 0; pointer-events: none;
+        mix-blend-mode: overlay;
+    }
+    
+    /* شاشة البداية */
+    #start-screen {
+        position: absolute; inset: 0; z-index: 1000;
+        background: #000; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        color: white; text-align: center;
+    }
+    #start-screen h1 {
+        font-size: 36px; letter-spacing: 2px; margin-bottom: 10px;
+        color: #fff; text-shadow: 0 0 20px #ff0000;
+    }
+    #start-screen p { color: #888; margin-bottom: 30px; }
+    #start-btn {
+        padding: 15px 40px; font-size: 20px; font-weight: bold;
+        background: #fff; color: #000; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        transition: transform 0.2s;
+    }
+    #start-btn:active { transform: scale(0.95); }
+    
+    /* السرعة (خطوط الأكشن) */
+    .speed-lines {
+        position: absolute; inset: 0; z-index: 15;
+        background: repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 20px,
+            rgba(255,255,255,0.1) 20px,
+            rgba(255,255,255,0.1) 22px
+        );
+        opacity: 0; transition: opacity 0.3s; pointer-events: none;
     }
 </style>
 </head>
 <body>
-    <canvas id="animeCanvas"></canvas>
-    <div id="overlay">
-        <h1>هجوم العمالقة - مشهد سينمائي</h1>
-        <p>صُنع بالكامل بـ HTML5 Canvas & JavaScript</p>
+
+<div id="episode-container" onclick="nextDialogue()">
+    
+    <!-- شاشة البداية -->
+    <div id="start-screen">
+        <h1>進撃の巨人</h1>
+        <p>الهجوم على العمالقة - الحلقة التفاعلية</p>
+        <button id="start-btn" onclick="startEpisode(event)">ابدأ الحلقة</button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('animeCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- أشرطة سينمائية -->
+    <div class="cinematic-bar top-bar"></div>
+    <div class="cinematic-bar bottom-bar"></div>
 
-        let width, height;
+    <!-- الخلفيات والشخصيات -->
+    <div id="scene-bg"></div>
+    <div class="speed-lines" id="speed-lines"></div>
+    <img id="character" src="" alt="Character">
+    
+    <!-- تأثيرات الضوء -->
+    <div class="flash-white" id="flash-white"></div>
+    <div class="flash-red" id="flash-red"></div>
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+    <!-- صندوق الحوار -->
+    <div id="dialogue-box">
+        <div id="speaker-name">إرين</div>
+        <div id="dialogue-text"></div>
+        <div id="next-hint">اضغط للمتابعة ▼</div>
+    </div>
+
+</div>
+
+<script>
+    // ============ السيناريو والحوارات ============
+    const script = [
+        {
+            speaker: "الراوي",
+            text: "في عام 845، سقط السور الخارجي... ودخلت العمالقة إلى المدينة.",
+            bg: "https://images.unsplash.com/photo-1506459225024-1428097a7e18?q=80&w=1000&auto=format&fit=crop", // خلفية درامية
+            char: null,
+            effect: "shake",
+            sound: "rumble"
+        },
+        {
+            speaker: "إرين",
+            text: "ميكاسا... أين أنت؟! لقد دمروا كل شيء... عائلتي، مدينتي، كل شيء!",
+            bg: "https://images.unsplash.com/photo-1506459225024-1428097a7e18?q=80&w=1000&auto=format&fit=crop",
+            char: "https://i.pinimg.com/736x/8a/e8/76/8ae8768b8007dccb39652f9134f1d9c8.jpg", // صورة إرين
+            effect: "zoom",
+            sound: "scream"
+        },
+        {
+            speaker: "ميكاسا",
+            text: "إرين، ابقَ خلفي. أنا سأحميك. هذا هو عالمنا القاسي.",
+            bg: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", // خلفية حمراء
+            char: "https://i.pinimg.com/736x/e4/e0/79/e4e079e7f9fb7b8c5e7f9fc0d8d9f1c8.jpg", // صورة ميكاسا
+            effect: "none",
+            sound: "calm"
+        },
+        {
+            speaker: "ليفاي",
+            text: "ابتعدوا من طريقي. سأقضي على هؤلاء الحشرات بنفسي. اختر قراراً لن تندم عليه.",
+            bg: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop",
+            char: "https://i.pinimg.com/736x/c2/54/2c/c2542cf4f2f1b3a51e1b2f9e7b6d2a1c.jpg", // صورة ليفاي
+            effect: "red_flash",
+            sound: "blade"
+        },
+        {
+            speaker: "إرين",
+            text: "أقسم... سأقضي على كل العمالقة! واحداً تلو الآخر! حتى آخر نفس في جسدي!",
+            bg: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1000&auto=format&fit=crop",
+            char: "https://i.pinimg.com/736x/8a/e8/76/8ae8768b8007dccb39652f9134f1d9c8.jpg",
+            effect: "shake",
+            sound: "roar"
+        },
+        {
+            speaker: "الراوي",
+            text: "وهكذا بدأت رحلة فيلق الاستطلاع... للتضحية بقلوبهم من أجل البشرية.",
+            bg: "https://images.unsplash.com/photo-1506459225024-1428097a7e18?q=80&w=1000&auto=format&fit=crop",
+            char: null,
+            effect: "white_flash",
+            sound: "epic"
         }
-        window.addEventListener('resize', resize);
-        resize();
+    ];
 
-        // ============ البخار والجزيئات ============
-        const particles = [];
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = -Math.random() * 2 - 1;
-                this.size = Math.random() * 40 + 10;
-                this.alpha = Math.random() * 0.5 + 0.2;
-                this.life = Math.random() * 100 + 50;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.size += 0.3;
-                this.alpha -= 0.005;
-                this.life--;
-            }
-            draw() {
-                if (this.alpha <= 0) return;
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+    let currentIndex = 0;
+    let isTyping = false;
+    let typingTimer;
+    let audioCtx;
+
+    // ============ تهيئة المؤثرات الصوتية ============
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSound(type) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'rumble') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(50, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 2);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2);
+            osc.start(); osc.stop(audioCtx.currentTime + 2);
+        } else if (type === 'scream' || type === 'roar') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        } else if (type === 'blade') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'epic') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(400, audioCtx.currentTime + 2);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 3);
+            osc.start(); osc.stop(audioCtx.currentTime + 3);
         }
+    }
 
-        // ============ الجندي (ODM Gear) ============
-        const scout = {
-            active: false,
-            progress: 0,
-            speed: 0.0035,
-            waitTimer: 80,
-            startX: 0, startY: 0, targetX: 0, targetY: 0,
-            reset() {
-                // ينطلق من اليمين لليسار
-                this.startX = width + 100;
-                this.startY = height * 0.3 + (Math.random() - 0.5) * 200;
-                this.targetX = -100;
-                this.targetY = height * 0.7 + (Math.random() - 0.5) * 200;
-                this.active = true;
-                this.progress = 0;
-            },
-            update() {
-                if (!this.active) {
-                    this.waitTimer--;
-                    if (this.waitTimer <= 0) {
-                        this.reset();
-                        this.waitTimer = Math.random() * 200 + 150;
-                    }
-                    return;
-                }
-                
-                this.progress += this.speed;
-                if (this.progress >= 1) {
-                    this.active = false;
-                    return;
-                }
-                
-                // حركة انسيابية (منحنى)
-                let t = this.progress;
-                let ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-                
-                this.x = this.startX + (this.targetX - this.startX) * ease;
-                this.y = this.startY + (this.targetY - this.startY) * ease - Math.sin(t * Math.PI) * 150;
-                
-                // إطلاق جزيئات السرعة
-                if (Math.random() < 0.5) {
-                    particles.push(new Particle(this.x, this.y));
-                }
-            },
-            draw() {
-                if (!this.active) return;
-                
-                // أسلاك الـ ODM
-                ctx.strokeStyle = 'rgba(200, 200, 200, 0.6)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(width * 0.9, -50);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(width * 0.1, -50);
-                ctx.stroke();
+    // ============ بدء الحلقة ============
+    function startEpisode(e) {
+        e.stopPropagation();
+        initAudio();
+        // تفعيل الصوت في الهواتف
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('dialogue-box').style.display = 'block';
+        
+        // تصغير الأشرطة السينمائية للتركيز على المشهد
+        document.querySelector('.top-bar').style.height = '6vh';
+        document.querySelector('.bottom-bar').style.height = '6vh';
+        
+        currentIndex = -1;
+        nextDialogue();
+    }
 
-                // رسم الجندي
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                
-                let angle = Math.atan2(this.targetY - this.startY, this.targetX - this.startX);
-                ctx.rotate(angle);
-                
-                if (this.targetX < this.startX) {
-                    ctx.scale(1, -1); // قلب الجندي
-                }
+    // ============ الانتقال للحوار التالي ============
+    function nextDialogue() {
+        if (document.getElementById('start-screen').style.display !== 'none') return;
 
-                // الكاب الأخضر
-                ctx.fillStyle = '#1e8449';
-                ctx.beginPath();
-                ctx.moveTo(-10, -5);
-                ctx.quadraticCurveTo(-30, 15, -20, 35);
-                ctx.quadraticCurveTo(-5, 15, 10, 0);
-                ctx.fill();
-
-                // الجسم
-                ctx.fillStyle = '#2c3e50';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 8, 15, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // صندوق الغاز
-                ctx.fillStyle = '#95a5a6';
-                ctx.fillRect(-12, 0, 6, 18);
-                ctx.fillRect(6, 0, 6, 18);
-
-                // الرأس
-                ctx.fillStyle = '#f1c40f';
-                ctx.beginPath();
-                ctx.arc(0, -12, 6, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
-            }
-        };
-        scout.waitTimer = 30;
-
-        // ============ المحرك الرئيسي ============
-        let time = 0;
-        let flashAlpha = 0;
-        let lightningTimer = 100;
-
-        function animate() {
-            time++;
-            
-            // السماء
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
-            skyGrad.addColorStop(0, '#050505');
-            skyGrad.addColorStop(0.5, '#1a0a0a');
-            skyGrad.addColorStop(0.8, '#3a1010');
-            skyGrad.addColorStop(1, '#0a0a0a');
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, width, height);
-
-            // شعار فيلق الاستطلاع في الخلفية (خافت)
-            ctx.save();
-            ctx.globalAlpha = 0.03;
-            ctx.fillStyle = '#fff';
-            ctx.font = `bold ${Math.min(width, height) * 0.5}px serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('翼', width / 2, height / 2);
-            ctx.restore();
-
-            // تأثير البرق
-            lightningTimer--;
-            if (lightningTimer <= 0) {
-                flashAlpha = 0.8;
-                lightningTimer = Math.random() * 200 + 200;
-            }
-            if (flashAlpha > 0) {
-                ctx.fillStyle = `rgba(200, 220, 255, ${flashAlpha})`;
-                ctx.fillRect(0, 0, width, height);
-                flashAlpha -= 0.05;
-            }
-
-            // الجبال
-            ctx.fillStyle = '#0f0808';
-            ctx.beginPath();
-            ctx.moveTo(0, height * 0.6);
-            ctx.lineTo(width * 0.2, height * 0.35);
-            ctx.lineTo(width * 0.4, height * 0.55);
-            ctx.lineTo(width * 0.7, height * 0.3);
-            ctx.lineTo(width, height * 0.5);
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
-            ctx.fill();
-
-            // ============ العملاق الكولوسال ============
-            const titanX = width * 0.7;
-            const titanY = height * 0.85;
-            
-            ctx.save();
-            ctx.translate(titanX, titanY);
-            
-            // العضلات
-            ctx.fillStyle = '#7a1f1f';
-            ctx.beginPath();
-            ctx.ellipse(0, 0, 130, 200, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // خطوط العضلات
-            ctx.strokeStyle = '#4a0f0f';
-            ctx.lineWidth = 6;
-            for (let i = -110; i <= 110; i += 22) {
-                ctx.beginPath();
-                ctx.moveTo(i, 150);
-                ctx.quadraticCurveTo(i * 1.5, -50, i * 0.8, -180);
-                ctx.stroke();
-            }
-            
-            // الفم
-            ctx.fillStyle = '#111';
-            ctx.beginPath();
-            ctx.ellipse(0, -50, 90, 60, 0, 0, Math.PI);
-            ctx.fill();
-            
-            // الأسنان
-            ctx.fillStyle = '#e0e0e0';
-            for (let i = -80; i <= 80; i += 25) {
-                ctx.beginPath();
-                ctx.moveTo(i, -105);
-                ctx.lineTo(i + 15, -70);
-                ctx.lineTo(i + 30, -105);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.moveTo(i, -5);
-                ctx.lineTo(i + 15, -40);
-                ctx.lineTo(i + 30, -5);
-                ctx.fill();
-            }
-            
-            // العيون المتوهجة
-            ctx.fillStyle = '#ffaa00';
-            ctx.shadowColor = '#ffaa00';
-            ctx.shadowBlur = 30;
-            
-            ctx.beginPath();
-            ctx.ellipse(-55, -130, 20, 10, 0.2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.beginPath();
-            ctx.ellipse(55, -130, 20, 10, -0.2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-
-            // بخار من العملاق
-            if (Math.random() < 0.4) {
-                particles.push(new Particle(titanX + (Math.random() - 0.5) * 200, titanY - 150));
-            }
-
-            // ============ السور العظيم ============
-            const wallY = height * 0.75;
-            const wallH = height * 0.25;
-            
-            const wallGrad = ctx.createLinearGradient(0, wallY, 0, height);
-            wallGrad.addColorStop(0, '#222');
-            wallGrad.addColorStop(1, '#050505');
-            ctx.fillStyle = wallGrad;
-            ctx.fillRect(0, wallY, width, wallH);
-            
-            // نقشة الحجر
-            ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-            ctx.lineWidth = 2;
-            const brickH = 30;
-            const brickW = 60;
-            
-            for (let y = wallY; y < height; y += brickH) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-                
-                const offset = ((y - wallY) / brickH) % 2 === 0 ? 0 : brickW / 2;
-                for (let x = offset; x < width; x += brickW) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x, y + brickH);
-                    ctx.stroke();
-                }
-            }
-
-            // تحديث ورسم البخار
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.update();
-                p.draw();
-                if (p.life <= 0 || p.alpha <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
-
-            // تحديث ورسم الجندي
-            scout.update();
-            scout.draw();
-
-            // ============ النصوص السينمائية ============
-            ctx.textAlign = 'center';
-            
-            let textAlpha = 0.7 + Math.sin(time * 0.1) * 0.3;
-            
-            ctx.fillStyle = `rgba(255, 255, 255, ${textAlpha})`;
-            ctx.font = 'bold clamp(24px, 5vw, 50px) -apple-system, BlinkMacSystemFont, sans-serif';
-            ctx.shadowColor = '#ff0000';
-            ctx.shadowBlur = 10;
-            ctx.fillText('進撃の巨人', width / 2, height * 0.15);
-            
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = `rgba(255, 150, 150, ${textAlpha})`;
-            ctx.font = 'bold clamp(12px, 2vw, 20px) -apple-system, BlinkMacSystemFont, sans-serif';
-            ctx.fillText('Dedicate your hearts!', width / 2, height * 0.15 + 40);
-
-            requestAnimationFrame(animate);
+        // إذا كان النص مازال يتكتب، كمله فوراً
+        if (isTyping) {
+            clearInterval(typingTimer);
+            document.getElementById('dialogue-text').innerText = script[currentIndex].text;
+            isTyping = false;
+            return;
         }
 
-        // تشغيل الأنمي
-        animate();
-    </script>
+        currentIndex++;
+        if (currentIndex >= script.length) {
+            // نهاية الحلقة
+            document.getElementById('dialogue-text').innerText = "شكراً للمشاهدة. اضغط لإعادة التشغيل.";
+            document.getElementById('speaker-name').innerText = "النهاية";
+            currentIndex = -1;
+            return;
+        }
+
+        const scene = script[currentIndex];
+        
+        // تحديث الشخصية
+        const charImg = document.getElementById('character');
+        if (scene.char) {
+            charImg.style.opacity = '0';
+            setTimeout(() => {
+                charImg.src = scene.char;
+                charImg.style.opacity = '1';
+            }, 200);
+        } else {
+            charImg.style.opacity = '0';
+        }
+
+        // تحديث الخلفية
+        const bg = document.getElementById('scene-bg');
+        bg.style.transform = 'scale(1.1)'; // زووم سينمائي
+        setTimeout(() => {
+            bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('${scene.bg}')`;
+        }, 300);
+
+        // المؤثرات
+        const container = document.getElementById('episode-container');
+        container.classList.remove('shake');
+        
+        if (scene.effect === 'shake') {
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('shake');
+            setTimeout(() => container.classList.remove('shake'), 500);
+        } else if (scene.effect === 'white_flash') {
+            const flash = document.getElementById('flash-white');
+            flash.style.transition = 'none'; flash.style.opacity = '1';
+            setTimeout(() => { flash.style.transition = '1s'; flash.style.opacity = '0'; }, 50);
+        } else if (scene.effect === 'red_flash') {
+            const flash = document.getElementById('flash-red');
+            flash.style.transition = 'none'; flash.style.opacity = '0.8';
+            setTimeout(() => { flash.style.transition = '1s'; flash.style.opacity = '0'; }, 50);
+        }
+
+        // تشغيل الصوت
+        if (scene.sound) playSound(scene.sound);
+
+        // تحديث صندوق الحوار
+        document.getElementById('speaker-name').innerText = scene.speaker;
+        document.getElementById('speaker-name').style.color = scene.speaker === 'إرين' ? '#e74c3c' : scene.speaker === 'ميكاسا' ? '#2c3e50' : scene.speaker === 'ليفاي' ? '#7f8c8d' : '#fff';
+        document.getElementById('speaker-name').style.background = scene.speaker === 'إرين' ? '#fff' : '#fff'; // نوحد اللون
+        
+        // تأثير الكتابة
+        typeText(scene.text);
+    }
+
+    // ============ تأثير الكتابة ============
+    function typeText(text) {
+        const el = document.getElementById('dialogue-text');
+        el.innerText = '';
+        isTyping = true;
+        let i = 0;
+        
+        clearInterval(typingTimer);
+        typingTimer = setInterval(() => {
+            el.innerText += text.charAt(i);
+            i++;
+            if (i >= text.length) {
+                clearInterval(typingTimer);
+                isTyping = false;
+            }
+        }, 40); // سرعة الكتابة
+    }
+</script>
 </body>
 </html>
