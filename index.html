@@ -29,6 +29,7 @@
   padding: 0;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  touch-action: manipulation; /* يمنع الزووم ويخلي النقر يخدم */
 }
 
 body {
@@ -74,7 +75,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-style: italic;
 }
 .top-icons { display: flex; gap: 20px; }
-.top-icons svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; }
+.top-icons svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; cursor: pointer; }
 
 /* ============ MAIN CONTENT ============ */
 .main-content {
@@ -639,7 +640,6 @@ function toggleLike(index, baseLikes) {
   } else {
     btn.classList.add('liked');
     likesEl.textContent = `${(baseLikes + 1).toLocaleString()} إعجاب`;
-    // إشعار وهمي
     setTimeout(() => {
       showIOSBanner('Vibe', `${users[0].name} أعجب بمنشورك أيضاً!`);
     }, 2000);
@@ -676,19 +676,22 @@ function closeModal(id) {
 }
 function addComment() {
   const input = document.getElementById('comment-input');
-  if(!input.value.trim()) return;
+  const text = input.value.trim();
+  if(!text) return; 
+  
   const list = document.getElementById('comments-list');
   const div = document.createElement('div');
   div.className = 'comment-item';
   div.innerHTML = `
     <img src="https://i.pravatar.cc/150?img=11" class="comment-avatar">
     <div>
-      <div class="comment-text"><b>أنت</b> ${input.value}</div>
+      <div class="comment-text"><b>أنت</b> ${text}</div>
       <div class="comment-time">الآن</div>
     </div>
   `;
   list.appendChild(div);
   input.value = '';
+  input.blur();
   list.scrollTop = list.scrollHeight;
 }
 
@@ -771,7 +774,6 @@ function showIOSBanner(title, body) {
 
 function triggerMockNotification() {
   showIOSBanner('رسالة جديدة', 'أحمد: مرحباً، كيف حالك؟');
-  // إضافة إشعار للصفحة
   notificationsData.unshift({
     user: users[0], type: 'message', text: 'أرسل لك رسالة.', time: 'الآن', image: null
   });
@@ -786,28 +788,28 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
-// ============ INIT ============
-window.onload = () => {
+// ============ INITIALIZATION ============
+// تشغيل الدوال مباشرة
+try {
   renderStories();
   renderFeed();
   renderExplore();
   renderProfile();
   renderActivity();
-  
-  setTimeout(() => {
-    document.getElementById('loader').classList.add('hide');
-    // إشعار ترحيبي
-    setTimeout(() => showIOSBanner('مرحباً بك في Vibe', 'استكشف أحدث المنشورات الآن!'), 1500);
-  }, 800);
-};
+} catch(e) {
+  console.log("Error loading data:", e);
+}
 
-// Prevent double tap zoom
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
+// إخفاء اللودر بالقوة بعد نصف ثانية (حتى لو الصور مازال ما حملتش)
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) loader.classList.add('hide');
+  
+  // إشعار ترحيبي
+  setTimeout(() => {
+    showIOSBanner('مرحباً بك في Vibe', 'استكشف أحدث المنشورات الآن!');
+  }, 1000);
+}, 500);
 
 </script>
 </body>
