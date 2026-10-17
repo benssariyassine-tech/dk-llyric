@@ -3,950 +3,650 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#0a0a1a" />
-<title>عجلة الحظ</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#000000" />
+<title>Vibe - iOS Social</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body {
-  height: 100%; overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  background: radial-gradient(circle at 50% 40%, #1a0a2e 0%, #0a0512 60%, #000 100%);
-  color: white; -webkit-user-select: none; user-select: none;
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 10px;
-  position: fixed; inset: 0;
-}
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-::-webkit-scrollbar { width: 0; height: 0; }
-
-/* Background glow effects */
-body::before {
-  content: ""; position: fixed; inset: 0;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(255,215,0,0.08), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(233,69,96,0.08), transparent 40%);
-  pointer-events: none; z-index: 0;
+/* ============ RESET & VARIABLES ============ */
+:root {
+  --bg: #000000;
+  --bg-elevated: #121212;
+  --bg-glass: rgba(18, 18, 18, 0.75);
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #8e8e93;
+  --ios-blue: #0A84FF;
+  --ios-red: #FF453A;
+  --ios-pink: #FF2D55;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
 }
 
-/* ============ HEADER ============ */
-.header {
-  text-align: center; position: relative; z-index: 5;
-  margin-bottom: 6px; flex-shrink: 0;
-}
-.title {
-  font-size: 26px; font-weight: 900;
-  background: linear-gradient(135deg, #ffd700 0%, #ff9500 50%, #ff3b30 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
-  filter: drop-shadow(0 2px 8px rgba(255,215,0,0.3));
-}
-.subtitle {
-  font-size: 11px; color: rgba(255,215,0,0.6);
-  letter-spacing: 3px; text-transform: uppercase; margin-top: 2px;
-  font-weight: 600;
-}
-
-/* ============ WHEEL WRAPPER ============ */
-.wheel-wrapper {
-  position: relative;
-  width: min(88vw, 88vh, 400px);
-  height: min(88vw, 88vh, 400px);
-  margin: 6px auto;
-  flex-shrink: 1;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8));
-  z-index: 2;
-}
-
-/* Outer glow ring */
-.wheel-wrapper::before {
-  content: ""; position: absolute; inset: -12px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, #ffd700, #ff9500, #ff3b30, #ff9500, #ffd700, #ff9500, #ff3b30, #ff9500, #ffd700);
-  z-index: -1;
-  animation: rotateRing 8s linear infinite;
-  filter: blur(6px);
-  opacity: 0.6;
-}
-@keyframes rotateRing {
-  to { transform: rotate(360deg); }
-}
-
-/* Metallic rim */
-.wheel-rim {
-  position: absolute; inset: -6px;
-  border-radius: 50%;
-  background:
-    conic-gradient(from 0deg,
-      #8b6914 0deg, #ffd700 20deg, #b8860b 40deg, #ffd700 60deg,
-      #8b6914 80deg, #ffd700 100deg, #b8860b 120deg, #ffd700 140deg,
-      #8b6914 160deg, #ffd700 180deg, #b8860b 200deg, #ffd700 220deg,
-      #8b6914 240deg, #ffd700 260deg, #b8860b 280deg, #ffd700 300deg,
-      #8b6914 320deg, #ffd700 340deg, #b8860b 360deg);
-  padding: 6px;
-  box-shadow:
-    inset 0 0 12px rgba(0,0,0,0.5),
-    0 0 20px rgba(255,215,0,0.3);
-  z-index: -1;
-}
-
-/* LED lights container */
-.leds {
-  position: absolute; inset: -20px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 3;
-}
-.led {
-  position: absolute;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  left: 50%; top: 50%;
-  margin-left: -4px; margin-top: -4px;
-  box-shadow: 0 0 8px currentColor, 0 0 16px currentColor, inset 0 0 4px #fff;
-  animation: ledBlink 1.5s infinite;
-}
-@keyframes ledBlink {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-/* The rotating wheel */
-#wheel {
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  display: block;
-  transition: none;
-  will-change: transform;
-}
-#wheel.spinning {
-  /* animation handled by JS */
-}
-
-/* Center hub */
-.hub {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 26%; height: 26%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 30%, #fff 0%, #ffd700 15%, #ff9500 40%, #b8860b 70%, #6b4c00 100%);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow:
-    0 0 0 4px rgba(139,105,20,0.9),
-    0 0 0 6px rgba(255,215,0,0.5),
-    0 4px 20px rgba(0,0,0,0.7),
-    inset 0 -4px 8px rgba(0,0,0,0.3),
-    inset 0 4px 8px rgba(255,255,255,0.4);
-  cursor: pointer;
-  z-index: 10;
-  transition: transform 0.15s;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   -webkit-tap-highlight-color: transparent;
-}
-.hub:active:not(.disabled) {
-  transform: translate(-50%, -50%) scale(0.92);
-}
-.hub.disabled { cursor: not-allowed; }
-.hub-text {
-  font-size: clamp(11px, 3vw, 15px);
-  font-weight: 900;
-  color: #5a3800;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-  letter-spacing: -0.5px;
-  text-align: center;
-  line-height: 1;
-}
-.hub.pulse {
-  animation: hubPulse 1.5s infinite;
-}
-@keyframes hubPulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(139,105,20,0.9), 0 0 0 6px rgba(255,215,0,0.5), 0 4px 20px rgba(0,0,0,0.7); }
-  50% { box-shadow: 0 0 0 4px rgba(139,105,20,0.9), 0 0 0 12px rgba(255,215,0,0.2), 0 4px 30px rgba(255,215,0,0.5); }
+  -webkit-touch-callout: none;
 }
 
-/* Top pointer */
-.pointer {
-  position: absolute;
-  top: -18px; left: 50%;
-  transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 14px solid transparent;
-  border-right: 14px solid transparent;
-  border-top: 30px solid #ffd700;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)) drop-shadow(0 0 8px rgba(255,215,0,0.6));
-  z-index: 20;
-  pointer-events: none;
-}
-.pointer::after {
-  content: "";
-  position: absolute;
-  top: -32px; left: -8px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff, #ffd700 50%, #b8860b);
-  box-shadow: 0 0 0 2px #8b6914, 0 2px 6px rgba(0,0,0,0.6);
-}
-
-/* ============ RESULT DISPLAY ============ */
-.result-area {
-  margin-top: 8px;
-  padding: 10px 24px;
-  border-radius: 14px;
-  background: rgba(0,0,0,0.6);
-  border: 2px solid rgba(255,215,0,0.3);
-  backdrop-filter: blur(10px);
-  text-align: center;
-  min-height: 60px;
-  display: flex; align-items: center; justify-content: center;
-  gap: 10px;
-  transition: all 0.4s;
-  z-index: 5;
-  flex-shrink: 0;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-}
-.result-area.win {
-  border-color: #ffd700;
-  box-shadow: 0 0 30px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,215,0,0.1);
-  animation: resultGlow 1s infinite;
-}
-@keyframes resultGlow {
-  0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.5); }
-  50% { box-shadow: 0 0 50px rgba(255,215,0,0.9); }
-}
-.result-label {
-  font-size: 11px;
-  color: rgba(255,215,0,0.7);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-.result-value {
-  font-size: 30px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #ffd700, #ff9500);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 6px rgba(255,215,0,0.5));
-  min-width: 100px;
-  letter-spacing: -1px;
-}
-.result-value.idle {
-  color: rgba(255,255,255,0.3);
-  background: none;
-  -webkit-text-fill-color: rgba(255,255,255,0.3);
-  filter: none;
-}
-
-/* ============ SPIN HISTORY ============ */
-.history {
-  margin-top: 6px;
-  display: flex; gap: 6px;
-  flex-wrap: wrap; justify-content: center;
-  max-width: 90vw;
-  min-height: 24px;
-  z-index: 5;
-}
-.history-pill {
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255,215,0,0.15);
-  border: 1px solid rgba(255,215,0,0.3);
-  font-size: 11px;
-  font-weight: 700;
-  color: #ffd700;
-  animation: pillIn 0.4s ease;
-}
-@keyframes pillIn {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* ============ CONFETTI ============ */
-#confetti-container {
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 100;
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  height: 100vh;
   overflow: hidden;
-}
-.confetti {
-  position: absolute;
-  width: 10px; height: 10px;
-  animation: confettiFall 3s linear forwards;
-  opacity: 0;
-}
-@keyframes confettiFall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* ============ WIN OVERLAY ============ */
-#win-overlay {
-  position: fixed; inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.15), rgba(0,0,0,0.85));
-  display: none;
-  align-items: center; justify-content: center;
-  z-index: 200;
-  backdrop-filter: blur(6px);
-  animation: fadeIn 0.3s ease;
+/* ============ TOP BAR ============ */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(var(--safe-top) + 44px);
+  padding-top: var(--safe-top);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 16px;
+  z-index: 100;
 }
-#win-overlay.show { display: flex; }
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.win-box {
-  text-align: center;
-  padding: 30px 40px;
-  background: linear-gradient(180deg, #1a1a2e, #0a0a1a);
-  border: 2px solid #ffd700;
-  border-radius: 24px;
-  box-shadow: 0 0 60px rgba(255,215,0,0.6), inset 0 0 30px rgba(255,215,0,0.1);
-  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 90vw;
-}
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
-  to { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-.win-icon {
-  font-size: 64px;
-  margin-bottom: 10px;
-  animation: bounce 1s infinite;
-}
-@keyframes bounce {
-  0%, 100% { transform: translateY(0) rotate(-5deg); }
-  50% { transform: translateY(-10px) rotate(5deg); }
-}
-.win-title {
-  font-size: 22px;
-  font-weight: 900;
-  color: #ffd700;
-  margin-bottom: 6px;
-  text-shadow: 0 2px 12px rgba(255,215,0,0.6);
-}
-.win-value {
-  font-size: 52px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #ffd700, #ff9500, #ff3b30);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 4px 12px rgba(255,215,0,0.6));
-  margin: 8px 0;
-  letter-spacing: -2px;
-  animation: pulse 1s infinite;
+  font-style: italic;
 }
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
-.win-sub {
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 20px;
-}
-.win-btn {
-  padding: 14px 32px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #ffd700, #ff9500);
-  color: #3a1a00;
-  font-weight: 900;
-  font-size: 16px;
-  box-shadow: 0 8px 24px rgba(255,215,0,0.5);
-  transition: transform 0.15s;
-}
-.win-btn:active { transform: scale(0.95); }
+.top-icons { display: flex; gap: 16px; }
+.top-icons svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; }
 
-/* ============ LOADING / STATUS ============ */
-.status {
-  margin-top: 4px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 1px;
-  text-align: center;
-  min-height: 16px;
-  z-index: 5;
+/* ============ MAIN CONTENT AREA ============ */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: calc(var(--safe-top) + 44px);
+  padding-bottom: calc(var(--safe-bottom) + 60px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
+.main-content::-webkit-scrollbar { display: none; }
 
-/* Debug */
-#debug {
-  position: fixed; bottom: 4px; left: 4px; right: 4px;
-  background: rgba(0,0,0,0.9); color: #0f0;
-  font-family: monospace; font-size: 10px;
-  padding: 4px 8px; border-radius: 4px;
-  z-index: 999; display: none;
-  max-height: 60px; overflow: auto;
-}
-#debug.show { display: block; }
+.view { display: none; animation: fadeIn 0.3s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-@media (max-width: 360px) {
-  .title { font-size: 22px; }
-  .result-value { font-size: 24px; }
-  .result-area { padding: 8px 16px; }
-  .win-value { font-size: 42px; }
+/* ============ STORIES ============ */
+.stories {
+  display: flex;
+  gap: 14px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  border-bottom: 0.5px solid var(--border);
 }
-@media (max-height: 640px) {
-  .header { margin-bottom: 2px; }
-  .title { font-size: 20px; }
-  .subtitle { display: none; }
-  .result-area { padding: 6px 16px; min-height: 44px; margin-top: 4px; }
-  .result-value { font-size: 22px; }
-  .history { margin-top: 2px; }
+.stories::-webkit-scrollbar { display: none; }
+.story {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer;
 }
+.story-ring {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+  position: relative;
+}
+.story-ring.seen { background: #333; }
+.story-img {
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--bg);
+  background: #222;
+}
+.story-name { font-size: 11px; color: var(--text-secondary); max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.story.add .story-ring { background: none; border: 1px dashed #444; }
+.story.add .story-img { background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; border: none; }
+.story.add svg { width: 24px; height: 24px; stroke: white; }
+
+/* ============ POSTS ============ */
+.post { margin-bottom: 20px; border-bottom: 0.5px solid var(--border); padding-bottom: 16px; }
+.post-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+}
+.post-user { display: flex; align-items: center; gap: 10px; }
+.post-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #333; }
+.post-username { font-size: 14px ; font-weight: 600; }
+.post-location { font-size: 11px; color: var(--text-secondary); }
+.post-more { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2; }
+
+.post-image-container { position: relative; width: 100%; aspect-ratio: 4/5; background: #111; overflow: hidden; }
+.post-image { width: 100%; height: 100%; object-fit: cover; }
+.heart-overlay {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 100px; height: 100px;
+  fill: white; opacity: 0; pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+}
+.heart-overlay.animate { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+.post-actions { display: flex; justify-content: space-between; padding: 12px 16px 8px; }
+.action-group { display: flex; gap: 16px; }
+.action-btn { background: none; border: none; cursor: pointer; padding: 0; }
+.action-btn svg { width: 26px; height: 26px; stroke: white; fill: none; stroke-width: 2; transition: all 0.2s; }
+.action-btn.liked svg { fill: var(--ios-red); stroke: var(--ios-red); animation: heartPop 0.3s; }
+@keyframes heartPop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+.post-likes { padding: 0 16px; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.post-caption { padding: 0 16px; font-size: 14px; line-height: 1.4; }
+.post-caption span { font-weight: 600; margin-left: 6px; }
+.post-comments { padding: 6px 16px 0; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.post-time { padding: 8px 16px 0; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; }
+
+/* ============ EXPLORE GRID ============ */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.grid-item { aspect-ratio: 1; background: #222; cursor: pointer; position: relative; }
+.grid-item img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ============ CREATE SCREEN ============ */
+.create-screen { padding: 20px; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: center; }
+.upload-box {
+  width: 200px; height: 200px;
+  border: 2px dashed #444; border-radius: 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; color: var(--text-secondary); cursor: pointer;
+  background: rgba(255,255,255,0.02); transition: all 0.2s;
+}
+.upload-box:active { background: rgba(255,255,255,0.05); border-color: var(--ios-blue); }
+.upload-box svg { width: 40px; height: 40px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.create-btn { margin-top: 20px; background: var(--ios-blue); color: white; padding: 14px 40px; border-radius: 30px; font-weight: 600; font-size: 16px; border: none; }
+
+/* ============ PROFILE ============ */
+.profile-header { padding: 20px 16px; display: flex; align-items: center; gap: 20px; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+.profile-stats { display: flex; gap: 24px; flex: 1; }
+.stat { display: flex; flex-direction: column; align-items: center; }
+.stat-num { font-size: 18px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--text-secondary); }
+.profile-info { padding: 0 16px 20px; }
+.profile-name { font-weight: 600; font-size: 14px; }
+.profile-bio { font-size: 13px; margin-top: 4px; color: var(--text-secondary); }
+.profile-actions { display: flex; gap: 8px; padding: 0 16px 20px; }
+.profile-btn { flex: 1; background: #1c1c1e; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+.profile-btn.primary { background: var(--ios-blue); }
+.profile-tabs { display: flex; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+.profile-tab { flex: 1; padding: 12px; text-align: center; border-bottom: 2px solid transparent; cursor: pointer; }
+.profile-tab.active { border-bottom-color: white; }
+.profile-tab svg { width: 24px; height: 24px; stroke: var(--text-secondary); }
+.profile-tab.active svg { stroke: white; }
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--safe-bottom) + 50px);
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+.nav-item { padding: 10px; cursor: pointer; position: relative; }
+.nav-item svg { width: 26px; height: 26px; stroke: var(--text-secondary); fill: none; stroke-width: 2; transition: all 0.2s; }
+.nav-item.active svg { stroke: white; fill: white; }
+.nav-item.active[data-tab="create"] svg { stroke: var(--ios-blue); fill: var(--ios-blue); }
+.nav-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; transition: border-color 0.2s; }
+.nav-item.active[data-tab="profile"] .nav-avatar { border-color: white; }
+
+/* ============ STORY VIEWER ============ */
+#story-viewer {
+  position: fixed; inset: 0; background: #000;
+  z-index: 1000; display: none; flex-direction: column;
+  animation: fadeIn 0.2s;
+}
+#story-viewer.show { display: flex; }
+.sv-progress { display: flex; gap: 4px; padding: calc(var(--safe-top) + 10px) 16px 10px; }
+.sv-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+.sv-fill { height: 100%; background: white; width: 0%; }
+.sv-fill.animating { animation: svProgress 5s linear forwards; }
+@keyframes svProgress { from { width: 0%; } to { width: 100%; } }
+.sv-header { display: flex; align-items: center; gap: 10px; padding: 0 16px; color: white; }
+.sv-avatar { width: 32px; height: 32px; border-radius: 50%; }
+.sv-name { font-weight: 600; font-size: 14px; }
+.sv-time { font-size: 12px; opacity: 0.7; }
+.sv-close { margin-left: auto; background: none; border: none; color: white; font-size: 24px; }
+.sv-image { flex: 1; object-fit: contain; width: 100%; }
+
+/* ============ LOADER ============ */
+#loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s; }
+#loader.hide { opacity: 0; pointer-events: none; }
+.spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ NOTIFICATIONS (TOAST) ============ */
+#toast {
+  position: fixed; top: calc(var(--safe-top) + 60px); left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: rgba(30,30,30,0.95); color: white; padding: 12px 24px; border-radius: 30px;
+  font-size: 14px; font-weight: 500; z-index: 2000; opacity: 0; pointer-events: none;
+  transition: all 0.3s; border: 0.5px solid var(--border); backdrop-filter: blur(10px);
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
 </style>
 </head>
 <body>
 
-<!-- Debug -->
-<div id="debug"></div>
+<!-- Loader -->
+<div id="loader"><div class="spinner"></div></div>
 
-<!-- Header -->
-<div class="header">
-  <div class="title">عجلة الحظ</div>
-  <div class="subtitle">Wheel of Fortune</div>
-</div>
-
-<!-- Wheel -->
-<div class="wheel-wrapper">
-  <div class="wheel-rim"></div>
-  <svg id="wheel" viewBox="0 0 400 400">
-    <defs>
-      <!-- Filters -->
-      <filter id="innerShadow">
-        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-        <feOffset dx="0" dy="2" result="offsetblur"/>
-        <feComponentTransfer>
-          <feFuncA type="linear" slope="0.5"/>
-        </feComponentTransfer>
-        <feMerge>
-          <feMergeNode/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
-    <g id="wheel-group">
-      <!-- Segments injected by JS -->
-    </g>
-  </svg>
-  <div class="pointer"></div>
-  <div class="hub" id="hub">
-    <div class="hub-text" id="hub-text">ابدأ</div>
-  </div>
-  <div class="leds" id="leds"></div>
-</div>
-
-<!-- Result -->
-<div class="result-area" id="result-area">
-  <div class="result-label">النتيجة</div>
-  <div class="result-value idle" id="result-value">—</div>
-</div>
-
-<!-- History -->
-<div class="history" id="history"></div>
-
-<!-- Status -->
-<div class="status" id="status">اضغط الزر الذهبي للبدء</div>
-
-<!-- Confetti container -->
-<div id="confetti-container"></div>
-
-<!-- Win overlay -->
-<div id="win-overlay">
-  <div class="win-box">
-    <div class="win-icon">🎉</div>
-    <div class="win-title">مبروك!</div>
-    <div class="win-value">15%</div>
-    <div class="win-sub">لقد فزت بالجائزة الكبرى</div>
-    <button class="win-btn" id="win-close">استمرار</button>
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="logo">Vibe</div>
+  <div class="top-icons">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
   </div>
 </div>
+
+<!-- Main Content -->
+<div class="main-content" id="main-scroll">
+
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="stories" id="stories-container">
+      <div class="story add">
+        <div class="story-ring">
+          <div class="story-img">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="story-name">قصتك</div>
+      </div>
+      <!-- Stories will be injected here -->
+    </div>
+    <div id="feed-container">
+      <!-- Posts will be injected here -->
+    </div>
+  </div>
+
+  <!-- EXPLORE VIEW -->
+  <div class="view" id="view-explore">
+    <div class="grid" id="explore-grid">
+      <!-- Explore images injected here -->
+    </div>
+  </div>
+
+  <!-- CREATE VIEW -->
+  <div class="view" id="view-create">
+    <div class="create-screen">
+      <div class="upload-box">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>اختر صورة</span>
+      </div>
+      <button class="create-btn" onclick="showToast('تم النشر بنجاح! ✨')">متابعة النشر</button>
+    </div>
+  </div>
+
+  <!-- PROFILE VIEW -->
+  <div class="view" id="view-profile">
+    <div class="profile-header">
+      <img src="https://i.pravatar.cc/150?img=11" class="profile-avatar" alt="Profile">
+      <div class="profile-stats">
+        <div class="stat"><span class="stat-num">128</span><span class="stat-label">منشور</span></div>
+        <div class="stat"><span class="stat-num">14.5K</span><span class="stat-label">متابع</span></div>
+        <div class="stat"><span class="stat-num">320</span><span class="stat-label">يتابع</span></div>
+      </div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">ياسين بن سارية</div>
+      <div class="profile-bio">مطور ويب 💻 | مهتم بتقنيات iOS 🍎 | الجزائر 🇩🇿</div>
+    </div>
+    <div class="profile-actions">
+      <button class="profile-btn primary">تعديل الملف</button>
+      <button class="profile-btn">مشاركة</button>
+    </div>
+    <div class="profile-tabs">
+      <div class="profile-tab active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg></div>
+      <div class="profile-tab"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+    </div>
+    <div class="grid" id="profile-grid">
+      <!-- Profile images injected here -->
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item active" data-tab="home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  <div class="nav-item" data-tab="explore">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+  <div class="nav-item" data-tab="create">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+  </div>
+  <div class="nav-item" data-tab="profile">
+    <img src="https://i.pravatar.cc/150?img=11" class="nav-avatar" alt="Profile">
+  </div>
+</div>
+
+<!-- Story Viewer Modal -->
+<div id="story-viewer">
+  <div class="sv-progress" id="sv-progress"></div>
+  <div class="sv-header">
+    <img src="" class="sv-avatar" id="sv-avatar">
+    <div>
+      <div class="sv-name" id="sv-name">User</div>
+      <div class="sv-time">منذ ساعتين</div>
+    </div>
+    <button class="sv-close" onclick="closeStory()">✕</button>
+  </div>
+  <img src="" class="sv-image" id="sv-image">
+</div>
+
+<!-- Toast -->
+<div id="toast">تم!</div>
 
 <script>
-(function() {
-'use strict';
-
-// ============ DEBUG ============
-var debugEl = document.getElementById('debug');
-function log(msg) {
-  console.log('[Wheel] ' + msg);
-  if (debugEl) debugEl.textContent = msg;
-}
-window.addEventListener('error', function(e) {
-  if (debugEl) {
-    debugEl.classList.add('show');
-    debugEl.style.color = '#f00';
-    debugEl.textContent = 'ERROR: ' + e.message + ' @ line ' + e.lineno;
-  }
-});
-
-log('Loading...');
-
-// ============ SEGMENTS CONFIG ============
-// 12 segments, 15% is the WINNER (index 3)
-var SEGMENTS = [
-  { value: '0%',   color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' },
-  { value: '5%',   color1: '#c41e3a', color2: '#8b0000', text: '#ffffff' },
-  { value: '10%',  color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' },
-  { value: '15%',  color1: '#ffd700', color2: '#ff9500', text: '#3a1a00' }, // WINNER
-  { value: '20%',  color1: '#c41e3a', color2: '#8b0000', text: '#ffffff' },
-  { value: '25%',  color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' },
-  { value: '30%',  color1: '#c41e3a', color2: '#8b0000', text: '#ffffff' },
-  { value: '40%',  color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' },
-  { value: '50%',  color1: '#c41e3a', color2: '#8b0000', text: '#ffffff' },
-  { value: '75%',  color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' },
-  { value: '100%', color1: '#c41e3a', color2: '#8b0000', text: '#ffffff' },
-  { value: '0%',   color1: '#7a1a1a', color2: '#5a1010', text: '#ffd7d7' }
+// ============ DATA ============
+const users = [
+  { id: 1, name: 'أحمد', avatar: 'https://i.pravatar.cc/150?img=12' },
+  { id: 2, name: 'سارة', avatar: 'https://i.pravatar.cc/150?img=9' },
+  { id: 3, name: 'محمد', avatar: 'https://i.pravatar.cc/150?img=3' },
+  { id: 4, name: 'ليلى', avatar: 'https://i.pravatar.cc/150?img=5' },
+  { id: 5, name: 'يوسف', avatar: 'https://i.pravatar.cc/150?img=7' }
 ];
 
-var WINNER_INDEX = 3; // 15%
-var N = SEGMENTS.length; // 12
-var SEG_ANGLE = 360 / N; // 30
+const storiesData = [
+  { user: users[0], image: 'https://picsum.photos/id/10/400/800', seen: false },
+  { user: users[1], image: 'https://picsum.photos/id/20/400/800', seen: false },
+  { user: users[2], image: 'https://picsum.photos/id/30/400/800', seen: true },
+  { user: users[3], image: 'https://picsum.photos/id/40/400/800', seen: false },
+  { user: users[4], image: 'https://picsum.photos/id/50/400/800', seen: true }
+];
 
-// ============ BUILD WHEEL ============
-function polarToCartesian(cx, cy, r, angleDeg) {
-  // 0deg = top (12 o'clock), clockwise
-  var rad = (angleDeg - 90) * Math.PI / 180;
-  return {
-    x: cx + r * Math.cos(rad),
-    y: cy + r * Math.sin(rad)
-  };
-}
-
-function segmentPath(cx, cy, r, startAngle, endAngle) {
-  var start = polarToCartesian(cx, cy, r, endAngle);
-  var end = polarToCartesian(cx, cy, r, startAngle);
-  var large = (endAngle - startAngle) <= 180 ? 0 : 1;
-  return [
-    'M', cx, cy,
-    'L', start.x.toFixed(2), start.y.toFixed(2),
-    'A', r, r, 0, large, 0, end.x.toFixed(2), end.y.toFixed(2),
-    'Z'
-  ].join(' ');
-}
-
-function buildWheel() {
-  var group = document.getElementById('wheel-group');
-  group.innerHTML = '';
-
-  var cx = 200, cy = 200, r = 200;
-
-  // Create segments
-  for (var i = 0; i < N; i++) {
-    var seg = SEGMENTS[i];
-    var startAngle = i * SEG_ANGLE;
-    var endAngle = startAngle + SEG_ANGLE;
-    var midAngle = startAngle + SEG_ANGLE / 2;
-
-    // Gradient definition
-    var gradId = 'grad' + i;
-    var grad = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
-    grad.setAttribute('id', gradId);
-    grad.setAttribute('cx', '50%');
-    grad.setAttribute('cy', '50%');
-    grad.setAttribute('r', '75%');
-    var stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    stop1.setAttribute('offset', '0%');
-    stop1.setAttribute('stop-color', seg.color1);
-    var stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-    stop2.setAttribute('offset', '100%');
-    stop2.setAttribute('stop-color', seg.color2);
-    grad.appendChild(stop1);
-    grad.appendChild(stop2);
-
-    var defs = group.parentNode.querySelector('defs') || group.parentNode;
-    // We'll add to the main defs
-    document.querySelector('#wheel defs').appendChild(grad);
-
-    // Segment path
-    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', segmentPath(cx, cy, r, startAngle, endAngle));
-    path.setAttribute('fill', 'url(#' + gradId + ')');
-    path.setAttribute('stroke', '#000');
-    path.setAttribute('stroke-width', '1.5');
-    group.appendChild(path);
-
-    // Divider lines
-    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    var p1 = polarToCartesian(cx, cy, 0, startAngle);
-    var p2 = polarToCartesian(cx, cy, r, startAngle);
-    line.setAttribute('x1', cx);
-    line.setAttribute('y1', cy);
-    line.setAttribute('x2', p2.x);
-    line.setAttribute('y2', p2.y);
-    line.setAttribute('stroke', 'rgba(255,215,0,0.4)');
-    line.setAttribute('stroke-width', '1.5');
-    group.appendChild(line);
-
-    // Text
-    var textPos = polarToCartesian(cx, cy, r * 0.72, midAngle);
-    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', textPos.x);
-    text.setAttribute('y', textPos.y);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'middle');
-    text.setAttribute('fill', seg.text);
-    text.setAttribute('font-size', '22');
-    text.setAttribute('font-weight', '900');
-    text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif');
-    // Rotate text so it faces outward
-    var rotation = midAngle;
-    text.setAttribute('transform', 'rotate(' + rotation + ' ' + textPos.x + ' ' + textPos.y + ')');
-    text.textContent = seg.value;
-    // Add shadow
-    text.setAttribute('filter', 'url(#innerShadow)');
-    group.appendChild(text);
+const postsData = [
+  {
+    user: users[0],
+    image: 'https://picsum.photos/id/101/500/600',
+    likes: 1240,
+    caption: 'غروب الشمس اليوم كان رائعاً 🌅',
+    location: 'الجزائر العاصمة',
+    time: 'منذ 2 ساعة'
+  },
+  {
+    user: users[1],
+    image: 'https://picsum.photos/id/104/500/600',
+    likes: 856,
+    caption: 'جولة في الطبيعة 🌲✨',
+    location: 'جبال الأطلس',
+    time: 'منذ 5 ساعات'
+  },
+  {
+    user: users[2],
+    image: 'https://picsum.photos/id/106/500/600',
+    likes: 3204,
+    caption: 'إبداع بلا حدود 🎨',
+    location: 'وهران',
+    time: 'منذ 8 ساعات'
   }
+];
 
-  // Inner circle (hub area base) - dark ring
-  var innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  innerCircle.setAttribute('cx', cx);
-  innerCircle.setAttribute('cy', cy);
-  innerCircle.setAttribute('r', '52');
-  innerCircle.setAttribute('fill', 'rgba(0,0,0,0.5)');
-  innerCircle.setAttribute('stroke', 'rgba(255,215,0,0.3)');
-  innerCircle.setAttribute('stroke-width', '2');
-  group.appendChild(innerCircle);
-}
+const exploreImages = [
+  'https://picsum.photos/id/201/300/300',
+  'https://picsum.photos/id/202/300/300',
+  'https://picsum.photos/id/203/300/300',
+  'https://picsum.photos/id/204/300/300',
+  'https://picsum.photos/id/205/300/300',
+  'https://picsum.photos/id/206/300/300',
+  'https://picsum.photos/id/207/300/300',
+  'https://picsum.photos/id/208/300/300',
+  'https://picsum.photos/id/209/300/300',
+  'https://picsum.photos/id/210/300/300',
+  'https://picsum.photos/id/211/300/300',
+  'https://picsum.photos/id/212/300/300'
+];
 
-buildWheel();
-log('Wheel built');
-
-// ============ LED LIGHTS ============
-function buildLeds() {
-  var ledsContainer = document.getElementById('leds');
-  ledsContainer.innerHTML = '';
-  var count = 24;
-  for (var i = 0; i < count; i++) {
-    var angle = (360 / count) * i;
-    var led = document.createElement('div');
-    led.className = 'led';
-    var rad = (angle - 90) * Math.PI / 180;
-    var radius = 50; // percentage of parent
-    var x = 50 + radius * Math.cos(rad);
-    var y = 50 + radius * Math.sin(rad);
-    led.style.left = x + '%';
-    led.style.top = y + '%';
-    // Alternate colors
-    led.style.color = i % 2 === 0 ? '#ffd700' : '#ff3b30';
-    led.style.background = i % 2 === 0 ? '#ffd700' : '#ff3b30';
-    led.style.animationDelay = (i * 0.06) + 's';
-    ledsContainer.appendChild(led);
-  }
-}
-buildLeds();
-log('LEDs built');
-
-// ============ AUDIO ============
-var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-var audioCtx = null;
-
-function initAudio() {
-  if (!audioCtx && AudioCtxClass) {
-    try {
-      audioCtx = new AudioCtxClass();
-    } catch(e) { log('Audio error: ' + e.message); }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-}
-
-function playTone(freq, dur, type, vol) {
-  if (!audioCtx) return;
-  try {
-    var osc = audioCtx.createOscillator();
-    var gain = audioCtx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol || 0.08, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + dur);
-  } catch(e) {}
-}
-
-function playTick() {
-  playTone(1800 + Math.random() * 200, 0.03, 'square', 0.05);
-}
-function playClick() {
-  playTone(600, 0.06, 'sine', 0.08);
-}
-function playWinFanfare() {
-  var notes = [523, 659, 784, 1047, 1319];
-  notes.forEach(function(freq, i) {
-    setTimeout(function() {
-      playTone(freq, 0.3, 'triangle', 0.12);
-    }, i * 100);
+// ============ RENDER FUNCTIONS ============
+function renderStories() {
+  const container = document.getElementById('stories-container');
+  storiesData.forEach((story, index) => {
+    const div = document.createElement('div');
+    div.className = 'story';
+    div.innerHTML = `
+      <div class="story-ring ${story.seen ? 'seen' : ''}">
+        <img src="${story.user.avatar}" class="story-img" alt="story">
+      </div>
+      <div class="story-name">${story.user.name}</div>
+    `;
+    div.onclick = () => openStory(index);
+    container.appendChild(div);
   });
 }
-function playWhoosh() {
-  if (!audioCtx) return;
-  try {
-    var bufferSize = audioCtx.sampleRate * 0.3;
-    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    var data = buffer.getChannelData(0);
-    for (var i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
-    }
-    var src = audioCtx.createBufferSource();
-    src.buffer = buffer;
-    var gain = audioCtx.createGain();
-    gain.gain.value = 0.05;
-    var filter = audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 800;
-    src.connect(filter);
-    filter.connect(gain);
-    gain.connect(audioCtx.destination);
-    src.start();
-  } catch(e) {}
+
+function renderFeed() {
+  const container = document.getElementById('feed-container');
+  postsData.forEach((post, index) => {
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = `
+      <div class="post-header">
+        <div class="post-user">
+          <img src="${post.user.avatar}" class="post-avatar" alt="avatar">
+          <div>
+            <div class="post-username">${post.user.name}</div>
+            <div class="post-location">${post.location}</div>
+          </div>
+        </div>
+        <svg class="post-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </div>
+      <div class="post-image-container" id="post-img-${index}">
+        <img src="${post.image}" class="post-image" alt="post">
+        <svg class="heart-overlay" id="heart-${index}" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div class="post-actions">
+        <div class="action-group">
+          <button class="action-btn" id="like-btn-${index}" onclick="toggleLike(${index}, ${post.likes})">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="action-btn"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+          <button class="action-btn"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+        <button class="action-btn"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      </div>
+      <div class="post-likes" id="likes-${index}">${post.likes.toLocaleString()} إعجاب</div>
+      <div class="post-caption"><span>${post.user.name}</span>${post.caption}</div>
+      <div class="post-comments">عرض كل التعليقات (24)</div>
+      <div class="post-time">${post.time}</div>
+    `;
+    
+    // Add double-tap to like
+    setTimeout(() => {
+      const imgContainer = document.getElementById(`post-img-${index}`);
+      let lastTap = 0;
+      imgContainer.addEventListener('click', (e) => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+          // Double tap
+          doubleTapLike(index, post.likes);
+          e.preventDefault();
+        }
+        lastTap = now;
+      });
+    }, 0);
+
+    container.appendChild(div);
+  });
 }
 
-// ============ VIBRATION ============
-function vibrate(ms) {
-  try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e) {}
+function renderExplore() {
+  const container = document.getElementById('explore-grid');
+  exploreImages.forEach(img => {
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.innerHTML = `<img src="${img}" loading="lazy">`;
+    div.onclick = () => showToast('عرض الصورة');
+    container.appendChild(div);
+  });
 }
 
-// ============ STATE ============
-var spinning = false;
-var currentRotation = 0;
-var history = [];
-
-// ============ SPIN LOGIC ============
-function spin() {
-  if (spinning) return;
-
-  initAudio();
-  playWhoosh();
-  vibrate(20);
-
-  spinning = true;
-
-  var hub = document.getElementById('hub');
-  var hubText = document.getElementById('hub-text');
-  var status = document.getElementById('status');
-  var resultArea = document.getElementById('result-area');
-  var resultValue = document.getElementById('result-value');
-
-  hub.classList.add('disabled');
-  hub.classList.remove('pulse');
-  hubText.textContent = '...';
-  status.textContent = 'العجلة تدور...';
-  resultArea.classList.remove('win');
-  resultValue.classList.add('idle');
-  resultValue.textContent = '—';
-
-  // Calculate target rotation
-  // Segment i occupies [i * SEG_ANGLE, (i+1) * SEG_ANGLE] in wheel's local coords (clockwise from top)
-  // To land winner under pointer (top), we need:
-  //   wheel rotation + segment mid angle ≡ 0 (mod 360)
-  //   wheel rotation ≡ -midAngle (mod 360)
-  // Winner mid angle = WINNER_INDEX * SEG_ANGLE + SEG_ANGLE / 2
-  var winnerMidAngle = WINNER_INDEX * SEG_ANGLE + SEG_ANGLE / 2;
-  var targetAngle = (360 - winnerMidAngle) % 360; // rotation to bring winner mid to top
-
-  // Add randomness within the segment (safely within boundaries)
-  var safeRange = (SEG_ANGLE / 2) - 4; // 11 degrees of safe zone
-  var randomOffset = (Math.random() * 2 - 1) * safeRange;
-  var finalAngle = targetAngle + randomOffset;
-
-  // Full rotations
-  var fullSpins = 6 + Math.floor(Math.random() * 3); // 6-8 rotations
-
-  // Current rotation modulo 360
-  var currentMod = ((currentRotation % 360) + 360) % 360;
-
-  // Calculate total additional rotation
-  // We want: (currentMod + additionalRotation) % 360 = finalAngle
-  var neededRotation = (finalAngle - currentMod + 360) % 360;
-  var totalRotation = fullSpins * 360 + neededRotation;
-
-  var startRotation = currentRotation;
-  var endRotation = currentRotation + totalRotation;
-
-  // Animation timing
-  var duration = 5500 + Math.random() * 1000; // 5.5-6.5 seconds
-  var startTime = performance.now();
-
-  // Tick tracking
-  var lastTickSegment = Math.floor(startRotation / SEG_ANGLE);
-
-  // Animation loop
-  function animate(now) {
-    var elapsed = now - startTime;
-    var progress = Math.min(1, elapsed / duration);
-
-    // Ease out quint - very smooth and dramatic
-    var eased = 1 - Math.pow(1 - progress, 5);
-
-    var rot = startRotation + (endRotation - startRotation) * eased;
-
-    // Apply rotation (negate for counterclockwise feel? No, we want clockwise)
-    // Actually for clockwise, positive rotation in CSS = clockwise
-    var wheel = document.getElementById('wheel');
-    // We need to rotate around center 200,200
-    wheel.style.transform = 'rotate(' + rot + 'deg)';
-    wheel.style.transformOrigin = '200px 200px';
-
-    // Tick sound on segment boundary crossing
-    var currentSeg = Math.floor(rot / SEG_ANGLE);
-    if (currentSeg !== lastTickSegment) {
-      lastTickSegment = currentSeg;
-      playTick();
-      // Small vibration on each tick
-      if (progress < 0.85) {
-        vibrate(5);
-      }
-    }
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      // Done
-      currentRotation = endRotation;
-      spinning = false;
-      hub.classList.remove('disabled');
-      hub.classList.add('pulse');
-      hubText.textContent = 'ابدأ';
-      onSpinComplete();
-    }
+function renderProfile() {
+  const container = document.getElementById('profile-grid');
+  for (let i = 0; i < 9; i++) {
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.innerHTML = `<img src="https://picsum.photos/id/${300+i}/300/300" loading="lazy">`;
+    container.appendChild(div);
   }
-
-  requestAnimationFrame(animate);
 }
 
-function onSpinComplete() {
-  var winner = SEGMENTS[WINNER_INDEX];
-  var resultArea = document.getElementById('result-area');
-  var resultValue = document.getElementById('result-value');
-  var status = document.getElementById('status');
+// ============ INTERACTIONS ============
+function toggleLike(index, baseLikes) {
+  const btn = document.getElementById(`like-btn-${index}`);
+  const likesEl = document.getElementById(`likes-${index}`);
+  const isLiked = btn.classList.contains('liked');
+  
+  if (isLiked) {
+    btn.classList.remove('liked');
+    likesEl.textContent = `${baseLikes.toLocaleString()} إعجاب`;
+  } else {
+    btn.classList.add('liked');
+    likesEl.textContent = `${(baseLikes + 1).toLocaleString()} إعجاب`;
+  }
+}
 
-  // Show result
-  resultValue.classList.remove('idle');
-  resultValue.textContent = winner.value;
-  resultArea.classList.add('win');
-  status.textContent = '🏆 ربحت الجائزة الكبرى!';
-
-  // Play win sound
-  playWinFanfare();
-  vibrate([100, 50, 100, 50, 300]);
-
-  // Confetti
-  setTimeout(function() {
-    launchConfetti();
-  }, 200);
-
-  // Show win overlay after short delay
-  setTimeout(function() {
-    document.getElementById('win-overlay').classList.add('show');
+function doubleTapLike(index, baseLikes) {
+  const btn = document.getElementById(`like-btn-${index}`);
+  const likesEl = document.getElementById(`likes-${index}`);
+  const heart = document.getElementById(`heart-${index}`);
+  
+  btn.classList.add('liked');
+  likesEl.textContent = `${(baseLikes + 1).toLocaleString()} إعجاب`;
+  
+  // Animate heart
+  heart.classList.add('animate');
+  setTimeout(() => {
+    heart.classList.remove('animate');
   }, 800);
-
-  // Add to history
-  history.unshift(winner.value);
-  if (history.length > 8) history.pop();
-  renderHistory();
 }
 
-function renderHistory() {
-  var container = document.getElementById('history');
-  container.innerHTML = '';
-  history.forEach(function(val, i) {
-    var pill = document.createElement('div');
-    pill.className = 'history-pill';
-    pill.textContent = val;
-    pill.style.opacity = String(1 - i * 0.1);
-    container.appendChild(pill);
+// ============ STORY VIEWER ============
+let currentStoryIndex = 0;
+let storyTimer = null;
+
+function openStory(index) {
+  currentStoryIndex = index;
+  const viewer = document.getElementById('story-viewer');
+  viewer.classList.add('show');
+  renderStoryContent();
+}
+
+function renderStoryContent() {
+  const story = storiesData[currentStoryIndex];
+  document.getElementById('sv-avatar').src = story.user.avatar;
+  document.getElementById('sv-name').textContent = story.user.name;
+  document.getElementById('sv-image').src = story.image;
+  
+  // Progress bar
+  const progressContainer = document.getElementById('sv-progress');
+  progressContainer.innerHTML = '';
+  storiesData.forEach((_, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'sv-bar';
+    const fill = document.createElement('div');
+    fill.className = 'sv-fill';
+    if (i < currentStoryIndex) fill.style.width = '100%';
+    if (i === currentStoryIndex) fill.classList.add('animating');
+    bar.appendChild(fill);
+    progressContainer.appendChild(bar);
   });
+  
+  clearTimeout(storyTimer);
+  storyTimer = setTimeout(() => {
+    nextStory();
+  }, 5000);
 }
 
-// ============ CONFETTI ============
-function launchConfetti() {
-  var container = document.getElementById('confetti-container');
-  var colors = ['#ffd700', '#ff9500', '#ff3b30', '#ff6b6b', '#ffffff', '#ffcc00', '#c41e3a'];
-  var count = 60;
-
-  for (var i = 0; i < count; i++) {
-    (function(index) {
-      setTimeout(function() {
-        var c = document.createElement('div');
-        c.className = 'confetti';
-        c.style.left = Math.random() * 100 + '%';
-        c.style.top = '-20px';
-        c.style.background = colors[Math.floor(Math.random() * colors.length)];
-        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-        c.style.width = (6 + Math.random() * 8) + 'px';
-        c.style.height = (6 + Math.random() * 8) + 'px';
-        var duration = 2.5 + Math.random() * 2;
-        c.style.animationDuration = duration + 's';
-        c.style.animationDelay = (Math.random() * 0.5) + 's';
-        container.appendChild(c);
-        setTimeout(function() {
-          if (c.parentNode) c.parentNode.removeChild(c);
-        }, (duration + 1) * 1000);
-      }, index * 25);
-    })(i);
+function nextStory() {
+  if (currentStoryIndex < storiesData.length - 1) {
+    currentStoryIndex++;
+    renderStoryContent();
+  } else {
+    closeStory();
   }
 }
 
-// ============ EVENT LISTENERS ============
-var hub = document.getElementById('hub');
-hub.addEventListener('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  spin();
-});
-hub.addEventListener('touchend', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  spin();
-}, { passive: false });
+function closeStory() {
+  document.getElementById('story-viewer').classList.remove('show');
+  clearTimeout(storyTimer);
+}
 
-document.getElementById('win-close').addEventListener('click', function() {
-  document.getElementById('win-overlay').classList.remove('show');
+// ============ NAVIGATION ============
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // Update active nav
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+    item.classList.add('active');
+    
+    // Switch view
+    const tab = item.dataset.tab;
+    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+    document.getElementById(`view-${tab}`).classList.add('active');
+    
+    // Scroll to top
+    document.getElementById('main-scroll').scrollTop = 0;
+  });
 });
 
-// Also allow spinning by tapping the wheel itself
-document.getElementById('wheel').addEventListener('click', function(e) {
-  // Only if not spinning and click is outside hub
-  if (!spinning) {
-    var rect = e.target.getBoundingClientRect();
-    // Ignore if clicking near center
-    var cx = rect.left + rect.width / 2;
-    var cy = rect.top + rect.height / 2;
-    var dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2));
-    if (dist > rect.width * 0.2) {
-      spin();
-    }
+// ============ TOAST ============
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ============ INIT ============
+window.onload = () => {
+  renderStories();
+  renderFeed();
+  renderExplore();
+  renderProfile();
+  
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hide');
+  }, 800);
+};
+
+// Prevent double tap zoom on iOS
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    e.preventDefault();
   }
-});
-
-// Initial pulse on hub
-hub.classList.add('pulse');
-
-// Preload audio context on first interaction
-document.addEventListener('touchstart', function once() {
-  initAudio();
-  document.removeEventListener('touchstart', once);
-}, { passive: true });
-document.addEventListener('click', function once() {
-  initAudio();
-  document.removeEventListener('click', once);
-});
-
-// Prevent double-tap zoom
-var lastTouch = 0;
-document.addEventListener('touchend', function(e) {
-  var now = Date.now();
-  if (now - lastTouch <= 300) e.preventDefault();
-  lastTouch = now;
+  lastTouchEnd = now;
 }, { passive: false });
 
-log('Ready! Press SPIN to start');
-
-})();
 </script>
-
 </body>
 </html>
