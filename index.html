@@ -14,7 +14,6 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* خلفية ديناميكية */
     body::before {
         content: ''; position: fixed; inset: 0;
         background: radial-gradient(circle at 10% 20%, rgba(227, 6, 19, 0.15) 0%, transparent 40%),
@@ -28,7 +27,6 @@
         max-width: 500px; margin: 0 auto; min-height: 100vh;
     }
 
-    /* الترويسة */
     header { text-align: center; margin-bottom: 25px; }
     .logo {
         width: 80px; height: 80px; border-radius: 24px;
@@ -40,7 +38,6 @@
     h1 { font-size: 24px; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.5px; }
     p.sub { font-size: 13px; color: #888; }
 
-    /* صندوق الإدخال (اللصق) */
     .input-card {
         background: rgba(28, 28, 30, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -69,7 +66,6 @@
     .btn-paste:active { transform: scale(0.96); }
     .btn-clear { background: #333; color: white; flex: 0.4; }
     
-    /* لوحة النتائج */
     #results-dashboard { display: none; animation: slideUp 0.4s ease; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -78,11 +74,22 @@
         text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
     }
 
+    /* بطاقة المجموع الكلي */
+    .total-card {
+        background: linear-gradient(135deg, #007aff, #0a84ff);
+        border-radius: 20px; padding: 20px; text-align: center;
+        margin-bottom: 20px; position: relative; overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3);
+    }
+    .total-label { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 8px; font-weight: 600; }
+    .total-amount { font-size: 42px; font-weight: 900; color: #fff; line-height: 1.1; }
+    .total-sub { font-size: 16px; color: rgba(255,255,255,0.9); font-weight: 600; margin-top: 4px; }
+
     /* بطاقة الرصيد */
     .credit-card {
         background: linear-gradient(135deg, #1c1c1e, #0a0a0a);
         border: 1px solid #333; border-radius: 20px;
-        padding: 25px 20px; text-align: center;
+        padding: 20px; text-align: center;
         margin-bottom: 20px; position: relative; overflow: hidden;
     }
     .credit-card::before {
@@ -90,8 +97,8 @@
         background: linear-gradient(90deg, #e30613, #ff4d4d);
     }
     .credit-label { font-size: 14px; color: #aaa; margin-bottom: 8px; }
-    .credit-amount { font-size: 48px; font-weight: 900; color: #fff; }
-    .credit-currency { font-size: 20px; color: #aaa; font-weight: 500; }
+    .credit-amount { font-size: 40px; font-weight: 900; color: #fff; }
+    .credit-currency { font-size: 18px; color: #aaa; font-weight: 500; }
 
     /* بطاقات الإنترنت */
     .data-card {
@@ -107,14 +114,11 @@
     .data-amount { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 8px; }
     .data-amount span { font-size: 14px; color: #888; font-weight: 400; }
     
-    /* شريط التقدم */
     .progress-bg { width: 100%; height: 8px; background: #000; border-radius: 10px; overflow: hidden; }
     .progress-fill { height: 100%; border-radius: 10px; transition: width 1s ease-out; }
     .fill-blue { background: linear-gradient(90deg, #007aff, #5ac8fa); }
-    .fill-green { background: linear-gradient(90deg, #34c759, #28cd41); }
     .fill-orange { background: linear-gradient(90deg, #ff9500, #ffcc00); }
 
-    /* إشعار */
     #toast {
         position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
         background: #333; color: white; padding: 12px 24px; border-radius: 30px;
@@ -135,42 +139,40 @@
         <p class="sub">قراءة ذكية لبيانات الرصيد</p>
     </header>
 
-    <!-- صندوق الإدخال -->
     <div class="input-card">
         <p style="font-size: 13px; color: #aaa; margin-bottom: 12px; line-height: 1.5;">
             اطلب الكود <b style="color: #fff;">*710#</b>، انسخ الرسالة الناتجة، والصقها هنا لتحليلها:
         </p>
         <textarea id="ussd-input" placeholder="Crédit 0 DA. Internet: 970.63Mo au 19 oct. 2026 ..."></textarea>
         <div class="btn-group">
-            <button class="btn btn-paste" onclick="pasteAndParse()">
-                📋 لصق وتحليل
-            </button>
-            <button class="btn btn-clear" onclick="clearInput()">
-                🗑️
-            </button>
+            <button class="btn btn-paste" onclick="pasteAndParse()">📋 لصق وتحليل</button>
+            <button class="btn btn-clear" onclick="clearInput()">🗑️</button>
         </div>
     </div>
 
-    <!-- لوحة النتائج -->
     <div id="results-dashboard">
-        <div class="section-title">الرصيد المتبقي</div>
         
+        <!-- المجموع الكلي للأنترنت -->
+        <div class="total-card">
+            <div class="total-label">إجمالي الأنترنت المتبقي</div>
+            <div class="total-amount" id="out-total-mb">0</div>
+            <div class="total-sub">ميجا (Mo)</div>
+        </div>
+
+        <div class="section-title">الرصيد المتبقي</div>
         <div class="credit-card">
             <div class="credit-label">الرصيد الحالي</div>
             <div class="credit-amount"><span id="out-credit">0</span> <span class="credit-currency">دج</span></div>
         </div>
 
-        <div class="section-title">عروض الإنترنت</div>
-        <div id="data-container">
-            <!-- سيتم ملؤها ديناميكياً بالجافاسكريبت -->
-        </div>
+        <div class="section-title">تفاصيل العروض</div>
+        <div id="data-container"></div>
     </div>
 </div>
 
 <div id="toast">تم التحليل بنجاح!</div>
 
 <script>
-    // دالة إظهار الإشعارات
     let toastTimer;
     function showToast(msg) {
         const toast = document.getElementById('toast');
@@ -180,17 +182,14 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // تفريغ الحقل
     function clearInput() {
         document.getElementById('ussd-input').value = '';
         document.getElementById('results-dashboard').style.display = 'none';
     }
 
-    // لصق من الحافظة (Clipboard) وتحليل
     async function pasteAndParse() {
         const input = document.getElementById('ussd-input');
         try {
-            // محاولة القراءة من الحافظة (تدعم المتصفحات الحديثة)
             if (navigator.clipboard && window.isSecureContext) {
                 const text = await navigator.clipboard.readText();
                 input.value = text;
@@ -200,47 +199,42 @@
             }
             parseText();
         } catch (err) {
-            // إذا فشلت القراءة التلقائية، المستخدم يمكنه اللصق يدوياً
             showToast("الرجاء اللصق يدوياً في الصندوق");
             input.focus();
         }
     }
 
-    // المستمع لحدث اللصق اليدوي (لأجهزة الآيفون)
     document.getElementById('ussd-input').addEventListener('input', parseText);
 
-    // ==========================================
-    // محرك التحليل (Regex Parser)
-    // ==========================================
     function parseText() {
         const text = document.getElementById('ussd-input').value;
         if (!text || text.trim().length < 5) return;
 
         const dashboard = document.getElementById('results-dashboard');
         const outCredit = document.getElementById('out-credit');
+        const outTotalMb = document.getElementById('out-total-mb');
         const dataContainer = document.getElementById('data-container');
 
-        // 1. استخراج الرصيد (Credit)
-        // يبحث عن كلمة Crédit متبوعة برقم ثم DA
+        // استخراج الرصيد
         const creditMatch = text.match(/Crédit\s*([\d.,]+)\s*DA/i);
         outCredit.textContent = creditMatch ? creditMatch[1] : '0';
 
-        // 2. استخراج عروض الإنترنت (Data)
         dataContainer.innerHTML = '';
         let foundData = false;
+        let totalInternet = 0; // متغير لحساب المجموع
 
-        // Regex لالتقاط: Internet: 970.63Mo au 19 oct. 2026
-        // ملاحظة: النص قد يحتوي على "Internet:2964.34 Mo." (بدون مسافة)
+        // استخراج الإنترنت
         const internetRegex = /Internet\s*:\s*([\d.,]+)\s*Mo\.?\s*au\s*([^I]+?)(?=\s*Internet|\s*Bonus|$)/gi;
         let match;
 
         while ((match = internetRegex.exec(text)) !== null) {
             foundData = true;
-            const amount = match[1];
+            const amount = parseFloat(match[1].replace(',', '.'));
+            totalInternet += amount; // نجمع القيمة
+            
             const date = match[2].trim();
-            // افتراض حد أقصى للعرض (مثلاً 5 جيجا) لرسم شريط التقدم
             const maxCap = 5000; 
-            const percentage = Math.min((parseFloat(amount) / maxCap) * 100, 100);
+            const percentage = Math.min((amount / maxCap) * 100, 100);
             
             const card = document.createElement('div');
             card.className = 'data-card';
@@ -248,26 +242,27 @@
                 <div class="data-header">
                     <div class="data-title">
                         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                        إنترنت أساسي
+                        إنترنت
                     </div>
                     <div class="data-date">حتى ${date}</div>
                 </div>
-                <div class="data-amount">${amount} <span>ميجا</span></div>
+                <div class="data-amount">${match[1]} <span>ميجا</span></div>
                 <div class="progress-bg"><div class="progress-fill fill-blue" style="width: 0%"></div></div>
             `;
             dataContainer.appendChild(card);
-            // أنيميشن شريط التقدم
             setTimeout(() => card.querySelector('.progress-fill').style.width = percentage + '%', 100);
         }
 
-        // Regex لالتقاط البونص: Bonus Data: 500Mo au 241026
+        // استخراج البونص
         const bonusRegex = /Bonus\s*Data\s*:\s*([\d.,]+)\s*Mo\.?\s*au\s*([^I]+?)(?=\s*Internet|\s*Bonus|$)/gi;
         while ((match = bonusRegex.exec(text)) !== null) {
             foundData = true;
-            const amount = match[1];
+            const amount = parseFloat(match[1].replace(',', '.'));
+            totalInternet += amount; // نجمع القيمة
+
             const date = match[2].trim();
             const maxCap = 1000;
-            const percentage = Math.min((parseFloat(amount) / maxCap) * 100, 100);
+            const percentage = Math.min((amount / maxCap) * 100, 100);
 
             const card = document.createElement('div');
             card.className = 'data-card';
@@ -279,7 +274,7 @@
                     </div>
                     <div class="data-date">حتى ${date}</div>
                 </div>
-                <div class="data-amount">${amount} <span>ميجا</span></div>
+                <div class="data-amount">${match[1]} <span>ميجا</span></div>
                 <div class="progress-bg"><div class="progress-fill fill-orange" style="width: 0%"></div></div>
             `;
             dataContainer.appendChild(card);
@@ -292,7 +287,9 @@
             return;
         }
 
-        // إظهار اللوحة
+        // عرض المجموع الكلي (بميجا)
+        outTotalMb.textContent = totalInternet.toFixed(2);
+
         dashboard.style.display = 'block';
         showToast("تم تحليل الرصيد بنجاح! 🎉");
     }
