@@ -3,546 +3,119 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#050505" />
-<title>النجاة في الغابة الحمراء</title>
+<meta name="theme-color" content="#000000" />
+<title>مساعد جيزي السريع</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body, html {
         width: 100%; height: 100%; overflow: hidden;
-        background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        touch-action: manipulation; color: white;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #0a0a0a; color: #ffffff;
+        touch-action: manipulation;
     }
 
-    /* ============ الخلفية السينمائية ============ */
-    #game-container {
-        position: relative; width: 100%; height: 100%;
-        overflow: hidden; background: #050505;
+    /* شاشة التطبيق */
+    #app {
+        display: flex; flex-direction: column; height: 100%;
+        padding: 20px; padding-top: 60px;
+        background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
     }
 
-    /* تأثير البيئة (غابة/ضباب) - يتغير حسب المشهد */
-    #environment {
-        position: absolute; inset: 0;
-        transition: background 2s ease-in-out, filter 2s ease-in-out;
-        background: radial-gradient(circle at center, #1a2a1a 0%, #050505 100%);
+    /* الترويسة */
+    header {
+        text-align: center; margin-bottom: 30px;
     }
+    .logo-icon {
+        width: 70px; height: 70px; border-radius: 50%;
+        background: linear-gradient(135deg, #e30613, #b00510);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 15px; box-shadow: 0 0 30px rgba(227, 6, 19, 0.4);
+    }
+    .logo-icon svg { width: 40px; height: 40px; fill: white; }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+    p.subtitle { font-size: 14px; color: #888; }
 
-    /* تأثير الأشجار (ظلال متحركة) */
-    .tree-shadow {
-        position: absolute; bottom: -10%; width: 30%; height: 100%;
-        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-        filter: blur(10px); opacity: 0.7;
+    /* الأزرار الرئيسية */
+    .actions-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        margin-bottom: 20px;
     }
-    .tree-1 { left: -5%; transform: skewX(10deg); }
-    .tree-2 { right: -5%; transform: skewX(-10deg); }
-    
-    /* الجزيئات (غبار/يراعات) */
-    .particle {
-        position: absolute; width: 4px; height: 4px; border-radius: 50%;
-        background: rgba(255, 255, 200, 0.6); box-shadow: 0 0 10px rgba(255,255,200,0.8);
-        animation: float 10s infinite linear; pointer-events: none;
+    .action-card {
+        background: #1c1c1e; border: 1px solid #333;
+        border-radius: 16px; padding: 20px 10px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 10px; cursor: pointer; text-decoration: none; color: white;
+        transition: transform 0.1s, background 0.2s;
     }
-    @keyframes float {
-        0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
-    }
+    .action-card:active { transform: scale(0.96); background: #2c2c2e; }
+    .action-card svg { width: 30px; height: 30px; stroke: #e30613; fill: none; stroke-width: 2; }
+    .action-card span { font-size: 13px; font-weight: 600; text-align: center; }
 
-    /* الأشرطة السينمائية (Letterbox) */
-    .cinematic-bar {
-        position: absolute; left: 0; width: 100%; height: 8vh;
-        background: #000; z-index: 100; pointer-events: none;
-        transition: height 1s ease-in-out;
+    /* معلومات إضافية */
+    .info-box {
+        background: rgba(255, 255, 255, 0.05); border-radius: 12px;
+        padding: 15px; font-size: 13px; color: #aaa; line-height: 1.6;
+        text-align: center; margin-top: auto; margin-bottom: 20px;
     }
-    .top-bar { top: 0; }
-    .bottom-bar { bottom: 0; }
+    .info-box b { color: #fff; }
 
-    /* تأثير الاهتزاز للرعب */
-    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-    @keyframes shake {
-        10%, 90% { transform: translate3d(-2px, 0, 0); }
-        20%, 80% { transform: translate3d(4px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-        40%, 60% { transform: translate3d(6px, 0, 0); }
+    /* تأثير النقر */
+    .toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+        background: #333; color: white; padding: 10px 20px; border-radius: 20px;
+        font-size: 14px; opacity: 0; transition: all 0.3s; pointer-events: none;
+        z-index: 100; white-space: nowrap;
     }
-
-    /* وميض أبيض/أحمر للصدمات */
-    .flash { position: absolute; inset: 0; pointer-events: none; z-index: 500; opacity: 0; transition: opacity 0.2s; }
-    .flash.white { background: #fff; }
-    .flash.red { background: #ff0000; mix-blend-mode: overlay; }
-
-    /* ============ واجهة المستخدم ============ */
-    #ui-layer {
-        position: absolute; inset: 0; z-index: 200;
-        display: flex; flex-direction: column; justify-content: flex-end;
-        padding: 10vh 5% 12vh 5%;
-        pointer-events: none;
-    }
-
-    #dialogue-box {
-        background: rgba(10, 10, 10, 0.85);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 12px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
-        pointer-events: auto;
-        display: none;
-        position: relative;
-    }
-
-    #speaker {
-        position: absolute; top: -16px; right: 20px;
-        background: #e74c3c; color: white;
-        padding: 4px 20px; border-radius: 20px;
-        font-weight: bold; font-size: 14px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        display: none;
-    }
-
-    #text {
-        font-size: clamp(16px, 4vw, 20px);
-        line-height: 1.8; color: #eee;
-        min-height: 80px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
-
-    /* ============ الأزرار والخيارات ============ */
-    #choices-container {
-        display: flex; flex-direction: column; gap: 12px;
-        margin-top: 20px; pointer-events: auto;
-        display: none;
-    }
-
-    .choice-btn {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white; padding: 15px 20px;
-        border-radius: 8px; font-size: 16px; text-align: right;
-        cursor: pointer; transition: all 0.2s;
-        backdrop-filter: blur(5px);
-    }
-
-    .choice-btn:hover, .choice-btn:active {
-        background: rgba(231, 76, 60, 0.3);
-        border-color: #e74c3c;
-        transform: translateX(-5px);
-        box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
-    }
-
-    /* ============ شاشة البداية ============ */
-    #start-screen {
-        position: absolute; inset: 0; z-index: 1000;
-        background: #000; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; text-align: center;
-        transition: opacity 1s ease;
-    }
-    #start-screen h1 {
-        font-size: clamp(28px, 6vw, 48px);
-        color: #e74c3c; letter-spacing: 2px;
-        text-shadow: 0 0 20px rgba(231,76,60,0.5);
-        margin-bottom: 10px; animation: pulse 2s infinite;
-    }
-    #start-screen p { color: #888; margin-bottom: 40px; font-size: 16px; }
-    #start-btn {
-        padding: 15px 50px; font-size: 18px; font-weight: bold;
-        background: transparent; color: white;
-        border: 2px solid #e74c3c; border-radius: 5px;
-        cursor: pointer; transition: all 0.3s; letter-spacing: 1px;
-    }
-    #start-btn:hover, #start-btn:active {
-        background: #e74c3c; box-shadow: 0 0 30px rgba(231,76,60,0.8);
-    }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(231,76,60,0.5); }
-        50% { opacity: 0.8; text-shadow: 0 0 40px rgba(231,76,60,0.8); }
-    }
-
-    /* شاشة النهاية */
-    #end-screen {
-        position: absolute; inset: 0; z-index: 900;
-        background: #000; display: none; flex-direction: column;
-        align-items: center; justify-content: center; text-align: center;
-        padding: 20px;
-    }
-    #end-title { font-size: 40px; margin-bottom: 20px; }
-    #end-desc { color: #aaa; font-size: 18px; margin-bottom: 40px; max-width: 600px; line-height: 1.6; }
-    #restart-btn {
-        padding: 12px 30px; background: #333; color: white;
-        border: 1px solid #555; border-radius: 5px; font-size: 16px; cursor: pointer;
-    }
-
-    /* مؤشر المتابعة */
-    .click-indicator {
-        position: absolute; bottom: 15px; left: 20px;
-        color: #666; font-size: 12px; animation: blink 1.5s infinite;
-        display: none;
-    }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<div id="game-container">
-    <!-- تأثيرات البيئة -->
-    <div id="environment"></div>
-    <div class="tree-shadow tree-1"></div>
-    <div class="tree-shadow tree-2"></div>
-    <div id="particles-container"></div>
-
-    <!-- وميض الصدمات -->
-    <div class="flash white" id="flash-white"></div>
-    <div class="flash red" id="flash-red"></div>
-
-    <!-- الأشرطة السينمائية -->
-    <div class="cinematic-bar top-bar"></div>
-    <div class="cinematic-bar bottom-bar"></div>
-
-    <!-- واجهة اللاعب -->
-    <div id="ui-layer">
-        <div id="dialogue-box">
-            <div id="speaker"></div>
-            <div id="text"></div>
-            <div class="click-indicator" id="click-hint">انقر للمتابعة ▼</div>
+<div id="app">
+    <header>
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
         </div>
-        <div id="choices-container"></div>
+        <h1>مساعد جيزي السريع</h1>
+        <p class="subtitle">كل ما تحتاجه في مكان واحد</p>
+    </header>
+
+    <div class="actions-grid">
+        <a href="tel:*710%23" class="action-card" onclick="showToast('جاري فتح الاتصال...')">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>فحص الرصيد<br>*710#</span>
+        </a>
+        <a href="tel:*700%23" class="action-card" onclick="showToast('جاري فتح الاتصال...')">
+            <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>تعبئة الرصيد<br>*700#</span>
+        </a>
+        <a href="tel:*720%23" class="action-card" onclick="showToast('جاري فتح الاتصال...')">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <span>الإنترنت<br>*720#</span>
+        </a>
+        <a href="tel:*777%23" class="action-card" onclick="showToast('جاري فتح الاتصال...')">
+            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>خدمة العملاء<br>*777#</span>
+        </a>
     </div>
 
-    <!-- شاشة البداية -->
-    <div id="start-screen">
-        <h1>الغابة الحمراء</h1>
-        <p>قصة نجاة تفاعلية - قراراتك تحدد مصيرك</p>
-        <button id="start-btn">ابدأ القصة</button>
-    </div>
-
-    <!-- شاشة النهاية -->
-    <div id="end-screen">
-        <div id="end-title"></div>
-        <div id="end-desc"></div>
-        <button id="restart-btn" onclick="location.reload()">إعادة المحاولة</button>
+    <div class="info-box">
+        <b>ملاحظة:</b> هذا التطبيق لا يقرأ رصيدك تلقائياً. عند النقر على أي زر، سيتم فتح تطبيق الاتصال في هاتفك مباشرة مع الكود المطلوب، وستظهر لك النتيجة على شاشة الهاتف.
     </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-// ==========================================
-// 1. محرك الصوت (Web Audio API)
-// ==========================================
-let audioCtx = null;
-function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-function playSound(type) {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
-
-    const t = audioCtx.currentTime;
-    if (type === 'click') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(800, t);
-        gain.gain.setValueAtTime(0.1, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-        osc.start(t); osc.stop(t + 0.1);
-    } else if (type === 'scary') {
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, t);
-        osc.frequency.exponentialRampToValueAtTime(40, t + 1);
-        gain.gain.setValueAtTime(0.3, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + 1);
-        osc.start(t); osc.stop(t + 1);
-    } else if (type === 'heartbeat') {
-        osc.type = 'sine'; osc.frequency.setValueAtTime(60, t);
-        gain.gain.setValueAtTime(0.5, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-        osc.start(t); osc.stop(t + 0.2);
-        setTimeout(() => {
-            const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain();
-            osc2.connect(gain2); gain2.connect(audioCtx.destination);
-            osc2.frequency.setValueAtTime(50, t + 0.3);
-            gain2.gain.setValueAtTime(0.4, t + 0.3);
-            gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
-            osc2.start(t + 0.3); osc2.stop(t + 0.5);
-        }, 300);
-    } else if (type === 'success') {
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(400, t);
-        osc.frequency.linearRampToValueAtTime(800, t + 0.3);
-        gain.gain.setValueAtTime(0.1, t);
-        gain.gain.linearRampToValueAtTime(0.01, t + 0.5);
-        osc.start(t); osc.stop(t + 0.5);
+    let toastTimer;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
     }
-}
-
-// ==========================================
-// 2. نظام الجزيئات (الغبار/اليراعات)
-// ==========================================
-const particlesContainer = document.getElementById('particles-container');
-function createParticles() {
-    for (let i = 0; i < 20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.animationDelay = Math.random() * 10 + 's';
-        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        p.style.opacity = Math.random() * 0.5 + 0.2;
-        particlesContainer.appendChild(p);
-    }
-}
-createParticles();
-
-// ==========================================
-// 3. القصة والخيارات (State Machine)
-// ==========================================
-const story = {
-    // --- البداية ---
-    start: {
-        text: "تستيقظ في غابة مظلمة، رأسك يؤلمك بشدة. لا تتذكر كيف وصلت إلى هنا. أمامك كبسولة نجاة محطمة، وعلى يمينك طريق يؤدي إلى عمق الغابة المظلمة.",
-        env: "radial-gradient(circle at center, #1a2a1a 0%, #050505 100%)",
-        speaker: "الراوي",
-        next: "intro_choice"
-    },
-    intro_choice: {
-        text: "ماذا ستفعل أولاً؟",
-        choices: [
-            { text: "🔍 تفقّد كبسولة النجاة (قد تجد معدات)", next: "pod_path" },
-            { text: "🌲 المشي نحو عمق الغابة المظلمة", next: "forest_path" }
-        ]
-    },
-
-    // --- مسار 1: الكبسولة ---
-    pod_path: {
-        text: "تتجه نحو الكبسولة المحطمة. المعدن ساخن، والرائحة كريهة. تجد داخلها جهاز اتصال لاسلكي مكسور، وبندقية صيد بآخر رصاصة، وملاحظة مكتوبة بخط مرتجف: 'لا تصدر صوتاً.. إنها تسمع كل شيء'.",
-        env: "radial-gradient(circle at 30% 30%, #2a1a1a 0%, #050505 100%)",
-        speaker: "أنت",
-        next: "pod_choice"
-    },
-    pod_choice: {
-        text: "ماذا تأخذ؟",
-        choices: [
-            { text: "📻 محاولة إصلاح جهاز الاتصال", next: "radio_ending" },
-            { text: "🔫 أخذ البندقية والاختباء", next: "gun_path" }
-        ]
-    },
-    radio_ending: {
-        text: "تنجح في تشغيل الجهاز! تسمع صوتاً بشرياً: 'هل يسمعنا أحد؟ نحن قادمون لإنقاذك'. فجأة، ينقطع الاتصال. تسمع خطوات ثقيلة تقترب منك. تلتفت لتجد ظلاً ضخماً يقف خلفك... لقد جذبت انتباهها بصوتك.",
-        env: "radial-gradient(circle at center, #4a0000 0%, #000 100%)",
-        speaker: "نهاية مأساوية",
-        ending: "BAD",
-        endingDesc: "في الغابة، الصمت هو سلاحك الوحيد. فضولك كلفك حياتك."
-    },
-    gun_path: {
-        text: "تأخذ البندقية وتختبئ داخل الكبسولة. تمر دقائق طويلة. تسمع خطوات ثقيلة تقترب... ثم تبتعد. تنجو هذه الليلة. عند الفجر، ترى مروحية حربية تقترب بعد أن التقطت إشارة الكبسولة أوتوماتيكياً. أنت في أمان الآن.",
-        env: "radial-gradient(circle at center, #1a2a3a 0%, #050505 100%)",
-        speaker: "نهاية سعيدة",
-        ending: "GOOD",
-        endingDesc: "الحكمة والاختباء في الوقت المناسب أنقذا حياتك."
-    },
-
-    // --- مسار 2: الغابة ---
-    forest_path: {
-        text: "تتوغل في الغابة. الأشجار عالية لدرجة أنها تحجب ضوء القمر. فجأة، تسمع صوت أوراق يتحرك خلفك. تتوقف.. الصوت يتوقف. تلتفت يميناً، ترى كهفاً صغيراً، وعلى يسارك ضوء خافت يبدو كأنه نار مخيم بعيدة.",
-        env: "radial-gradient(circle at center, #0a1a0a 0%, #000 100%)",
-        speaker: "أنت",
-        next: "forest_choice"
-    },
-    forest_choice: {
-        text: "أين ستذهب؟",
-        choices: [
-            { text: "🔥 الجري نحو ضوء النار", next: "fire_ending" },
-            { text: "🦇 الاختباء داخل الكهف المظلم", next: "cave_ending" }
-        ]
-    },
-    fire_ending: {
-        text: "تركض بأقصى سرعة نحو الضوء. تصل لتجد معسكراً لصيادين مسلحين. يشرحون لك أن هذه الغابة مليئة بالوحوش، وأنهم كانوا في مهمة بحث عنك. يقدمون لك الطعام ويأخذونك إلى بر الأمان.",
-        env: "radial-gradient(circle at center, #3a2a1a 0%, #050505 100%)",
-        speaker: "نهاية سعيدة",
-        ending: "GOOD",
-        endingDesc: "أحياناً، المخاطرة والجري نحو النور هي الطريق الوحيد للنجاة."
-    },
-    cave_ending: {
-        text: "تدخل الكهف وتبقى في زاوية مظلمة. صوت الخطوات يقترب... يقف عند مدخل الكهف. تراه بعينيك: مخلوق ضخم ذو عيون حمراء. لا يراك بسبب الظلام. يشمشم الهواء ويبتعد. لكنك محاصر. تنقضي الأيام، والطعام ينفد، وتفقد وعيك ببطء... لن يصلك أحد.",
-        env: "radial-gradient(circle at center, #1a0a1a 0%, #000 100%)",
-        speaker: "نهاية مأساوية",
-        ending: "BAD",
-        endingDesc: "الاختباء لفترة طويلة قد يحميك من الوحش، لكنه لن ينجيك من الجوع واليأس."
-    }
-};
-
-// ==========================================
-// 4. محرك اللعبة (Game Engine)
-// ==========================================
-let currentState = "start";
-let isTyping = false;
-let typingTimer = null;
-let typeWriterResolve = null;
-
-const elText = document.getElementById('text');
-const elSpeaker = document.getElementById('speaker');
-const elChoices = document.getElementById('choices-container');
-const elDialogueBox = document.getElementById('dialogue-box');
-const elClickHint = document.getElementById('click-hint');
-const elEnv = document.getElementById('environment');
-
-// تأثير الكتابة
-function typeWriter(text) {
-    return new Promise(resolve => {
-        elText.innerText = '';
-        isTyping = true;
-        typeWriterResolve = resolve;
-        let i = 0;
-        
-        clearInterval(typingTimer);
-        typingTimer = setInterval(() => {
-            elText.innerText += text.charAt(i);
-            i++;
-            if (i >= text.length) {
-                clearInterval(typingTimer);
-                isTyping = false;
-                elClickHint.style.display = 'block';
-                resolve();
-            }
-        }, 35); // سرعة الكتابة
-    });
-}
-
-// دالة عرض المشهد
-async function loadScene(sceneId) {
-    const scene = story[sceneId];
-    if (!scene) return;
-
-    currentState = sceneId;
-    
-    // إخفاء الخيارات ومؤشر النقر
-    elChoices.style.display = 'none';
-    elClickHint.style.display = 'none';
-
-    // تغيير البيئة
-    if (scene.env) {
-        elEnv.style.background = scene.env;
-    }
-
-    // تأثيرات الرعب (اهتزاز ووميض)
-    if (scene.ending === 'BAD') {
-        document.getElementById('game-container').classList.add('shake');
-        playSound('scary');
-        setTimeout(() => document.getElementById('game-container').classList.remove('shake'), 600);
-        
-        const flash = document.getElementById('flash-red');
-        flash.style.opacity = '0.6';
-        setTimeout(() => flash.style.opacity = '0', 300);
-    } else if (scene.ending === 'GOOD') {
-        playSound('success');
-        const flash = document.getElementById('flash-white');
-        flash.style.opacity = '0.3';
-        setTimeout(() => flash.style.opacity = '0', 200);
-    }
-
-    // إعداد المتحدث
-    if (scene.speaker) {
-        elSpeaker.style.display = 'block';
-        elSpeaker.innerText = scene.speaker;
-    } else {
-        elSpeaker.style.display = 'none';
-    }
-
-    // تشغيل النص
-    elDialogueBox.style.display = 'block';
-    await typeWriter(scene.text);
-
-    // إذا كان هناك نهاية
-    if (scene.ending) {
-        elClickHint.style.display = 'none';
-        setTimeout(() => showEnding(scene), 1500);
-        return;
-    }
-
-    // إذا كان هناك خيارات
-    if (scene.choices) {
-        elClickHint.style.display = 'none';
-        elChoices.innerHTML = '';
-        scene.choices.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerText = choice.text;
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                playSound('click');
-                loadScene(choice.next);
-            };
-            elChoices.appendChild(btn);
-        });
-        elChoices.style.display = 'flex';
-    } 
-    // إذا كان هناك مشهد تالي (بدون خيارات)
-    else if (scene.next) {
-        elDialogueBox.onclick = () => {
-            if (isTyping) {
-                // تخطي الكتابة
-                clearInterval(typingTimer);
-                elText.innerText = scene.text;
-                isTyping = false;
-                elClickHint.style.display = 'block';
-                if (typeWriterResolve) typeWriterResolve();
-            } else {
-                // الانتقال للمشهد التالي
-                elDialogueBox.onclick = null;
-                playSound('click');
-                loadScene(scene.next);
-            }
-        };
-    }
-}
-
-// شاشة النهاية
-function showEnding(scene) {
-    const endScreen = document.getElementById('end-screen');
-    const title = document.getElementById('end-title');
-    const desc = document.getElementById('end-desc');
-
-    if (scene.ending === 'GOOD') {
-        title.innerText = "🌟 نجاة!";
-        title.style.color = "#2ecc71";
-        title.style.textShadow = "0 0 20px rgba(46, 204, 113, 0.5)";
-    } else {
-        title.innerText = "💀 النهاية";
-        title.style.color = "#e74c3c";
-        title.style.textShadow = "0 0 20px rgba(231, 76, 60, 0.5)";
-        // صوت نبضات القلب في النهاية المأساوية
-        playSound('heartbeat');
-        setTimeout(() => playSound('heartbeat'), 1000);
-    }
-    
-    desc.innerText = scene.endingDesc;
-    
-    endScreen.style.display = 'flex';
-    setTimeout(() => { endScreen.style.opacity = '1'; }, 50);
-}
-
-// ==========================================
-// 5. بدء اللعبة
-// ==========================================
-document.getElementById('start-btn').onclick = (e) => {
-    e.stopPropagation();
-    initAudio(); // تفعيل الصوت
-    playSound('click');
-    
-    // إخفاء شاشة البداية
-    const startScreen = document.getElementById('start-screen');
-    startScreen.style.opacity = '0';
-    setTimeout(() => startScreen.style.display = 'none', 1000);
-    
-    // تصغير الأشرطة السينمائية
-    document.querySelector('.top-bar').style.height = '5vh';
-    document.querySelector('.bottom-bar').style.height = '5vh';
-    
-    // بدء القصة
-    loadScene('start');
-};
-
-// منع التحديد المزدوج للشاشة
-document.addEventListener('touchstart', e => {
-    if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
 </script>
+
 </body>
 </html>
